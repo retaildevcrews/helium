@@ -25,7 +25,7 @@ assignees: ''
 
 
 ### Acceptance Criteria
-Reference: [Done-Done Checklist] (https://github.com/Microsoft/code-with-engineering-playbook/blob/master/Engineering/BestPractices/DoneDone.md)
+Reference: [Done - Approved WiKi Definition](https://github.com/RetailDevCrews/helium/wiki/Definition-of-Done)
 - [ ] Should ‹testable condition that should be satisfied›
 - [ ] Should ‹testable condition that should be satisfied›
 - [ ] …
@@ -46,9 +46,6 @@ Also, here are a few points that need to be addressed:
 
 
 ### Tasks
-*Stories are intended to be completed in a single sprint; if task breakdown creates addition work then team should discuss promoting the Story to an Epic.
-Reference: [Minimal Valuable Slices] (https://github.com/Microsoft/code-with-engineering-playbook/blob/master/Engineering/BestPractices/MinimalSlices.md)*
-
-Reference: [How to Write Better Tasks] (http://agilebutpragmatic.blogspot.com/2012/04/splitting-story-into-tasks-how-to-write.html)
-
 **_Assignee should break down work into tasks here_**
+- [ ] Update
+- [ ] Update
