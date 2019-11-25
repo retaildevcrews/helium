@@ -1,4 +1,4 @@
-name: CI-ACR
+name: CICD-ACR
 
 on:
   push:

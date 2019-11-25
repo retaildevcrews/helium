@@ -41,7 +41,7 @@ In the browser, navigate to your forked repo page in Github to set up credential
     - Name: REGISTRY_PASSWORD
     - Value: {copy output from `echo $He_SP_PWD_CICD` command}
 
-![alt text](../images/githubactions-cicd.jpg "Add Github Secret")
+![alt text](../images/githubactions-secret.jpg "Add Github Secret")
 
 ## Add Github Workflow File (.yml) 
 
@@ -55,6 +55,6 @@ In the browser, navigate to your forked repo page in Github to set up credential
 ## Verify Successful Workflow
 
 1. After merging changes into master, navigate to the Actions tab in your repo.
-2. You should see an instance of the newly added workflow (default name is CI-ACR) running or succesfully completed.
+2. You should see an instance of the newly added workflow (default name is CICD-ACR) running or succesfully completed.
 
 ![alt text](../images/githubactions-run.jpg "Successful Workflow Run")
