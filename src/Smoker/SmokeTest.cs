@@ -1,4 +1,5 @@
 ﻿using Helium;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -6,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.Serialization;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,9 +17,6 @@ namespace Smoker
     {
         private readonly List<Request> _requestList;
         private readonly string _baseUrl;
-
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions { AllowTrailingCommas = true };
-
         private readonly HttpClient _client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
 
         public Test(List<string> fileList, string baseUrl)
@@ -418,7 +415,7 @@ namespace Smoker
                 try
                 {
                     // deserialize the json
-                    var resList = JsonSerializer.Deserialize<List<dynamic>>(body, options: _jsonSerializerOptions) as List<dynamic>;
+                    var resList = JsonConvert.DeserializeObject<List<dynamic>>(body) as List<dynamic>;
 
                     // validate count
                     if (r.Validation.JsonArray.Count > 0 && r.Validation.JsonArray.Count != resList.Count)
@@ -472,7 +469,7 @@ namespace Smoker
                 try
                 {
                     // deserialize the json into an IDictionary
-                    IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(body, _jsonSerializerOptions);
+                    IDictionary<string, object> dict = JsonConvert.DeserializeObject<ExpandoObject>(body);
 
                     foreach (var f in r.Validation.JsonObject)
                     {
@@ -530,7 +527,7 @@ namespace Smoker
             try
             {
                 // deserialize json into a list (array)
-                List<Request> list = JsonSerializer.Deserialize<List<Request>>(json, _jsonSerializerOptions);
+                List<Request> list = JsonConvert.DeserializeObject<List<Request>>(json);
 
                 if (list != null && list.Count > 0)
                 {

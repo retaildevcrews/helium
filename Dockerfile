@@ -1,5 +1,5 @@
 ### build the app
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build
 
 ### Optional: Set Proxy Variables
 # ENV http_proxy {value}
@@ -19,7 +19,7 @@ RUN dotnet publish -c Release -o /app
 ###########################################################
 
 ### build the runtime container
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS runtime
 
 # create a user
 RUN groupadd -g 4120 helium && \
