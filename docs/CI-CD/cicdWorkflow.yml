@@ -1,0 +1,23 @@
+name: CICD-ACR
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Build and publish to ACR
+      uses: azure/docker-login@v1
+      with:
+        login-server: helium.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}    
+    - run: |
+        docker build -t helium.azurecr.io/helium-csharp:latest --target=release .
+        docker tag helium.azurecr.io/helium-csharp:latest helium.azurecr.io/helium-csharp:${{ github.sha }}
+        docker push helium.azurecr.io/helium-csharp:${{ github.sha }}
+        docker push helium.azurecr.io/helium-csharp:latest
