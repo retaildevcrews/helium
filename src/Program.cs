@@ -406,8 +406,9 @@ namespace Helium
                         // handle sleep (--sleep config.SleepMs)
                         else if (args[i].ToLower() == "--sleep")
                         {
-                            if (int.TryParse(args[i + 1], out Config.SleepMs))
+                            if (int.TryParse(args[i + 1], out int v))
                             {
+                                Config.SleepMs = v;
                                 i++;
                             }
 
@@ -423,8 +424,9 @@ namespace Helium
                         // handle config.Threads (--threads config.Threads)
                         else if (args[i].ToLower() == "--threads")
                         {
-                            if (int.TryParse(args[i + 1], out Config.Threads))
+                            if (int.TryParse(args[i + 1], out int v))
                             {
+                                Config.Threads = v;
                                 i++;
                             }
                             else
@@ -454,8 +456,9 @@ namespace Helium
                         // handle duration (--duration config.Duration (seconds))
                         else if (args[i].ToLower() == "--duration")
                         {
-                            if (int.TryParse(args[i + 1], out Config.Duration))
+                            if (int.TryParse(args[i + 1], out int v))
                             {
+                                Config.Duration = v;
                                 i++;
                             }
                             else
@@ -480,25 +483,37 @@ namespace Helium
             string env = Environment.GetEnvironmentVariable("RUNLOOP");
             if (!string.IsNullOrEmpty(env))
             {
-                bool.TryParse(env, out Config.RunLoop);
+                if (bool.TryParse(env, out bool b))
+                {
+                    Config.RunLoop = b;
+                }
             }
 
             env = Environment.GetEnvironmentVariable("RUNWEB");
             if (!string.IsNullOrEmpty(env))
             {
-                bool.TryParse(env, out Config.RunWeb);
+                if (bool.TryParse(env, out bool b))
+                {
+                    Config.RunWeb = b;
+                }
             }
 
             env = Environment.GetEnvironmentVariable("RANDOM");
             if (!string.IsNullOrEmpty(env))
             {
-                bool.TryParse(env, out Config.Random);
+                if (bool.TryParse(env, out bool b))
+                {
+                    Config.Random = b;
+                }
             }
 
             env = Environment.GetEnvironmentVariable("VERBOSE");
             if (!string.IsNullOrEmpty(env))
             {
-                bool.TryParse(env, out Config.Verbose);
+                if (bool.TryParse(env, out bool b))
+                {
+                    Config.Verbose = b;
+                }
             }
 
             env = Environment.GetEnvironmentVariable("HOST");
@@ -516,7 +531,11 @@ namespace Helium
             env = Environment.GetEnvironmentVariable("SLEEP");
             if (!string.IsNullOrEmpty(env))
             {
-                if (!int.TryParse(env, out Config.SleepMs))
+                if (int.TryParse(env, out int v))
+                {
+                    Config.SleepMs = v;
+                }
+                else
                 {
                     // exit on error
                     Console.WriteLine(_sleepParameterError, env);
@@ -527,7 +546,11 @@ namespace Helium
             env = Environment.GetEnvironmentVariable("THREADS");
             if (!string.IsNullOrEmpty(env))
             {
-                if (!int.TryParse(env, out Config.Threads))
+                if (int.TryParse(env, out int v))
+                {
+                    Config.Threads = v;
+                }
+                else
                 {
                     // exit on error
                     Console.WriteLine(_threadsParameterError, env);
