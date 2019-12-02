@@ -1,0 +1,171 @@
+# Learnings and Feedbacks from Java Spring-Boot SDK Usage
+
+Helium-Java is a Spring-Boot framework Java based reference application for using the Azure Web App for Containers service.
+Walmart is a big Java shop and has > 80% Spring framework usage hence Spring-Boot was chosen for building this reference app.
+
+## Following issues were uncovered and CSE feedbacks Filed as part of Helium-Java journey so far:
+
+### KeyVault:​
+
+Fail to get Key Vault access through MSI on local development environment​ [https://csefy19.visualstudio.com/CSE%20Feedback/_workitems/edit/262008]
+This is a security hole in development environment which was uncovered here and now is seen with Walmart as well
+
+```bash
+
+Local development environments cannot access keyvault thru MSI as below
+azure.keyvault.uri=https://gelato.vault.azure.net/
+azure.keyvault.client-id=17305c4a-13a8-444b-bb88-1a7e184f6b52
+azure.keyvault.client-key=
+
+
+Local development environments can access keyvault with clear-text as below
+azure.keyvault.uri=https://gelato.vault.azure.net/
+azure.keyvault.client-id=17305c4a-13a8-444b-bb88-1a7e184f6b52
+azure.keyvault.client-key=c5f6781e-8d02-47d3-8f79-cdf892590892
+
+```
+
+Needs fix in Java SDK azure-keyvault-secrets-spring-boot-starter to help Java development experience at par as C# SDKs
+
+### CosmosDB
+
+#### Spring framework does not support different document types in the same collection Spring patch needed​ [ https://csefy19.visualstudio.com/CSE%20Feedback/_workitems/edit/264307/]
+
+Spring framework's spring-data module is built on the following 3 principles:
+1. Repository pattern - No code repositories
+2. Reduced boiler plate code for CRUD operations
+3. Generated Queries ex: findBy
+
+
+```bash
+
+Defines an entity-specific repository
+
+@Entity
+public class Book {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @Version
+    private int version;
+
+    private String title;
+
+    @ManyToMany
+    @JoinTable(name = "book_author",
+                joinColumns = { @JoinColumn(name = "fk_book") },
+                inverseJoinColumns = { @JoinColumn(name = "fk_author") })
+    private List authors = new ArrayList();
+
+    ...
+}
+
+public interface BookRepository extends CrudRepository<Book, Long> {
+
+    Book findByTitle(String title);
+}
+
+RunWith(SpringRunner.class)
+@SpringBootTest
+public class GettingStartedApplicationTests {
+
+    Logger log = Logger.getLogger(this.getClass().getName());
+
+    @Autowired
+    private BookRepository bookRepository;
+
+
+    @Test
+    @Transactional
+    public void testByTitle() {
+        log.info("... testByTitle ...");
+
+        Book b = bookRepository.findByTitle("Hibernate Tips");
+        Assert.assertEquals(new Long(1), b.getId());
+    }
+
+    @Test
+    @Transactional
+    public void testPersistBook() {
+        log.info("... testPersistBook ...");
+
+        Book b = new Book();
+        b.setTitle("Hibernate Tips - More than 70 solutions to common Hibernate problems");
+
+        bookRepository.save(b);
+    }
+}
+
+
+```
+
+This is limitation and would need fix in in spring-boot itself. Spring-Boot entity framework works on entity<-> repo mapping. This would need fix in spring
+Hence we cannot have movies, genre,actors in the same "movies" collection.
+spring-data-cosmosdb expects to have 3 separate collections as "movies", "genre", "actor"
+However this is cost implication as "genre" collection having just 30 elements needs a separate collection and is 3 times the RU querying for 3 different collection.
+
+Java spring-data-cosmosdb needs patch from Spring framework itself.
+
+
+#### Support for single document read with partition key​ [https://csefy19.visualstudio.com/CSE%20Feedback/_workitems/edit/261697/]
+
+ ```bash
+repository.findById
+
+or
+
+repository.findBy<ColumnNameId>
+
+//is internally a QueryDocument call and not a readDocument call
+
+```
+
+There is no option to use readDocument with partition key via spring-boot Java SDK spring-data-cosmosdb
+
+
+#### support for usage metrics like GetRequestCharge​ [ https://csefy19.visualstudio.com/CSE%20Feedback/_workitems/edit/261698/]
+
+Need support for Usage metrics like GetRequestCharge on the findBy calls, since findBy does not return ResourceResponse<Document> or ChangeFeed and returns of Type<T>
+
+
+#### No native query support with @Query Annotation [https://csefy19.visualstudio.com/CSE%20Feedback/_workitems/edit/254390/]
+
+ ```bash
+@Query(“Select * from c where c.userId= :1 order by order by c.createdAt ”)
+
+List<User> retrieveByID(string userId);
+
+```
+
+#### Lack of significant features , got the aggregation feature working now.
+Other limitations
+unique keys, no support for multiple partition keys, only strings supported in partition keys etc
+
+#### Similar lack of features have been observed on B2C, App Insights, App Config modules, Java Search SDKs
+
+## Impact of Java
+
+###Community
+- Java is the second most popular programming language after Python as per 2019 linkedin stats with ~9 million Java engineers worldwide
+- ~6k java developers on Azure
+
+###To name few Customers on Azure Java (Almost all here are on Spring-Boot)
+
+- Walmart
+- Morgan Stanley
+- Kroger
+- Duetsche Bank
+- Schlumberger
+- Samsumg
+- BankOfAmerica
+- Pros
+
+Thru this forum we would like to re-iterate
+
+- Help support Java and Spring-Boot as a first-class technology across all Azure services​.
+
+- Help improve Java experience on Azure services working with Customers and PGs!​
+
+- Help Improve Java and Spring-Boot SDKs, bring them to them same level as C#! ​
