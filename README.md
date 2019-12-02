@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-This sample is an ASP.NET Core WebAPI application designed to "fork and code" with the following features:
+This is an ASP.NET Core WebAPI reference application designed to "fork and code" with the following features:
 
 - Securely build, deploy and run an App Service (Web App for Containers) application
 - Securely build, deploy and run an Azure Kubernetes Service application
@@ -67,7 +67,7 @@ nslookup ${He_Name}.azurecr.io
 
 Create Resource Groups
 
-- When experimenting with this sample, you should create new resource groups to avoid accidentally deleting resources
+- When experimenting with this app, you should create new resource groups to avoid accidentally deleting resources
 
   - If you use an existing resource group, please make sure to apply resource locks to avoid accidentally deleting resources
 
@@ -110,7 +110,7 @@ source ~/{yoursameuniquename}.env
 Create and load sample data into CosmosDB
 
 - This takes several minutes to run
-- This sample is designed to use a simple dataset from IMDb of 100 movies and their associated actors and genres
+- This app is designed to use a simple dataset from IMDb of 100 movies and their associated actors and genres
   - See full explanation of data model design decisions [here:](https://github.com/4-co/imdb)
 
 ```bash
@@ -148,7 +148,7 @@ docker run -it --rm fourco/imdb-import 100Movies $He_Name $He_Cosmos_RW_Key $He_
 Create Azure Key Vault
 
 - All secrets are stored in Azure Key Vault for security
-  - This sample uses Managed Identity to access Key Vault
+  - This app uses Managed Identity to access Key Vault
 
 ```bash
 
