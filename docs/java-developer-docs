@@ -1,13 +1,12 @@
-# Learnings and Feedbacks from Java Spring-Boot SDK Usage
+# Learnings from Helium-Java
 
 Helium-Java is a Spring-Boot framework Java based reference application for using the Azure Web App for Containers service.
 Walmart is a big Java shop and has > 80% Spring framework usage hence Spring-Boot was chosen for building this reference app.
 
-## Following issues were uncovered and CSE feedbacks Filed as part of Helium-Java journey so far:
 
-### KeyVault:​
+### KeyVault:
 
-Fail to get Key Vault access through MSI on local development environment​ [https://csefy19.visualstudio.com/CSE%20Feedback/_workitems/edit/262008]
+Fail to get Key Vault access through MSI on local development environment​
 This is a security hole in development environment which was uncovered here and now is seen with Walmart as well
 
 ```bash
@@ -29,7 +28,7 @@ Needs fix in Java SDK azure-keyvault-secrets-spring-boot-starter to help Java de
 
 ### CosmosDB
 
-#### Spring framework does not support different document types in the same collection Spring patch needed​ [ https://csefy19.visualstudio.com/CSE%20Feedback/_workitems/edit/264307/]
+#### Spring framework does not support different document types in the same collection Spring patch needed
 
 Spring framework's spring-data module is built on the following 3 principles:
 1. Repository pattern - No code repositories
@@ -109,7 +108,7 @@ However this is cost implication as "genre" collection having just 30 elements n
 Java spring-data-cosmosdb needs patch from Spring framework itself.
 
 
-#### Support for single document read with partition key​ [https://csefy19.visualstudio.com/CSE%20Feedback/_workitems/edit/261697/]
+#### Support for single document read with partition key
 
  ```bash
 repository.findById
@@ -125,12 +124,12 @@ repository.findBy<ColumnNameId>
 There is no option to use readDocument with partition key via spring-boot Java SDK spring-data-cosmosdb
 
 
-#### support for usage metrics like GetRequestCharge​ [ https://csefy19.visualstudio.com/CSE%20Feedback/_workitems/edit/261698/]
+#### support for usage metrics like GetRequestCharge
 
 Need support for Usage metrics like GetRequestCharge on the findBy calls, since findBy does not return ResourceResponse<Document> or ChangeFeed and returns of Type<T>
 
 
-#### No native query support with @Query Annotation [https://csefy19.visualstudio.com/CSE%20Feedback/_workitems/edit/254390/]
+#### No native query support with @Query Annotation
 
  ```bash
 @Query(“Select * from c where c.userId= :1 order by order by c.createdAt ”)
