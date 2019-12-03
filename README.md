@@ -99,6 +99,7 @@ Save your environment variables for ease of reuse and picking up where you left 
 
 # run the saveenv.sh script at any time to save He_* variables to ~/${He_Name}.env
 # make sure you are in the root of the repo
+chmod +x ./saveenv.sh
 ./saveenv.sh
 
 # at any point if your terminal environment gets cleared, you can source the file
