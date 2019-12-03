@@ -1,8 +1,8 @@
-# Build an ASP.NET Core application using App Service, Managed Identity and Key Vault
+# Build an ASP.NET Core, Node.js (in development), or Java Spring Boot (in development) application using Managed Identity and Key Vault
 
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-This is an ASP.NET Core WebAPI reference application designed to "fork and code" with the following features:
+This is a Web API reference application designed to "fork and code" with the following features:
 
 - Securely build, deploy and run an App Service (Web App for Containers) application
 - Securely build, deploy and run an Azure Kubernetes Service application
@@ -22,7 +22,7 @@ This is an ASP.NET Core WebAPI reference application designed to "fork and code"
   - Will not work in Cloud Shell unless you have a remote dockerd
 - Azure CLI 2.0.72+ ([download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest))
 - Docker CLI ([download](https://docs.docker.com/install/))
-- .NET Core SDK 3.0 ([download](https://dotnet.microsoft.com/download))
+- .NET Core SDK 3.0 (for .NET version) ([download](https://dotnet.microsoft.com/download))
 - Visual Studio Code (optional) ([download](https://code.visualstudio.com/download))
 
 ## Setup
