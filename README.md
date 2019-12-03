@@ -22,7 +22,7 @@ This is an ASP.NET Core WebAPI reference application designed to "fork and code"
   - Will not work in Cloud Shell unless you have a remote dockerd
 - Azure CLI 2.0.72+ ([download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest))
 - Docker CLI ([download](https://docs.docker.com/install/))
-- .NET Core SDK 2.2 ([download](https://dotnet.microsoft.com/download))
+- .NET Core SDK 3.0 ([download](https://dotnet.microsoft.com/download))
 - Visual Studio Code (optional) ([download](https://code.visualstudio.com/download))
 
 ## Setup
