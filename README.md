@@ -112,7 +112,7 @@ Create and load sample data into CosmosDB
 
 - This takes several minutes to run
 - This app is designed to use a simple dataset from IMDb of 100 movies and their associated actors and genres
-  - See full explanation of data model design decisions [here:](https://github.com/4-co/imdb)
+  - See full explanation of data model design decisions [here](https://github.com/RetailDevCrews/imdb)
 
 ```bash
 
