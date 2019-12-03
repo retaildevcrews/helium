@@ -251,7 +251,7 @@ Run the Integration Test
 
 cd src
 
-dotnet run -- --host https://${He_Name}.azurewebsites.net --files baseline.json
+dotnet run -- --host https://${He_Name}.azurewebsites.net --files 100MoviesTest/integration-test.json
 
 ```
 
