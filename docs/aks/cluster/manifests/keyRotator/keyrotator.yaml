@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kv-rotate
+  labels:
+    aadpodidbinding: podid-bluebell-kv-rotate
+spec:
+  selector:
+    matchLabels:
+      app: kv-rotate
+  template:
+    metadata:
+      labels:
+        app: kv-rotate
+        aadpodidbinding: podid-bluebell-kv-rotate
+    spec:
+      containers:
+      - name: kv-rotate
+        image: bluebell.azurecr.io/kr-aks
+        command: ["dotnet", "key-rotation.dll", "bluebell-aks"]
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"

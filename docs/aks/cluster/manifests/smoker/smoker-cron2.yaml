@@ -1,0 +1,19 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: smoker-job2
+  annotations:
+    fluxcd.io/ignore: "true"
+spec:
+  schedule: "*/20 * * * *"
+  successfulJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: smoker2
+              image: bluebell.azurecr.io/helium-aks-integration-test
+              imagePullPolicy: Always
+              command: ["dotnet", "integration-test.dll", "-h", "http://52.230.216.170.nip.io/","-t", "1", "-s", "100","-d","450"]
+          restartPolicy: OnFailure

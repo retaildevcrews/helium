@@ -1,0 +1,81 @@
+# Default values for bluebell.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+labels:
+  aadpodidbinding: podid
+replicaCount: 1
+
+image:
+  repository: bluebell.azurecr.io
+  name: helium-csharp-aks
+  tag: cj6
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+annotations:
+  linkerd.io/inject: enabled
+  
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 4120
+
+ingress:
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:4120;
+      proxy_hide_header l5d-remote-ip;
+      proxy_hide_header l5d-server-id;
+  hosts:
+    - host: 52.230.216.170.nip.io
+      paths: /
+
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: 
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+keyVaultName: bluebell-aks-kv
+
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  metricName: response_per_second
+  metricTargetValue: 4
