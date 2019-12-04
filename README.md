@@ -1,15 +1,15 @@
-# Build an ASP.NET Core application using App Service, Managed Identity and Key Vault
+# Build a Web API reference application using Managed Identity, Key Vault, and Cosmos DB that is designed to be deployed to Azure App Service or Azure Kubernetes Service (AKS)
 
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-This sample is an ASP.NET Core WebAPI application designed to "fork and code" with the following features:
+This is a Web API reference application designed to "fork and code" with the following features:
 
-- Securely build, deploy and run an App Service (Web App for Containers) application
-- Securely build, deploy and run an Azure Kubernetes Service application
+- Securely build, deploy and run an Azure App Service (Web App for Containers) application
+- Securely build, deploy and run an Azure Kubernetes Service (AKS) application
 - Use Managed Identity to securely access resources
 - Securely store secrets in Key Vault
-- Securely build and deploy the Docker container from Container Registry or Azure DevOps
-- Connect to and query CosmosDB
+- Securely build and deploy the Docker container from Azure Container Registry (ACR) or Azure DevOps
+- Connect to and query Cosmos DB
 - Automatically send telemetry and logs to Azure Monitor
 
 ![alt text](./docs/images/architecture.jpg "Architecture Diagram")
@@ -17,12 +17,12 @@ This sample is an ASP.NET Core WebAPI application designed to "fork and code" wi
 ## Prerequisites
 
 - Azure subscription with permissions to create:
-  - Resource Groups, Service Principals, Keyvault, CosmosDB, Azure Container Registry, Azure Monitor, App Service or AKS
+  - Resource Groups, Service Principals, Key Vault, Cosmos DB, Azure Container Registry, Azure Monitor, App Service or AKS
 - Bash shell (tested on Mac, Ubuntu, Windows with WSL2)
   - Will not work in Cloud Shell unless you have a remote dockerd
 - Azure CLI 2.0.72+ ([download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest))
 - Docker CLI ([download](https://docs.docker.com/install/))
-- .NET Core SDK 2.2 ([download](https://dotnet.microsoft.com/download))
+- .NET Core SDK 3.0 ([download](https://dotnet.microsoft.com/download))
 - Visual Studio Code (optional) ([download](https://code.visualstudio.com/download))
 
 ## Setup
@@ -67,12 +67,12 @@ nslookup ${He_Name}.azurecr.io
 
 Create Resource Groups
 
-- When experimenting with this sample, you should create new resource groups to avoid accidentally deleting resources
+- When experimenting with this app, you should create new resource groups to avoid accidentally deleting resources
 
   - If you use an existing resource group, please make sure to apply resource locks to avoid accidentally deleting resources
 
 - You will create 3 resource groups
-  - One for CosmosDB
+  - One for Cosmos DB
   - One for ACR
   - One for App Service or AKS, Key Vault and Azure Monitor
 
@@ -107,11 +107,11 @@ source ~/{yoursameuniquename}.env
 
 ```
 
-Create and load sample data into CosmosDB
+Create and load sample data into Cosmos DB
 
 - This takes several minutes to run
-- This sample is designed to use a simple dataset from IMDb of 100 movies and their associated actors and genres
-  - See full explanation of data model design decisions [here:](https://github.com/4-co/imdb)
+- This app is designed to use a simple dataset from IMDb of 100 movies and their associated actors and genres
+  - See full explanation of data model design decisions [here](https://github.com/RetailDevCrews/imdb)
 
 ```bash
 
@@ -120,7 +120,7 @@ export He_Cosmos_URL=https://${He_Name}.documents.azure.com:443/
 export He_Cosmos_DB=imdb
 export He_Cosmos_Col=movies
 
-# create the CosmosDB server
+# create the Cosmos DB server
 az cosmosdb create -g $He_Cosmos_RG -n $He_Name
 
 # create the database
@@ -148,14 +148,14 @@ docker run -it --rm fourco/imdb-import 100Movies $He_Name $He_Cosmos_RW_Key $He_
 Create Azure Key Vault
 
 - All secrets are stored in Azure Key Vault for security
-  - This sample uses Managed Identity to access Key Vault
+  - This app uses Managed Identity to access Key Vault
 
 ```bash
 
 ## create the Key Vault and add secrets
 az keyvault create -g $He_App_RG -n $He_Name
 
-# add CosmosDB keys
+# add Cosmos DB keys
 az keyvault secret set -o table --vault-name $He_Name --name "CosmosUrl" --value $He_Cosmos_URL
 az keyvault secret set -o table --vault-name $He_Name --name "CosmosKey" --value $He_Cosmos_RO_Key
 az keyvault secret set -o table --vault-name $He_Name --name "CosmosDatabase" --value $He_Cosmos_DB
@@ -250,7 +250,7 @@ Run the Integration Test
 
 cd src
 
-dotnet run -- --host https://${He_Name}.azurewebsites.net --files baseline.json
+dotnet run -- --host https://${He_Name}.azurewebsites.net --files 100MoviesTest/integration-test.json
 
 ```
 
@@ -259,10 +259,11 @@ dotnet run -- --host https://${He_Name}.azurewebsites.net --files baseline.json
 ```bash
 
 # build the Docker image
+# make sure you are in the root of the repo
 docker build . -t helium-integration
 
 # run the tests in the container
-docker run -it --rm helium-integration --host https://${He_Name}.azurewebsites.net --files baseline.json
+docker run -it --rm helium-integration --host https://${He_Name}.azurewebsites.net --files 100MoviesTest/integration-test.json
 
 ```
 
