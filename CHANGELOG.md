@@ -1,5 +1,9 @@
 # Change Log
 
+## Dec 5, 2019
+
+- Updated docs
+
 ## Nov 24, 2019
 
 - Split into helium and helium-csharp repos
