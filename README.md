@@ -1,4 +1,4 @@
-# Build an ASP.NET Core, Node.js (in development), or Java Spring Boot (in development) application using Managed Identity and Key Vault
+# Build a Web API reference application using Managed Identity, Key Vault, and Cosmos DB that is designed to be deployed to Azure App Service or AKS. 
 
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
@@ -9,7 +9,7 @@ This is a Web API reference application designed to "fork and code" with the fol
 - Use Managed Identity to securely access resources
 - Securely store secrets in Key Vault
 - Securely build and deploy the Docker container from Container Registry or Azure DevOps
-- Connect to and query CosmosDB
+- Connect to and query Cosmos DB
 - Automatically send telemetry and logs to Azure Monitor
 
 ![alt text](./docs/images/architecture.jpg "Architecture Diagram")
@@ -22,7 +22,7 @@ This is a Web API reference application designed to "fork and code" with the fol
   - Will not work in Cloud Shell unless you have a remote dockerd
 - Azure CLI 2.0.72+ ([download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest))
 - Docker CLI ([download](https://docs.docker.com/install/))
-- .NET Core SDK 3.0 (for .NET version) ([download](https://dotnet.microsoft.com/download))
+- .NET Core SDK 3.0 ([download](https://dotnet.microsoft.com/download))
 - Visual Studio Code (optional) ([download](https://code.visualstudio.com/download))
 
 ## Setup
