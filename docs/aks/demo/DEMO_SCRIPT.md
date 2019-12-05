@@ -222,7 +222,7 @@ az aks get-credentials -n $He_AKS_Name -g $He_App_RG
 kubectl get nodes
 ```
 
-Install AAD Pod Identity of 
+Install AAD Pod Identity for the application
 
 In the root of the clones repository make the `aad-podid.sh` script executable
 
@@ -299,7 +299,25 @@ Validate the install with:
 linkerd check
 ```
 
-## Install the Azure Application Gateway Ingress Controller
+## Install the NGNIX ingress controller
+
+Create a namespace for your ingress resources. There is a yaml file located in the clones repository under ./docs/aks/cluster/manifests/ingress-nginx-namespace.yaml
+
+```shell
+kubectl apply -f ingress-nginx-namespace.yaml
+```
+
+Use Helm to deploy an NGINX ingress controller
+
+```shell
+helm3 install stable/nginx-ingress \
+    --namespace ingress-nginx \
+    --set controller.replicaCount=2 \
+    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
+    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+```
+
+## Deploy the needed componenets of helium, key rotator and the testing harness
 
 
 
