@@ -8,11 +8,9 @@ Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally
 
 * Azure Container Registry
 * Azure Kubernetes Service
-  * Flux
-  * Helm3 Operator
   * Linkerd ServiceMesh
   * Prometheus
-  * NGINX Ingress Controller
+  * Azure Application Gateway Ingress Controller
   * Azure AAD Pod Identity
 * Azure Key Vault
 * Azure CosmosDB
@@ -30,6 +28,9 @@ Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally
 - Docker CLI ([download](https://docs.docker.com/install/))
 - .NET Core SDK 2.2 ([download](https://dotnet.microsoft.com/download))
 - Visual Studio Code (optional) ([download](https://code.visualstudio.com/download))
+- kubectl (install by using `sudo az aks install-cli`)
+- Helm v3 ([Install Instructions](https://helm.sh/docs/intro/install/))
+
 
 ### Setup
 
@@ -221,7 +222,7 @@ az aks get-credentials -n $He_AKS_Name -g $He_App_RG
 kubectl get nodes
 ```
 
-Install AAD Pod Identity
+Install AAD Pod Identity of 
 
 In the root of the clones repository make the `aad-podid.sh` script executable
 
@@ -230,6 +231,78 @@ sudo chmod +x aad-podid.sh
 
 ./aad-podid.sh -a ${He_AKS_Name} -r ${He_App_RG} -m ${He_Name}-msi
 ```
+
+## Install Helm 3
+
+Download the Helm v3 CLI:
+
+```shell
+# mac os
+OS=darwin-amd64 && \
+mkdir -p $HOME/.helm3/bin && \
+curl -sSL "https://get.helm.sh/helm-v3.0.0-${OS}.tar.gz" | tar xvz && \
+chmod +x ${OS}/helm && mv ${OS}/helm $HOME/.helm3/bin/helm3
+```
+
+or
+
+```shell
+# Linux/WSL
+OS=linux-amd64 && \
+mkdir -p $HOME/.helm3/bin && \
+curl -sSL "https://get.helm.sh/helm-v3.0.0-${OS}.tar.gz" | tar xvz && \
+chmod +x ${OS}/helm && mv ${OS}/helm $HOME/.helm3/bin/helm3
+```
+
+Add the helmv3 binary to your path and set Helm home:
+
+```shell
+export PATH=$PATH:$HOME/.helm3/bin
+export HELM_HOME=$HOME/.helm3
+```
+
+Verify the installation with:
+
+```shell
+helm3 version
+```
+
+Add the required helm repositories
+
+```shell
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
+helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
+helm repo add application-gateway-kubernetes-ingress https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
+helm repo update
+```
+
+## Install Linkerd Service Mesh into the cluster
+
+Download the Linkerd v2 CLI:
+
+```shell
+# macOS and linux/WSL
+
+curl -sL https://run.linkerd.io/install | sh
+export PATH=$PATH:$HOME/.linkerd2/bin
+```
+
+Install the Linkerd control plane in the linkerd namespace:
+
+```shell
+linkerd install | kubectl apply -f -
+```
+
+Validate the install with:
+
+```shell
+linkerd check
+```
+
+## Install the Azure Application Gateway Ingress Controller
+
+
+
 
 ## Dashboard setup
 
