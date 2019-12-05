@@ -1,9 +1,9 @@
-# Definition of Done
+# Engineers Practices
 
-## *This page documents what has been agreed to by Dev Team as the definition of done.*
+## Definition of Done
 
 * Code changes reviewed & signed off
-* Existing documentation is updated (readme, .md's, and/or wiki pages)
+* Existing documentation is updated (readme, .md's)
 * New documentation needed to support the change is created
 * Code changes checked into master
 * All existing automated tests (unit and/or e2e) pass successfully, new tests added as needed

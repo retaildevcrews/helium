@@ -1,11 +1,7 @@
 # Helium User Story 
 
-## EPIC
-*As a web application developer, I want a reference web application that is secure by default while leveraging engineering best practices so that I can easily fork and code and deploy.*
-
 ## USER STORY
-*As a web application developer, I want a secure reference application, so that I can securely store, access, and maintain secrets.*
-
+*As a web application developer, I want a reference web application that is secure by default while leveraging engineering best practices so that I can easily fork and code and deploy.*
 
 ### Acceptance Criteria:
 - Securely build, deploy and run an Azure App Service (Web App for Containers) application
