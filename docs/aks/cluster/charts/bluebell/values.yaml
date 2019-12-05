@@ -8,7 +8,7 @@ replicaCount: 1
 image:
   repository: bluebell.azurecr.io
   name: helium-csharp-aks
-  tag: cj6
+  tag: latest
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []

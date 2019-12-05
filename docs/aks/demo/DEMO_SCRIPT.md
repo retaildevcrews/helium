@@ -31,11 +31,25 @@ Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally
 - kubectl (install by using `sudo az aks install-cli`)
 - Helm v3 ([Install Instructions](https://helm.sh/docs/intro/install/))
 
-
 ### Setup
 
-- Fork this repo and clone to your local machine
-  - cd to the base directory of the repo
+Fork this repo and clone to your local machine
+
+```shell
+cd $HOME
+
+mkdir demo
+
+cd demo
+
+git clone https://github.com/RetailDevCrews/helium
+```
+
+Change into the base directory of the repo
+
+```shell
+cd helium
+```
 
 Login to Azure and select subscription
 
@@ -232,6 +246,12 @@ sudo chmod +x aad-podid.sh
 ./aad-podid.sh -a ${He_AKS_Name} -r ${He_App_RG} -m ${He_Name}-msi
 ```
 
+The last line of the output will explain the proper label annotation needed when deploying the application. This will be needed later during the application install
+
+```shell
+export LABEL=<output from aad-podid.sh>
+```
+
 ## Install Helm 3
 
 Download the Helm v3 CLI:
@@ -304,7 +324,7 @@ linkerd check
 Create a namespace for your ingress resources. There is a yaml file located in the clones repository under ./docs/aks/cluster/manifests/ingress-nginx-namespace.yaml
 
 ```shell
-kubectl apply -f ingress-nginx-namespace.yaml
+kubectl apply -f docs/aks/cluster/manifests/ingress-nginx-namespace.yaml
 ```
 
 Use Helm to deploy an NGINX ingress controller
@@ -319,8 +339,43 @@ helm3 install stable/nginx-ingress \
 
 ## Deploy the needed componenets of helium, key rotator and the testing harness
 
+An helm chart is included for the reference application ([helium](https://github.com/RetailDevCrews/helium-csharp))
 
+Install the Helm Chart located in the cloned directory
 
+```shell
+cd docs/aks/cluster/charts
+```
+
+Create a file called helm-config.yaml with the following contents that should be edited to fit the environment being deployed in
+
+```yaml
+# Default values for bluebell.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+labels:
+  aadpodidbinding: podid #should be value of $LABEL from the output o aad-podid.sh
+
+image:
+  repository: xxxx.azurecr.io #The spceific acr created for this environment
+  name: helium-csharp # The name of the image for the helium-csharp repo
+
+annotations:
+  linkerd.io/inject: enabled # Allows for the application to be injected into the Service Mesh
+
+ingress:
+  hosts:
+    - host: 52.230.216.170.nip.io # Replace the IP address with the IP of the nginx external IP. kubectl get svc -n ingress-nginx to see the correct IP
+      paths: /
+
+keyVaultName: helium-aks-kv # Replace with the name of the Key Vault that holds the secrets
+```
+
+This file can now be given to the the helm install as an override to the default values.
+
+```shell
+helm3 install helium-aks . --set image.repository=<acr_name>.azurecr.io -f helm-config.yaml
+```
 
 ## Dashboard setup
 
