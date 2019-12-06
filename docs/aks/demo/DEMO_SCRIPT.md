@@ -6,15 +6,15 @@ Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally
 
 ### Azure Components in Use
 
-* Azure Container Registry
-* Azure Kubernetes Service
-  * Linkerd ServiceMesh
-  * Prometheus
-  * Azure Application Gateway Ingress Controller
-  * Azure AAD Pod Identity
-* Azure Key Vault
-* Azure CosmosDB
-* Application Insights
+- Azure Container Registry
+- Azure Kubernetes Service
+  - Linkerd ServiceMesh
+  - Prometheus
+  - Azure Application Gateway Ingress Controller
+  - Azure AAD Pod Identity
+- Azure Key Vault
+- Azure CosmosDB
+- Application Insights
 
 ## Demo Install
 
