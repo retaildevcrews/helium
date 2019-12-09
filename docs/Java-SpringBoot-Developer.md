@@ -24,7 +24,7 @@ If you need access to Key Vault in your app, you can retrieve the Key Vault Clie
 
 Add the dependency "azure-keyvault-secrets-spring-boot-starter" and "azure-client-authentication" to the maven POM file
 
-[POM.xml] (https://github.com/microsoft/helium-java/blob/master/pom.xml) 
+[POM.xml](https://github.com/microsoft/helium-java/blob/master/pom.xml) 
 
 ```xml
 <dependencies>
@@ -65,7 +65,7 @@ azure.keyvault.uri=https://${KeyVaultName}.vault.azure.net/
 
 ### JAVA-SPRINGBOOT-KEYVAULT-SDK-GAP : Local Development issue with spring-boot starter for key-vault with MSI
 This does not works in the local development scenario as the spring-boot keyvault java sdk fails to get Key Vault access through MSI on local development environment​ 
-This is a security hole in development environment which was uncovered here and now is seen with Walmart as well
+This is a security hole in development environment which was uncovered here and now is seen with Customers as well
 
 Local development environments cannot access keyvault thru MSI as below
 ```properties
@@ -82,7 +82,7 @@ azure.keyvault.client-key=c5f6781e-8d02-47d3-8f79-cdf892590892
 ```
 ### Solution:
 1. Use clear-text for testing locally 
-2. Use service principal with client-key stored in the Azure DevOps as secret value - Samsclub is doing this
+2. Use service principal with client-key stored in the Azure DevOps as secret value - Customers are using this approach
 
 #### Now, you can get Azure Key Vault secret value as a configuration property in spring framework
 [Application.java] (https://github.com/microsoft/helium-java/blob/master/src/main/java/com/microsoft/azure/helium/Application.java)
@@ -335,7 +335,7 @@ Store the application insights instrumentation key in Key Vault to configure Hel
 
 Add the dependency "azure-keyvault-secrets-spring-boot-starter" and "azure-client-authentication" to the maven POM file
 
-[POM.xml] (https://github.com/microsoft/helium-java/blob/master/pom.xml) 
+[POM.xml](https://github.com/microsoft/helium-java/blob/master/pom.xml) 
 
 ```xml
     <dependency>
