@@ -1,10 +1,8 @@
-# Learnings from Helium-Java
+# Lessons learned from the Helium-Java project
 
-Helium-Java is a Spring-Boot framework Java based reference application for using the Azure Web App for Containers service.
-Walmart is a big Java shop and has > 80% Spring framework usage hence Spring-Boot was chosen for building this reference app.
+Helium-Java is a Spring-Boot framework Java based reference application for using the Azure Web Apps for Containers service.
 
-
-### KeyVault:
+## KeyVault
 
 Fail to get Key Vault access through MSI on local development environment​
 This is a security hole in development environment which was uncovered here and now is seen with Walmart as well
@@ -31,10 +29,10 @@ Needs fix in Java SDK azure-keyvault-secrets-spring-boot-starter to help Java de
 #### Spring framework does not support different document types in the same collection Spring patch needed
 
 Spring framework's spring-data module is built on the following 3 principles:
+
 1. Repository pattern - No code repositories
 2. Reduced boiler plate code for CRUD operations
 3. Generated Queries ex: findBy
-
 
 ```bash
 
@@ -107,7 +105,6 @@ However this is cost implication as "genre" collection having just 30 elements n
 
 Java spring-data-cosmosdb needs patch from Spring framework itself.
 
-
 #### Support for single document read with partition key
 
  ```bash
@@ -123,11 +120,9 @@ repository.findBy<ColumnNameId>
 
 There is no option to use readDocument with partition key via spring-boot Java SDK spring-data-cosmosdb
 
-
 #### support for usage metrics like GetRequestCharge
 
-Need support for Usage metrics like GetRequestCharge on the findBy calls, since findBy does not return ResourceResponse<Document> or ChangeFeed and returns of Type<T>
-
+Need support for Usage metrics like GetRequestCharge on the findBy calls, since findBy does not return `ResourceResponse<Document>` or ChangeFeed and returns of `Type<T>`
 
 #### No native query support with @Query Annotation
 
@@ -138,7 +133,8 @@ List<User> retrieveByID(string userId);
 
 ```
 
-#### Lack of significant features , got the aggregation feature working now.
+#### Lack of significant features , got the aggregation feature working now
+
 Other limitations
 unique keys, no support for multiple partition keys, only strings supported in partition keys etc
 
@@ -146,11 +142,12 @@ unique keys, no support for multiple partition keys, only strings supported in p
 
 ## Impact of Java
 
-###Community
+### Community
+
 - Java is the second most popular programming language after Python as per 2019 linkedin stats with ~9 million Java engineers worldwide
 - ~6k java developers on Azure
 
-###To name few Customers on Azure Java (Almost all here are on Spring-Boot)
+### To name few Customers on Azure Java (Almost all here are on Spring-Boot)
 
 - Walmart
 - Morgan Stanley
