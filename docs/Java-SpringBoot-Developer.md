@@ -274,9 +274,6 @@ public interface MoviesRepository extends DocumentDbRepository<Movie, String>  {
 }
  ```
 
-### Solution:
-1. Customers are moving to Cosmos Mongo for easier developer experience with features on Native queries, Cross doc queries, paginations, flexibility support
-
 ## AKS Pod Identity Support
 
 WIP 
