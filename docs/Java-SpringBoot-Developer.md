@@ -16,11 +16,11 @@
 
 ## Managed Identity and Key Vault
 
-After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to the Service Principal, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code.
+After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to the Service Principal, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in application code.
 
 ### Key Vault
 
-If you need access to Key Vault in your app, you can retrieve the Key Vault Client from Spring framework's DI rather than have to track credentials and create a new connection.
+If you need access to Key Vault in your application, you can retrieve the Key Vault Client from Spring framework's DI rather than have to track credentials and create a new connection.
 
 #### Adding Key Vault via Spring Configuration
 
@@ -43,22 +43,12 @@ Add the dependency "azure-keyvault-secrets-spring-boot-starter" and "azure-clien
 </dependencies>
 ```
 
-Open the application.properties file and add below properties to specify your Azure Key Vault url, Azure service principal client id and client key. azure.keyvault.enabled is used to turn on/off Azure Key Vault Secret property source, default is true.
+To use Managed Identity with App Service - please refer to [Using Managed Identity](https://docs.microsoft.com/en-us/azure/app-service/overview-managed-identity?tabs=dotnet)
+
+- Open the application.properties file and add below properties to specify your Azure Key Vault url
+- azure.keyvault.enabled is used to turn on/off Azure Key Vault Secret property source, default is true.
 
 [application.properties](https://github.com/microsoft/helium-java/blob/master/src/main/resources/application.properties)
-
-```properties
-
-azure.keyvault.enabled=true
-azure.keyvault.uri=https://${KeyVaultName}.vault.azure.net/
-azure.keyvault.client-id=${client_id}
-azure.keyvault.client-key=${client_key}
-
-```
-
-To use managed identity for App Services - please refer to [Using ManagedIdentities setup](https://docs.microsoft.com/en-us/azure/app-service/overview-managed-identity?tabs=dotnet)
-
-To use it in an App Service, add the below properties:
 
 ```properties
 azure.keyvault.enabled=true
@@ -67,23 +57,17 @@ azure.keyvault.uri=https://${KeyVaultName}.vault.azure.net/
 
 ### JAVA-SPRINGBOOT-KEYVAULT-SDK-GAP : Local Development issue with spring-boot starter for key-vault with MSI
 
-This does not works in the local development scenario as the spring-boot keyvault java sdk fails to get Key Vault access through MSI on local development environment​
-This is a security hole in development environment which was uncovered here and now is seen with Customers as well
+- This does not works in the local development scenario as the spring-boot keyvault java sdk fails to get Key Vault access through MSI on local development environment​
+- This is a security issue that affects the development environment
 
-Local development environments cannot access keyvault thru MSI as below
-
-```properties
-azure.keyvault.uri=https://${KeyVaultName}.vault.azure.net/
-azure.keyvault.client-id=${client_id}
-azure.keyvault.client-key=
-```
-
-Local development environments can access keyvault with clear-text as below
+Local development environment can only access keyvault with clear-text credentials as below
 
 ```properties
+
 azure.keyvault.uri=https://${KeyVaultName}.vault.azure.net/
 azure.keyvault.client-id=${client_id}
 azure.keyvault.client-key=${client_key}
+
 ```
 
 #### Solution
