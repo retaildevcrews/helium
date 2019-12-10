@@ -4,17 +4,19 @@
 
 1. [Managed Identity and Key Vault](#managed-identity-and-key-vault)
     - [Key Vault](#key-vault)
-2. [Key Rotation](#key-rotation) - Work in progress
+2. [Key Rotation](#key-rotation)
+    - Work in progress
 3. [Cosmos DB](#cosmos-db)
     - [Spring Repository Pattern](#spring-repository-pattern)
     - [Partition Key Function](#partition-key-usage-in-spring)
-4. [AKS Pod Identity Support](#aks-pod-identity-support) - Work in progress
+4. [AKS Pod Identity Support](#aks-pod-identity-support)
+    - Work in progress
 5. [Versioning](#versioning)
 6. [Application Insights](#application-insights)
 
 ## Managed Identity and Key Vault
 
-After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code.
+After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to the Service Principal, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code.
 
 ### Key Vault
 
@@ -41,7 +43,7 @@ Add the dependency "azure-keyvault-secrets-spring-boot-starter" and "azure-clien
 </dependencies>
 ```
 
-Open application.properties file and add below properties to specify your Azure Key Vault url, Azure service principal client id and client key. azure.keyvault.enabled is used to turn on/off Azure Key Vault Secret property source, default is true.
+Open the application.properties file and add below properties to specify your Azure Key Vault url, Azure service principal client id and client key. azure.keyvault.enabled is used to turn on/off Azure Key Vault Secret property source, default is true.
 
 [application.properties](https://github.com/microsoft/helium-java/blob/master/src/main/resources/application.properties)
 
@@ -54,7 +56,7 @@ azure.keyvault.client-key=${client_key}
 
 ```
 
-To use managed identities for App Services - please refer to [Using ManagedIdentities setup](https://docs.microsoft.com/en-us/azure/app-service/overview-managed-identity?tabs=dotnet)
+To use managed identity for App Services - please refer to [Using ManagedIdentities setup](https://docs.microsoft.com/en-us/azure/app-service/overview-managed-identity?tabs=dotnet)
 
 To use it in an App Service, add the below properties:
 
@@ -71,23 +73,23 @@ This is a security hole in development environment which was uncovered here and 
 Local development environments cannot access keyvault thru MSI as below
 
 ```properties
-azure.keyvault.uri=https://gelato.vault.azure.net/
-azure.keyvault.client-id=17305c4a-13a8-444b-bb88-1a7e184f6b52
+azure.keyvault.uri=https://${KeyVaultName}.vault.azure.net/
+azure.keyvault.client-id=${client_id}
 azure.keyvault.client-key=
 ```
 
 Local development environments can access keyvault with clear-text as below
 
 ```properties
-azure.keyvault.uri=https://gelato.vault.azure.net/
-azure.keyvault.client-id=17305c4a-13a8-444b-bb88-1a7e184f6b52
-azure.keyvault.client-key=c5f6781e-8d02-47d3-8f79-cdf892590892
+azure.keyvault.uri=https://${KeyVaultName}.vault.azure.net/
+azure.keyvault.client-id=${client_id}
+azure.keyvault.client-key=${client_key}
 ```
 
 #### Solution
 
 1. Use clear-text for testing locally
-2. Use service principal with client-key stored in the Azure DevOps as secret value - Customers are using this approach
+2. Use service principal with client-key stored in the Azure DevOps as secret value
 
 #### Now, you can get Azure Key Vault secret value as a configuration property in spring framework
 
@@ -137,12 +139,11 @@ However this is cost implication as "genre" collection having just 30 elements n
 
 #### Solution
 
-spring-data-cosmosdb-starter is based Spring-Boot's Spring-Data framework .
-Spring-Data Defines an entity-specific repository and is built on the following 3 principles:
-
-1. Repository pattern - No code repositories
-2. Reduced boiler plate code for CRUD operations
-3. Generated Queries ex: findBy
+- spring-data-cosmosdb-starter is based on Spring-Boot's Spring-Data framework
+- Spring-Data Defines an entity-specific repository and is built on the following 3 principles:
+  1. Repository pattern - No code repositories
+  2. Reduced boiler plate code for CRUD operations
+  3. Generated Queries ex: findBy
 
 ```java
 
@@ -199,7 +200,7 @@ public class MoviesService {
 
 ### Partition Key usage in Spring
 
-### JAVA-SPRINGBOOT-SDK-GAP: spring-boot cosmosdb sdk does not support single document read with partition key​ as it internally calls QueryDocument and not a ReadDocument hence it is not a 1 RU
+### JAVA-SPRINGBOOT-SDK-GAP: spring-boot cosmosdb sdk does not support single document read with partition key​ as it internally calls QueryDocument and not a ReadDocument hence it is not a 1 RU operation
 
 To query by partition id annotate field partition column with @partitionkey in the [document entity](https://github.com/jyotsnaravikumar/helium-java/blob/CSE-feedbacks/src/main/java/com/microsoft/azure/helium/app/movie/Movie.java)
 
@@ -225,7 +226,7 @@ public class Movie  extends  MovieBase{
 }
 ```
 
-Then Query by field name example findByMovieId as below:
+Then query by field name example findByMovieId as below:
 
 [MoviesService.java](https://github.com/jyotsnaravikumar/helium-java/blob/CSE-feedbacks/src/main/java/com/microsoft/azure/helium/app/movie/MoviesService.java)
 
@@ -287,9 +288,9 @@ public interface MoviesRepository extends DocumentDbRepository<Movie, String>  {
 
 ## Versioning
 
-Helium dynamically builds a version string based spring-boot snapshot version and date time of build. This is displayed in both the Healthz output as well as the Swagger UI.
+Helium dynamically builds a version string based on spring-boot snapshot version and date time of build. This is displayed in both the Healthz output as well as the Swagger UI.
 
-[BuildConfig.java](BuildConfig)
+[Build Config](BuildConfig.java)
 
 ```xml
     <plugin>
