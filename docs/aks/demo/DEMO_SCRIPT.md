@@ -330,7 +330,7 @@ kubectl apply -f docs/aks/cluster/manifests/ingress-nginx-namespace.yaml
 Use Helm to deploy an NGINX ingress controller
 
 ```shell
-helm3 install stable/nginx-ingress \
+helm3 install ingress stable/nginx-ingress \
     --namespace ingress-nginx \
     --set controller.replicaCount=2 \
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
