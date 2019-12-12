@@ -6,9 +6,9 @@ labels:
 replicaCount: 1
 
 image:
-  repository: bluebell.azurecr.io
-  name: helium-csharp-aks
-  tag: latest
+  repository: retaildevcrew
+  name: helium-csharp
+  tag: stable
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -71,7 +71,7 @@ tolerations: []
 
 affinity: {}
 
-keyVaultName: bluebell-aks-kv
+keyVaultName: ""
 
 hpa:
   enabled: true
