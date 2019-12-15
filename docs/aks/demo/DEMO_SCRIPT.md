@@ -65,7 +65,9 @@ az account set -s {subscription name or Id}
 
 ```
 
-Choose a unique DNS name
+This demo will create resource groups, a CosmosDB instance, Key Vault, Azure Container Registry, and Azure App Service.
+
+Choose a unique name for DNS and resource name prefix.
 
 ```bash
 
