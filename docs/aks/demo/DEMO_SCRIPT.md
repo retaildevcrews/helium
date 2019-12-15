@@ -200,7 +200,7 @@ az acr login -n $He_Name
 # If you get an error that the login server isn't available, it's a DNS issue that will resolve in a minute or two, just retry
 
 # Build the container with az acr build
-### Make sure you are in the src directory
+### Make sure you are in the root of the repo
 az acr build -r $He_Name -t $He_Name.azurecr.io/helium-csharp .
 
 ```
