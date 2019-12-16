@@ -162,6 +162,10 @@ if kubectl get deploy mic > /dev/null 2>&1; then
 fi
 
 echo "AAD Pod Identity has been deployed to you cluster $AKS_NAME and is using $MSI_NAME for its managed Identity"
-echo "Now you can configure ${MSI_NAME} to have access rihts to any azure resource based on Azure IAM roles"
+echo "Now you can configure ${MSI_NAME} to have access rights to any azure resource based on Azure IAM roles"
+echo " "
+echo "To assign the MSI to your keyvault run the following:"
+echo "az keyvault set-policy -n ${He_Name} --object-id ${MSI_PrincID} --secret-permissions get list --key-permissions get list --certificate-permissions get list"
+echo " "
 echo "Add the label below to your deployment to assign an aad MSi to those pods:"
-echo " aadpodidentity: podid=${MSI_NAME}"
+echo " aadpodidentity: podid-${MSI_NAME}"

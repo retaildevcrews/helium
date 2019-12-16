@@ -1,0 +1,31 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{  include "smoker.fullname" . }}3
+  annotations:
+    fluxcd.io/ignore: 'true'
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  schedule: '*/20 * * * *'
+  successfulJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: smoker3
+              image: retaildevcrew/helium-integration-test
+              imagePullPolicy: Always
+              command:
+                - dotnet
+                - integration-test.dll
+                - '-h'
+                - '{{ .Values.ingressURL }}'
+                - '-t'
+                - '1'
+                - '-s'
+                - '100'
+                - '-d'
+                - '450'
+          restartPolicy: OnFailure
