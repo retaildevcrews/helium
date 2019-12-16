@@ -65,7 +65,9 @@ az account set -s {subscription name or Id}
 
 ```
 
-Choose a unique DNS name
+This demo will create resource groups, a CosmosDB instance, Key Vault, Azure Container Registry, and Azure App Service.
+
+Choose a unique name for DNS and resource name prefix.
 
 ```bash
 
@@ -198,7 +200,7 @@ az acr login -n $He_Name
 # If you get an error that the login server isn't available, it's a DNS issue that will resolve in a minute or two, just retry
 
 # Build the container with az acr build
-### Make sure you are in the src directory
+### Make sure you are in the root of the repo
 az acr build -r $He_Name -t $He_Name.azurecr.io/helium-csharp .
 
 ```
@@ -238,9 +240,10 @@ kubectl get nodes
 
 Install AAD Pod Identity for the application
 
-In the root of the clones repository make the `aad-podid.sh` script executable
+Change directories to the `docs\aks` folder and make the `aad-podid.sh` script executable. Runnig this shell script will deploy AAD Pod Identity to your cluster and assign a Managed Identity.
 
 ```shell
+cd docs/aks
 sudo chmod +x aad-podid.sh
 
 ./aad-podid.sh -a ${He_AKS_Name} -r ${He_App_RG} -m ${He_Name}-msi
@@ -249,7 +252,13 @@ sudo chmod +x aad-podid.sh
 The last line of the output will explain the proper label annotation needed when deploying the application. This will be needed later during the application install
 
 ```shell
+<<<<<<< HEAD
 export LABEL="<output from aad-podid.sh>"
+=======
+export LABEL=<output from aad-podid.sh>
+
+# Optional: Run ./saveenv.sh to save latest variables
+>>>>>>> ca2ef2be3efce9d7586a77845039fbce278d9aed
 ```
 
 ## Install Helm 3
