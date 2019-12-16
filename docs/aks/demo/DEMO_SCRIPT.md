@@ -290,10 +290,10 @@ helm3 version
 Add the required helm repositories
 
 ```shell
-helm repo add stable https://kubernetes-charts.storage.googleapis.com
-helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
-helm repo add application-gateway-kubernetes-ingress https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
-helm repo update
+helm3 repo add stable https://kubernetes-charts.storage.googleapis.com
+helm3 repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
+helm3 repo add application-gateway-kubernetes-ingress https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
+helm3 repo update
 ```
 
 ## Install Linkerd Service Mesh into the cluster
