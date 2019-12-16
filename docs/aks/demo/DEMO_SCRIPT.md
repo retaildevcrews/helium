@@ -324,7 +324,7 @@ linkerd check
 Create a namespace for your ingress resources. There is a yaml file located in the clones repository under ./docs/aks/cluster/manifests/ingress-nginx-namespace.yaml
 
 ```shell
-kubectl apply -f docs/aks/cluster/manifests/ingress-nginx-namespace.yaml
+kubectl apply -f cluster/manifests/ingress-nginx-namespace.yaml
 ```
 
 Use Helm to deploy an NGINX ingress controller
