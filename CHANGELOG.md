@@ -1,5 +1,13 @@
 # Change Log
 
+## Dec 12, 2019
+
+- updated /healthz tests to new format
+
+## Dec 5, 2019
+
+- Updated docs
+
 ## Nov 24, 2019
 
 - Split into helium and helium-csharp repos
