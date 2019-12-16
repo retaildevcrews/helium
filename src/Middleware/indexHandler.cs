@@ -77,7 +77,7 @@ namespace Helium
             {
                 host += "/";
             }
-            host += "healthz";
+            host += "healthz/ietf";
 
             try
             {

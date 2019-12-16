@@ -60,9 +60,6 @@ namespace Smoker
             string body;
             string res = string.Empty;
 
-            // send the first request as a warm up
-            //await Warmup(requestList[0].Url);
-
             // send each request
             foreach (Request r in _requestList)
             {
@@ -343,7 +340,7 @@ namespace Smoker
         {
             string res = string.Empty;
 
-            if (!string.IsNullOrEmpty(r.ContentType))
+            if (!string.IsNullOrEmpty(r.Validation.ContentType))
             {
                 if (!resp.Content.Headers.ContentType.ToString().StartsWith(r.Validation.ContentType))
                 {

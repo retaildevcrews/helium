@@ -111,7 +111,7 @@ Create and load sample data into Cosmos DB
 
 - This takes several minutes to run
 - This app is designed to use a simple dataset from IMDb of 100 movies and their associated actors and genres
-  - See full explanation of data model design decisions [here](https://github.com/RetailDevCrews/imdb)
+  - See full explanation of data model design decisions [here](https://github.com/retaildevcrews/imdb)
 
 ```bash
 
@@ -139,7 +139,7 @@ export He_Cosmos_RO_Key=$(az cosmosdb keys list -n $He_Name -g $He_Cosmos_RG --q
 export He_Cosmos_RW_Key=$(az cosmosdb keys list -n $He_Name -g $He_Cosmos_RG --query primaryMasterKey -o tsv)
 
 # run the IMDb Import
-docker run -it --rm fourco/imdb-import 100Movies $He_Name $He_Cosmos_RW_Key $He_Cosmos_DB $He_Cosmos_Col
+docker run -it --rm retaildevcrew/imdb-import $He_Name $He_Cosmos_RW_Key $He_Cosmos_DB $He_Cosmos_Col
 
 # Optional: Run ./saveenv.sh to save latest variables
 
@@ -250,7 +250,7 @@ Run the Integration Test
 
 cd src
 
-dotnet run -- --host https://${He_Name}.azurewebsites.net --files 100MoviesTest/integration-test.json
+dotnet run -- --host https://${He_Name}.azurewebsites.net --files baseline.json
 
 ```
 
@@ -263,7 +263,7 @@ dotnet run -- --host https://${He_Name}.azurewebsites.net --files 100MoviesTest/
 docker build . -t helium-integration
 
 # run the tests in the container
-docker run -it --rm helium-integration --host https://${He_Name}.azurewebsites.net --files 100MoviesTest/integration-test.json
+docker run -it --rm helium-integration --host https://${He_Name}.azurewebsites.net --files baseline.json
 
 ```
 
