@@ -249,7 +249,7 @@ sudo chmod +x aad-podid.sh
 The last line of the output will explain the proper label annotation needed when deploying the application. This will be needed later during the application install
 
 ```shell
-export LABEL=<output from aad-podid.sh>
+export LABEL="<output from aad-podid.sh>"
 ```
 
 ## Install Helm 3
