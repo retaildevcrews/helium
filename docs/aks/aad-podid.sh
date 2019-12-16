@@ -143,11 +143,11 @@ if kubectl get deploy mic > /dev/null 2>&1; then
 fi
 
 echo "The aadpodidentitybiding resource will be deployed to cluster $AKS_NAME. It will be saved to your current directory as aadpodidentitybinding.yaml"
-cat << EOF > cluster/manifests/aadpodidentity/aadpodidentitybinding.yaml
+cat << EOF > cluster/manifests/aadpodidentity/${MSI_NAME}aadpodidentitybinding.yaml
 apiVersion: "aadpodidentity.k8s.io/v1"
 kind: AzureIdentityBinding
 metadata:
- name: ${MIS_NAME}-binding
+ name: ${MSI_NAME}-binding
 spec:
  AzureIdentity: ${MSI_NAME}
  Selector: podid-${MSI_NAME}
