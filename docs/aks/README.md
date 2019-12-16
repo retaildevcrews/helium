@@ -122,6 +122,7 @@ Save your environment variables for ease of reuse and picking up where you left 
 
 # run the saveenv.sh script at any time to save He_* variables to ~/${He_Name}.env
 # make sure you are in the root of the repo
+cd $REPO_ROOT
 ./saveenv.sh
 
 # at any point if your terminal environment gets cleared, you can source the file
@@ -252,6 +253,8 @@ sudo chmod +x aad-podid.sh
 
 The output will give the command to provide the MSI with the proper rights to the keyvault created earlier. Run the command as it is shown exactly in the output, (i.e.):
 
+### example
+
 ```shell
 az keyvault set-policy -n ejvtst1216 --object-id ff4634eb-662f-4faa-9c44-b03e41a09522 --secret-permissions get list --key-permissions get list --certificate-permissions get list
 ```
@@ -335,10 +338,10 @@ linkerd check
 
 ## Install the NGNIX ingress controller
 
-Create a namespace for your ingress resources. There is a yaml file located in the clones repository under ./docs/aks/cluster/manifests/ingress-nginx-namespace.yaml
+Create a namespace for your ingress resources. There is a yaml file located in the clones repository under `$REPO_ROOT/docs/aks/cluster/manifests/ingress-nginx-namespace.yaml`
 
 ```shell
-kubectl apply -f cluster/manifests/ingress-nginx-namespace.yaml
+kubectl apply -f $REPO_ROOT/docs/aks/cluster/manifests/ingress-nginx-namespace.yaml
 ```
 
 Use Helm to deploy an NGINX ingress controller
@@ -407,7 +410,7 @@ For more documentation on creating and sharing Dashboards, see ([here](https://d
 
 ## Optional
 
-A testing application was written to stress test the application and drive the Request Units on the CsomsoDB. You can deploy the application to AKS as a cronjob. The cronjobs can be deployed to your cluster via a helm chart located at `REPO_BASE/docs/aks/cluster/charts`.
+A testing application was written to stress test the application and drive the Request Units on the CsomsoDB. You can deploy the application to AKS as a cronjob. The cronjobs can be deployed to your cluster via a helm chart located at `REPO_ROOT/docs/aks/cluster/charts`.
 
 ```shell
 cd $REPO_ROOT/docs/aks/cluster/charts
