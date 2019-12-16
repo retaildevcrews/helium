@@ -240,9 +240,10 @@ kubectl get nodes
 
 Install AAD Pod Identity for the application
 
-In the root of the clones repository make the `aad-podid.sh` script executable
+Change directories to the `docs\aks` folder and make the `aad-podid.sh` script executable. Runnig this shell script will deploy AAD Pod Identity to your cluster and assign a Managed Identity.
 
 ```shell
+cd docs/aks
 sudo chmod +x aad-podid.sh
 
 ./aad-podid.sh -a ${He_AKS_Name} -r ${He_App_RG} -m ${He_Name}-msi
@@ -252,6 +253,8 @@ The last line of the output will explain the proper label annotation needed when
 
 ```shell
 export LABEL=<output from aad-podid.sh>
+
+# Optional: Run ./saveenv.sh to save latest variables
 ```
 
 ## Install Helm 3
