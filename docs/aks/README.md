@@ -298,6 +298,8 @@ export PATH=$PATH:$HOME/.helm/bin
 export HELM_HOME=$HOME/.helm
 ```
 
+>NOTE: This will only set the helm command during the existing terminal session. Copy the 2 lines above to your bash or zsh profile so that the helm command can be run any time.
+
 Verify the installation with:
 
 ```shell
