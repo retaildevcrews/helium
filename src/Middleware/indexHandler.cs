@@ -164,7 +164,7 @@ namespace Helium
             var list = App.Metrics.GetMetricList(maxAge);
             foreach (var r in list)
             {
-                html += string.Format($"{r.Key.PadLeft(r.Key.Length + 4).PadRight(24).Substring(0, 24)} {r.Count.ToString().PadLeft(12)} {Math.Round(r.Average,1).ToString().PadLeft(11)} {r.Min.ToString().PadLeft(11)} {r.Max.ToString().PadLeft(11)} \n");
+                html += string.Format($"{r.Key.PadLeft(r.Key.Length + 4).PadRight(24).Substring(0, 24)} {r.Count.ToString().PadLeft(12)} {Math.Round(r.Average, 1).ToString().PadLeft(11)} {r.Min.ToString().PadLeft(11)} {r.Max.ToString().PadLeft(11)} \n");
             }
 
             return html + "\n";
