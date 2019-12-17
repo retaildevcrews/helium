@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-## A good user story should be (I-N-V-E-S-T principle)**
+## A good user story should follow the I-N-V-E-S-T principle
 
 - _Independent_ (from other user stories, allowing to realize them in any order);
 - _Negotiable_ (omit details that would freeze the story);
@@ -22,16 +22,16 @@ assignees: ''
 
 ## Acceptance Criteria
 
-Reference: [Done - Approved WiKi Definition](https://github.com/RetailDevCrews/helium/wiki/Definition-of-Done)
+Reference: [Definition of Done](../../docs/EngineeringPractices.md)
 
 - [ ] Should "testable condition that should be satisfied"
 - [ ] Should "testable condition that should be satisfied"
 
 Also, here are a few points that need to be addressed:
 
-1. Constraint 1;
-1. Constraint 2;
-1. Constraint 3.
+- Constraint 1
+- Constraint 2
+- Constraint 3
 
 ## Resources
 
@@ -42,5 +42,5 @@ Also, here are a few points that need to be addressed:
 
 **_Assignee should break down work into tasks here_**
 
-- [ ] Update
-- [ ] Update
+- [ ] Task 1
+- [ ] Task 2
