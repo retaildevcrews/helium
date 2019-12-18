@@ -375,7 +375,7 @@ cd $REPO_ROOT/docs/aks/cluster/charts
 Create a file called helm-config.yaml with the following contents that should be edited to fit the environment being deployed in
 
 ```yaml
-# Default values for bluebell.
+# Default values for helium.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 labels:
@@ -399,7 +399,7 @@ keyVaultName: helium-aks-kv # Replace with the name of the Key Vault that holds 
 This file can now be given to the the helm install as an override to the default values.
 
 ```shell
-helm install helium-aks bluebell --set image.repository=<acr_name>.azurecr.io -f helm-config.yaml
+helm install helium-aks helium --set image.repository=<acr_name>.azurecr.io -f helm-config.yaml
 ```
 
 ## Dashboard setup

@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "bluebell.fullname" . }}
+  name: {{ include "helium.fullname" . }}
   labels:
 {{- toYaml .Values.labels | nindent 4 }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
-    app.kubernetes.io/name: {{ include "bluebell.name" . }}
+    app.kubernetes.io/name: {{ include "helium.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
   {{- with .Values.annotations }}
   annotations:
@@ -16,14 +16,14 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "bluebell.name" . }}
+      app.kubernetes.io/name: {{ include "helium.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
 {{- toYaml .Values.labels | nindent 8 }}
         chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
-        app.kubernetes.io/name: {{ include "bluebell.name" . }}
+        app.kubernetes.io/name: {{ include "helium.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
       {{- with .Values.annotations }}
       annotations:
@@ -34,7 +34,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ template "bluebell.serviceAccountName" . }}
+      serviceAccountName: {{ template "helium.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:

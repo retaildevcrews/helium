@@ -1,16 +1,16 @@
 # Setup CI-CD with ACR (Azure Container Registry) Task
+
 Azure Conainer Registry has the ability to do Docker builds directly from a GitHub repository. ACR can also do this as a task that can be triggered based on a schedule, webhook or git commit.
 
 ## Create a GitHub personal access token
+
 To trigger a task on a commit to a Git repository, ACR Tasks need a personal access token (PAT) to access the repository. If you do not already have a PAT, follow these steps to generate one in GitHub:
 
-1. Navigate to the PAT creation page on GitHub at https://github.com/settings/tokens/new
+1. Navigate to the PAT creation page on GitHub at <https://github.com/settings/tokens/new>
 
 2. Enter a short description for the token, for example, "ACR Tasks Demo"
 
 3. Select scopes for ACR to access the repo. To access a public repo as in this tutorial, under repo, enable repo:status and public_repo
-
-Screenshot of the Personal Access Token generation page in GitHub
 
  >Note: To generate a PAT to access a private repo, select the scope for full repo control.
 
@@ -18,9 +18,17 @@ Screenshot of the Personal Access Token generation page in GitHub
 
 5. Copy and save the generated token in a secure location (you use this token when you define a task in the following section)
 
-Screenshot of the generated Personal Access Token in GitHub
 
 ## Create the build task
+
+Fork the repository you want to work with. This example is using the <https://github.com/retaildevcrews/helium-csharp> repository.
+
+Once you have forkedthe repository then clone it to your local system
+
+```shell
+git clone http://github.com/gituser/helium-chsarp
+```
+
 Now that you've completed the steps required to enable ACR Tasks to read commit status and create webhooks in a repository, you can create a task that triggers a container image build on commits to the repo.
 
 First, populate these shell environment variables with values appropriate for your environment. This step isn't strictly required, but makes executing the multiline Azure CLI commands in this tutorial a bit easier. If you don't populate these environment variables, you must manually replace each value wherever it appears in the example commands.
@@ -43,7 +51,7 @@ az acr task create \
     --file Dockerfile \
     --git-access-token $GIT_PAT
  ```
- 
+
 This task specifies that any time code is committed to the master branch in the repository specified by --context, ACR Tasks will build the container image from the code in that branch. The Dockerfile specified by --file from the repository root is used to build the image. The --image argument can specify a parameterized value of {{.Run.ID}} for the version portion of the image's tag, ensuring the built image correlates to a specific build, and is tagged uniquely. This must be reflected correctly where the image is being pulled from.
 
 Output from a successful az acr task create command is similar to the following:
@@ -54,9 +62,9 @@ Output from a successful az acr task create command is similar to the following:
     "cpu": 2
   },
   "creationDate": "2018-09-14T22:42:32.972298+00:00",
-  "id": "/subscriptions/<Subscription ID>/resourceGroups/myregistry/providers/Microsoft.ContainerRegistry/registries/myregistry/tasks/taskhelloworld",
+  "id": "/subscriptions/<Subscription ID>/resourceGroups/myregistry/providers/Microsoft.ContainerRegistry/registries/myregistry/tasks/helium-csharp-build",
   "location": "westcentralus",
-  "name": "taskhelloworld",
+  "name": "helium-csharp-build",
   "platform": {
     "architecture": "amd64",
     "os": "Linux",
@@ -68,7 +76,7 @@ Output from a successful az acr task create command is similar to the following:
   "step": {
     "arguments": [],
     "baseImageDependencies": null,
-    "contextPath": "https://github.com/gituser/acr-build-helloworld-node",
+    "contextPath": "https://github.com/gituser/helium-csharp.git",
     "dockerFilePath": "Dockerfile",
     "imageNames": [
       "helloworld:{{.Run.ID}}"
@@ -90,7 +98,7 @@ Output from a successful az acr task create command is similar to the following:
         "name": "defaultSourceTriggerName",
         "sourceRepository": {
           "branch": "master",
-          "repositoryUrl": "https://github.com/gituser/acr-build-helloworld-node",
+          "repositoryUrl": "https://github.com/gituser/helium-csharp",
           "sourceControlAuthProperties": null,
           "sourceControlType": "GitHub"
         },
@@ -106,89 +114,157 @@ Output from a successful az acr task create command is similar to the following:
 ```
 
 ## Test the build task
+
 You now have a task that defines your build. To test the build pipeline, trigger a build manually by executing the az acr task run command:
 
 ```shell
-az acr task run --registry $ACR_NAME --name taskhelloworld
+az acr task run --registry $ACR_NAME --name helium-csharp-build
 ```
 
 By default, the az acr task run command streams the log output to your console when you execute the command.
 
 ```shell
-$ az acr task run --registry $ACR_NAME --name taskhelloworld
+az acr task run --registry $ACR_NAME --name helium-csharp-build
+2019/12/11 15:33:18 Downloading source code...
+2019/12/11 15:33:20 Finished downloading source code
+2019/12/11 15:33:21 Using acb_vol_df1899fb-9097-4edc-8698-010a308bb1f4 as the home volume
+2019/12/11 15:33:21 Setting up Docker configuration...
+2019/12/11 15:33:22 Successfully set up Docker configuration
+2019/12/11 15:33:22 Logging in to registry: myregejv.azurecr.io
+2019/12/11 15:33:23 Successfully logged into myregejv.azurecr.io
+2019/12/11 15:33:23 Executing step ID: build. Timeout(sec): 28800, Working directory: '', Network: ''
+2019/12/11 15:33:23 Scanning for dependencies...
+2019/12/11 15:33:24 Successfully scanned dependencies
+2019/12/11 15:33:24 Launching container with name: build
+Sending build context to Docker daemon  2.171MB
+Step 1/13 : FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
+2.2: Pulling from dotnet/core/sdk
+Digest: sha256:3ad18424d43e58cfc03ff828465a811463add47042de3ae0d1aeffbef97fd63d
+Status: Downloaded newer image for mcr.microsoft.com/dotnet/core/sdk:2.2
+ ---> 84120c6c3491
+Step 2/13 : COPY src /src
+ ---> 46ab1751d2cf
+Step 3/13 : WORKDIR /src/unit-tests
+ ---> Running in 0a7aa72ee7c3
+Removing intermediate container 0a7aa72ee7c3
+ ---> f9a0155bafdf
+Step 4/13 : RUN dotnet test --logger:trx
+ ---> Running in 08e7c6caa98f
+Test run for /src/unit-tests/bin/Debug/netcoreapp2.2/unit-tests.dll(.NETCoreApp,Version=v2.2)
+Microsoft (R) Test Execution Command Line Tool Version 16.0.1
+Copyright (c) Microsoft Corporation.  All rights reserved.
 
-2018/09/17 22:51:00 Using acb_vol_9ee1f28c-4fd4-43c8-a651-f0ed027bbf0e as the home volume
-2018/09/17 22:51:00 Setting up Docker configuration...
-2018/09/17 22:51:02 Successfully set up Docker configuration
-2018/09/17 22:51:02 Logging in to registry: myregistry.azurecr.io
-2018/09/17 22:51:03 Successfully logged in
-2018/09/17 22:51:03 Executing step: build
-2018/09/17 22:51:03 Obtaining source code and scanning for dependencies...
-2018/09/17 22:51:05 Successfully obtained source code and scanned for dependencies
-Sending build context to Docker daemon  23.04kB
-Step 1/5 : FROM node:9-alpine
-9-alpine: Pulling from library/node
-Digest: sha256:8dafc0968fb4d62834d9b826d85a8feecc69bd72cd51723c62c7db67c6dec6fa
-Status: Image is up to date for node:9-alpine
- ---> a56170f59699
-Step 2/5 : COPY . /src
- ---> 5f574fcf5816
-Step 3/5 : RUN cd /src && npm install
- ---> Running in b1bca3b5f4fc
-npm notice created a lockfile as package-lock.json. You should commit this file.
-npm WARN helloworld@1.0.0 No repository field.
+Starting test execution, please wait...
+Results File: /src/unit-tests/TestResults/_08e7c6caa98f_2019-12-11_15_33_53_087.trx
 
-up to date in 0.078s
-Removing intermediate container b1bca3b5f4fc
- ---> 44457db20dac
-Step 4/5 : EXPOSE 80
- ---> Running in 9e6f63ec612f
-Removing intermediate container 9e6f63ec612f
- ---> 74c3e8ea0d98
-Step 5/5 : CMD ["node", "/src/server.js"]
- ---> Running in 7382eea2a56a
-Removing intermediate container 7382eea2a56a
- ---> e33cd684027b
-Successfully built e33cd684027b
-Successfully tagged myregistry.azurecr.io/helloworld:da2
-2018/09/17 22:51:11 Executing step: push
-2018/09/17 22:51:11 Pushing image: myregistry.azurecr.io/helloworld:da2, attempt 1
-The push refers to repository [myregistry.azurecr.io/helloworld]
-4a853682c993: Preparing
-[...]
-4a853682c993: Pushed
-[...]
-da2: digest: sha256:c24e62fd848544a5a87f06ea60109dbef9624d03b1124bfe03e1d2c11fd62419 size: 1366
-2018/09/17 22:51:21 Successfully pushed image: myregistry.azurecr.io/helloworld:da2
-2018/09/17 22:51:21 Step id: build marked as successful (elapsed time in seconds: 7.198937)
-2018/09/17 22:51:21 Populating digests for step id: build...
-2018/09/17 22:51:22 Successfully populated digests for step id: build
-2018/09/17 22:51:22 Step id: push marked as successful (elapsed time in seconds: 10.180456)
-The following dependencies were found:
+Total tests: 17. Passed: 17. Failed: 0. Skipped: 0.
+Test Run Successful.
+Test execution time: 3.6850 Seconds
+Removing intermediate container 08e7c6caa98f
+ ---> 4b81f9b92c3a
+Step 5/13 : WORKDIR /src/app
+ ---> Running in 5ae762937b8d
+Removing intermediate container 5ae762937b8d
+ ---> 1f9906749135
+Step 6/13 : RUN dotnet publish -c Release -o /app
+ ---> Running in a9c911599d8c
+Microsoft (R) Build Engine version 16.0.450+ga8dc7f1d34 for .NET Core
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+  Restore completed in 111.39 ms for /src/app/helium.csproj.
+  Restore completed in 51.15 ms for /src/app/helium.csproj.
+  helium -> /src/app/bin/Release/netcoreapp2.2/helium.dll
+  helium -> /app/
+Removing intermediate container a9c911599d8c
+ ---> 611e55ac8be0
+Step 7/13 : FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
+2.2: Pulling from dotnet/core/aspnet
+Digest: sha256:470b07b57e48fc0b742f0498e7e4a1e697c17002317a33bd0dae0b9e6c6bc8ad
+Status: Downloaded newer image for mcr.microsoft.com/dotnet/core/aspnet:2.2
+ ---> 594143f47344
+Step 8/13 : EXPOSE 4120
+ ---> Running in 09e2364fec96
+Removing intermediate container 09e2364fec96
+ ---> 3ca723fd1ca1
+Step 9/13 : WORKDIR /app
+ ---> Running in 474baa1f0e11
+Removing intermediate container 474baa1f0e11
+ ---> 98c426308d00
+Step 10/13 : RUN groupadd -g 4120 helium &&     useradd -r  -u 4120 -g helium helium &&     mkdir -p /home/helium &&     chown -R helium:helium /home/helium
+ ---> Running in 1729b44dde16
+Removing intermediate container 1729b44dde16
+ ---> 7a66e67cae0d
+Step 11/13 : USER helium
+ ---> Running in f3ed2c7d3041
+Removing intermediate container f3ed2c7d3041
+ ---> 47dba89aa94c
+Step 12/13 : COPY --from=build /app .
+ ---> 84a42ac314cf
+Step 13/13 : ENTRYPOINT [ "dotnet",  "helium.dll" ]
+ ---> Running in ab774ad43fb5
+Removing intermediate container ab774ad43fb5
+ ---> 4aa71d1353a2
+Successfully built 4aa71d1353a2
+Successfully tagged myregejv.azurecr.io/helium-csharp:cj11
+2019/12/11 15:34:18 Successfully executed container: build
+2019/12/11 15:34:18 Executing step ID: push. Timeout(sec): 1800, Working directory: '', Network: ''
+2019/12/11 15:34:18 Pushing image: myregejv.azurecr.io/helium-csharp:cj11, attempt 1
+The push refers to repository [myregejv.azurecr.io/helium-csharp]
+3fd9e227cead: Preparing
+5c3bb1089f30: Preparing
+8281019f21b7: Preparing
+5788d77a8c40: Preparing
+a2f9ed91e120: Preparing
+75bb365bb264: Preparing
+99b5261d397c: Preparing
+75bb365bb264: Waiting
+99b5261d397c: Waiting
+a2f9ed91e120: Layer already exists
+5788d77a8c40: Layer already exists
+75bb365bb264: Layer already exists
+99b5261d397c: Layer already exists
+8281019f21b7: Pushed
+5c3bb1089f30: Pushed
+3fd9e227cead: Pushed
+cj11: digest: sha256:5c28202fe57c2fe289e3dd60b2a5b95a60eef657c2e0394fb87275b924fcf5e4 size: 1789
+2019/12/11 15:34:27 Successfully pushed image: myregejv.azurecr.io/helium-csharp:cj11
+2019/12/11 15:34:27 Step ID: build marked as successful (elapsed time in seconds: 54.801341)
+2019/12/11 15:34:27 Populating digests for step ID: build...
+2019/12/11 15:34:30 Successfully populated digests for step ID: build
+2019/12/11 15:34:30 Step ID: push marked as successful (elapsed time in seconds: 9.178506)
+2019/12/11 15:34:30 The following dependencies were found:
+2019/12/11 15:34:30
 - image:
-    registry: myregistry.azurecr.io
-    repository: helloworld
-    tag: da2
-    digest: sha256:c24e62fd848544a5a87f06ea60109dbef9624d03b1124bfe03e1d2c11fd62419
+    registry: myregejv.azurecr.io
+    repository: helium-csharp
+    tag: cj11
+    digest: sha256:5c28202fe57c2fe289e3dd60b2a5b95a60eef657c2e0394fb87275b924fcf5e4
   runtime-dependency:
-    registry: registry.hub.docker.com
-    repository: library/node
-    tag: 9-alpine
-    digest: sha256:8dafc0968fb4d62834d9b826d85a8feecc69bd72cd51723c62c7db67c6dec6fa
+    registry: mcr.microsoft.com
+    repository: dotnet/core/aspnet
+    tag: "2.2"
+    digest: sha256:470b07b57e48fc0b742f0498e7e4a1e697c17002317a33bd0dae0b9e6c6bc8ad
+  buildtime-dependency:
+  - registry: mcr.microsoft.com
+    repository: dotnet/core/sdk
+    tag: "2.2"
+    digest: sha256:3ad18424d43e58cfc03ff828465a811463add47042de3ae0d1aeffbef97fd63d
   git:
-    git-head-revision: 68cdf2a37cdae0873b8e2f1c4d80ca60541029bf
+    git-head-revision: ec1f8ee097c4797aee35f22643f1e0ce3e90490d
 
-
-Run ID: da2 was successful after 27s
-Trigger a build with a commit
+Run ID: cj11 was successful after 1m12s
 ```
+
+Trigger a build with a commit
 
 Now that you've tested the task by manually running it, trigger it automatically with a source code change.
 
-First, ensure you're in the directory containing your local clone of the repository. Make a small change the is inconsequential to the your local copy of the clones repository and then commit the change back to origin
+First, ensure you're in the directory containing your local clone of the repository. Make a small change that is inconsequential to the your local copy of the clones repository and then commit the change back to origin. AS an example add a blank line to the appsettings.json of the helium-csharp src code
 
 ```shell
-$ git push origin master
+git add appsettings.json
+git commit -m "Testing CI"
+git push origin master
 Username for 'https://github.com': <github-username>
 Password for 'https://githubuser@github.com': <personal-access-token>
 ```
@@ -202,7 +278,7 @@ az acr task logs --registry $ACR_NAME
 Output is similar to the following, showing the currently executing (or last-executed) task:
 
 ```shell
-$ az acr task logs --registry $ACR_NAME
+az acr task logs --registry $ACR_NAME
 Showing logs of the last created run.
 Run ID: da4
 
@@ -221,7 +297,7 @@ az acr task list-runs --registry $ACR_NAME --output table
 Output from the command should appear similar to the following. The runs that ACR Tasks has executed are displayed, and "Git Commit" appears in the TRIGGER column for the most recent task:
 
 ```shell
-$ az acr task list-runs --registry $ACR_NAME --output table
+az acr task list-runs --registry $ACR_NAME --output table
 
 RUN ID    TASK                  PLATFORM    STATUS     TRIGGER     STARTED               DURATION
 --------  --------------        ----------  ---------  ----------  --------------------  ----------
