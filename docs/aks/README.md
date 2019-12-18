@@ -42,7 +42,7 @@ mkdir demo
 
 cd demo
 
-git clone https://github.com/RetailDevCrews/helium
+git clone https://github.com/retaildevcrews/helium
 ```
 
 Change into the base directory of the repo
