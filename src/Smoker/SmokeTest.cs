@@ -71,26 +71,24 @@ namespace Smoker
                         dt = DateTime.UtcNow;
 
                         // process the response
-                        using (HttpResponseMessage resp = await _client.SendAsync(req))
+                        using HttpResponseMessage resp = await _client.SendAsync(req);
+                        body = await resp.Content.ReadAsStringAsync();
+
+                        Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss")}\t{(int)resp.StatusCode}\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
+
+                        // validate the response
+                        if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
                         {
-                            body = await resp.Content.ReadAsStringAsync();
+                            res = ValidateContentType(r, resp);
+                            res += ValidateContentLength(r, resp);
+                            res += ValidateContains(r, body);
+                            res += ValidateJsonArray(r, body);
+                            res += ValidateJsonObject(r, body);
 
-                            Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss")}\t{(int)resp.StatusCode}\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
-
-                            // validate the response
-                            if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
+                            if (!string.IsNullOrEmpty(res))
                             {
-                                res = ValidateContentType(r, resp);
-                                res += ValidateContentLength(r, resp);
-                                res += ValidateContains(r, body);
-                                res += ValidateJsonArray(r, body);
-                                res += ValidateJsonObject(r, body);
-
-                                if (!string.IsNullOrEmpty(res))
-                                {
-                                    Console.Write(res);
-                                    res = string.Empty;
-                                }
+                                Console.Write(res);
+                                res = string.Empty;
                             }
                         }
                     }
@@ -106,7 +104,7 @@ namespace Smoker
             return isError;
         }
 
-        public async Task<string> RunFromWebRequest(int id)
+        public async Task<string> RunFromWebRequest()
         {
             DateTime dt;
             HttpRequestMessage req;
@@ -131,20 +129,18 @@ namespace Smoker
                         dt = DateTime.UtcNow;
 
                         // process the response
-                        using (HttpResponseMessage resp = await _client.SendAsync(req))
+                        using HttpResponseMessage resp = await _client.SendAsync(req);
+                        body = await resp.Content.ReadAsStringAsync();
+
+                        res += string.Format($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss")}\t{(int)resp.StatusCode}\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t{resp.Content.Headers.ContentLength}\t{r.Url}\n");
+
+                        // validate the response
+                        if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
                         {
-                            body = await resp.Content.ReadAsStringAsync();
-
-                            res += string.Format($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss")}\t{(int)resp.StatusCode}\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t{resp.Content.Headers.ContentLength}\t{r.Url}\n");
-
-                            // validate the response
-                            if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
-                            {
-                                res += ValidateContentType(r, resp);
-                                res += ValidateContentLength(r, resp);
-                                res += ValidateContains(r, body);
-                                res += ValidateJsonArray(r, body);
-                            }
+                            res += ValidateContentType(r, resp);
+                            res += ValidateContentLength(r, resp);
+                            res += ValidateContains(r, body);
+                            res += ValidateJsonArray(r, body);
                         }
                     }
                 }
@@ -212,45 +208,43 @@ namespace Smoker
                             dt = DateTime.UtcNow;
 
                             // process the response
-                            using (HttpResponseMessage resp = await _client.SendAsync(req))
+                            using HttpResponseMessage resp = await _client.SendAsync(req);
+                            body = await resp.Content.ReadAsStringAsync();
+                            res = string.Empty;
+
+                            // validate the response
+                            if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
                             {
-                                body = await resp.Content.ReadAsStringAsync();
-                                res = string.Empty;
-
-                                // validate the response
-                                if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
-                                {
-                                    res = ValidateStatusCode(r, resp);
-                                    res = ValidateContentType(r, resp);
-                                    res += ValidateContentLength(r, resp);
-                                    res += ValidateContains(r, body);
-                                    res += ValidateJsonArray(r, body);
-                                }
-
-                                int duration = (int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds;
-
-                                // only log 4XX and 5XX status codes
-                                if (config.Verbose || (int)resp.StatusCode > 399 || !string.IsNullOrEmpty(res))
-                                {
-                                    if (config.RunWeb)
-                                    {
-                                        // datetime is redundant for web app
-                                        Console.WriteLine($"{id}\t{(int)resp.StatusCode}\t{duration}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine($"{id}\t{DateTime.UtcNow.ToString("MM/dd hh:mm:ss")}\t{duration}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
-                                    }
-
-                                    if (!string.IsNullOrEmpty(res))
-                                    {
-                                        // res has a LF appended, so don't use writeline
-                                        Console.Write(res);
-                                    }
-                                }
-
-                                App.Metrics.Add((int)resp.StatusCode, duration);
+                                res = ValidateStatusCode(r, resp);
+                                res = ValidateContentType(r, resp);
+                                res += ValidateContentLength(r, resp);
+                                res += ValidateContains(r, body);
+                                res += ValidateJsonArray(r, body);
                             }
+
+                            int duration = (int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds;
+
+                            // only log 4XX and 5XX status codes
+                            if (config.Verbose || (int)resp.StatusCode > 399 || !string.IsNullOrEmpty(res))
+                            {
+                                if (config.RunWeb)
+                                {
+                                    // datetime is redundant for web app
+                                    Console.WriteLine($"{id}\t{(int)resp.StatusCode}\t{duration}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"{id}\t{DateTime.UtcNow.ToString("MM/dd hh:mm:ss")}\t{duration}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
+                                }
+
+                                if (!string.IsNullOrEmpty(res))
+                                {
+                                    // res has a LF appended, so don't use writeline
+                                    Console.Write(res);
+                                }
+                            }
+
+                            App.Metrics.Add((int)resp.StatusCode, duration);
                         }
                     }
                     catch (System.Threading.Tasks.TaskCanceledException tce)
@@ -306,13 +300,9 @@ namespace Smoker
         {
             try
             {
-                using (var req = new HttpRequestMessage(new HttpMethod("GET"), MakeUrl(path)))
-                {
-                    using (var resp = await _client.SendAsync(req))
-                    {
-                        string body = await resp.Content.ReadAsStringAsync();
-                    }
-                }
+                using var req = new HttpRequestMessage(new HttpMethod("GET"), MakeUrl(path));
+                using var resp = await _client.SendAsync(req);
+                string body = await resp.Content.ReadAsStringAsync();
             }
 
             catch (Exception ex)
@@ -559,7 +549,7 @@ namespace Smoker
             // avoid // in the URL
             if (url.EndsWith("/") && path.StartsWith("/"))
             {
-                url = url.Substring(0, url.Length - 1);
+                url = url[0..^1];
             }
 
             return url + path;

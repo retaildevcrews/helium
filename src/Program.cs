@@ -603,6 +603,8 @@ namespace Helium
         // display the usage text
         private static void Usage()
         {
+            Console.WriteLine($"Version: {Helium.Version.AssemblyVersion}");
+            Console.WriteLine();
             Console.WriteLine("Usage: dotnet run -- [-h] [--help] --host hostUrl [--files file1.json [file2.json] [file3.json] ...]\n[--runloop] [--sleep sleepMs] [--threads numberOfThreads] [--duration durationSeconds] [--random]\n[--runweb] [--verbose] [--maxage maxMinutes]");
             Console.WriteLine("\t--host host name or host Url");
             Console.WriteLine("\t--files file1 [file2 file3 ...] (default *.json)");
