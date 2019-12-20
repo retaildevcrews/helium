@@ -1,8 +1,10 @@
 # Change Log
 
-## Dec 12, 2019
+## V0.4.0
 
+- Dec 19, 2019
 - updated /healthz tests to new format
+- Added AKS docs
 
 ## Dec 5, 2019
 

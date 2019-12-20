@@ -4,7 +4,7 @@ Setup Github Actions to build and push the helium container to Azure Container R
 
 ## Create Service Principal for ACR Push
 
-First, create a Service Principal and grant it ACR push access using the Azure CLI. 
+First, create a Service Principal and grant it ACR push access using the Azure CLI.
 
 ```bash
 
@@ -33,23 +33,23 @@ echo $He_SP_PWD_CICD
 In the browser, navigate to your forked repo page in Github to set up credentials with the newly created service principal.
 
 1. Go to Settings -> Secrets
-2. Select "Add a new secret" 
+2. Select "Add a new secret"
 3. Add the secret:
     - Name: REGISTRY_USERNAME
-    - Value: {copy output from `echo $He_SP_ID_CICD` command} 
+    - Value: {copy output from `echo $He_SP_ID_CICD` command}
 4. Add the secret:
     - Name: REGISTRY_PASSWORD
     - Value: {copy output from `echo $He_SP_PWD_CICD` command}
 
 ![alt text](../images/githubactions-secret.jpg "Add Github Secret")
 
-## Add Github Workflow File (.yml) 
+## Add Github Workflow File (.yml)
 
-1. Create a new branch in your forked repo off of master. 
-2. Copy the [cicdWorkflow.yml](./cicdWorkflow.yml) from this folder to your forked repo in the .github/workflows directory. If the .github folder does not already exist at the root, create one. 
+1. Create a new branch in your forked repo off of master.
+2. Copy the [cicdWorkflow.yml](./cicdWorkflow.yml) from this folder to your forked repo in the .github/workflows directory. If the .github folder does not already exist at the root, create one.
 3. Update the yml file in your forked repo with the name of your ACR. The file defaults to "helium", so update with $He_Name from previous readme steps.
-    - The workflow is designed to push the same image twice to ACR, one with the latest tag and one tagged with the last commit SHA.  Update the tagging strategy as needed. 
-    - It is also designed to be triggered on a push to the master branch, see [documentation](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#onpushpull_requestbranchestags) for more options. 
+    - The workflow is designed to push the same image twice to ACR, one with the latest tag and one tagged with the last commit SHA.  Update the tagging strategy as needed.
+    - It is also designed to be triggered on a push to the master branch, see [documentation](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#onpushpull_requestbranchestags) for more options.
 4. Merge changes into master through a pull request.  
 
 ## Verify Successful Workflow

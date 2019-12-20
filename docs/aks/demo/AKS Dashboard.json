@@ -1,0 +1,677 @@
+{
+  "properties": {
+    "lenses": {
+      "0": {
+        "order": 0,
+        "parts": {
+          "0": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 3,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "settings": {
+                    "content": "# Usage and Performance\n",
+                    "title": " ",
+                    "subtitle": " "
+                  }
+                }
+              }
+            }
+          },
+          "1": {
+            "position": {
+              "x": 3,
+              "y": 0,
+              "colSpan": 5,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/{SUBSCRIPTION_GUID}/resourceGroups/{AKS_RESOURCE_GROUP}/providers/microsoft.insights/components/helium-aks"
+                          },
+                          "name": "requests/count",
+                          "aggregationType": 7,
+                          "namespace": "microsoft.insights/components",
+                          "metricVisualization": {
+                            "displayName": "Server requests"
+                          }
+                        }
+                      ],
+                      "title": "Total Server requests",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "2": {
+            "position": {
+              "x": 8,
+              "y": 0,
+              "colSpan": 5,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/{SUBSCRIPTION_GUID}/resourceGroups/{AKS_RESOURCE_GROUP}/providers/microsoft.insights/components/helium-aks"
+                          },
+                          "name": "requests/duration",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.insights/components",
+                          "metricVisualization": {
+                            "displayName": "Server response time"
+                          }
+                        }
+                      ],
+                      "title": "Avg Server Response Time",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "3": {
+            "position": {
+              "x": 0,
+              "y": 3,
+              "colSpan": 3,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "settings": {
+                    "content": "# Usage Breakdown",
+                    "title": "  ",
+                    "subtitle": ""
+                  }
+                }
+              }
+            }
+          },
+          "4": {
+            "position": {
+              "x": 3,
+              "y": 3,
+              "colSpan": 5,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/{SUBSCRIPTION_GUID}/resourceGroups/{AKS_RESOURCE_GROUP}/providers/microsoft.insights/components/helium-aks"
+                          },
+                          "name": "requests/count",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.insights/components/kusto",
+                          "metricVisualization": {
+                            "displayName": "Server requests"
+                          }
+                        }
+                      ],
+                      "title": "Total Server Requests by Pod",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      },
+                      "grouping": {
+                        "dimension": "cloud/roleInstance",
+                        "sort": 2,
+                        "top": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "5": {
+            "position": {
+              "x": 8,
+              "y": 3,
+              "colSpan": 5,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/{SUBSCRIPTION_GUID}/resourceGroups/{COSMOS_RESOURCE_GROUP}/providers/Microsoft.DocumentDB/databaseAccounts/helium-aks"
+                          },
+                          "name": "TotalRequestUnits",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.documentdb/databaseaccounts",
+                          "metricVisualization": {
+                            "displayName": "Total Request Units",
+                            "resourceDisplayName": "helium-aks"
+                          }
+                        },
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/{SUBSCRIPTION_GUID}/resourceGroups/{COSMOS_RESOURCE_GROUP}/providers/Microsoft.DocumentDB/databaseAccounts/helium-aks"
+                          },
+                          "name": "TotalRequests",
+                          "aggregationType": 7,
+                          "namespace": "microsoft.documentdb/databaseaccounts",
+                          "metricVisualization": {
+                            "displayName": "Total Requests",
+                            "resourceDisplayName": "helium-aks"
+                          }
+                        }
+                      ],
+                      "title": "Total RUs for Cosmos DB",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "6": {
+            "position": {
+              "x": 0,
+              "y": 6,
+              "colSpan": 3,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "settings": {
+                    "content": "# Failed Requests\n",
+                    "title": "  ",
+                    "subtitle": "  "
+                  }
+                }
+              }
+            }
+          },
+          "7": {
+            "position": {
+              "x": 3,
+              "y": 6,
+              "colSpan": 5,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/{SUBSCRIPTION_GUID}/resourceGroups/{AKS_RESOURCE_GROUP}/providers/microsoft.insights/components/helium-aks"
+                          },
+                          "name": "requests/failed",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.insights/components/kusto",
+                          "metricVisualization": {
+                            "displayName": "Failed requests"
+                          }
+                        }
+                      ],
+                      "title": "Total Failed Requests by Response Code",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      },
+                      "grouping": {
+                        "dimension": "request/resultCode",
+                        "sort": 2,
+                        "top": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "8": {
+            "position": {
+              "x": 8,
+              "y": 6,
+              "colSpan": 5,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/{SUBSCRIPTION_GUID}/resourceGroups/{AKS_RESOURCE_GROUP}/providers/microsoft.insights/components/helium-aks"
+                          },
+                          "name": "requests/failed",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.insights/components/kusto",
+                          "metricVisualization": {
+                            "displayName": "Failed requests"
+                          }
+                        }
+                      ],
+                      "title": "Total Failed Requests by Request Path",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 1,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      },
+                      "grouping": {
+                        "dimension": "request/urlPath",
+                        "sort": 2,
+                        "top": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "9": {
+            "position": {
+              "x": 0,
+              "y": 9,
+              "colSpan": 3,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "settings": {
+                    "content": "# Cosmos Key Rotation\n\n",
+                    "title": " ",
+                    "subtitle": ""
+                  }
+                }
+              }
+            }
+          },
+          "10": {
+            "position": {
+              "x": 3,
+              "y": 9,
+              "colSpan": 5,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/{SUBSCRIPTION_GUID}/resourceGroups/{AKS_RESOURCE_GROUP}/providers/microsoft.insights/components/helium-aks"
+                          },
+                          "name": "keyRotated",
+                          "aggregationType": 7,
+                          "namespace": "azure.applicationinsights",
+                          "metricVisualization": {
+                            "displayName": "keyRotated",
+                            "resourceDisplayName": "helium-aks"
+                          }
+                        }
+                      ],
+                      "title": "helium Key Rotated ",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 1,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "11": {
+            "position": {
+              "x": 8,
+              "y": 9,
+              "colSpan": 5,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/{SUBSCRIPTION_GUID}/resourceGroups/{AKS_RESOURCE_GROUP}/providers/microsoft.insights/components/helium-aks"
+                          },
+                          "name": "newKeyLoaded",
+                          "aggregationType": 7,
+                          "namespace": "azure.applicationinsights",
+                          "metricVisualization": {
+                            "displayName": "newKeyLoaded",
+                            "resourceDisplayName": "helium-aks"
+                          }
+                        }
+                      ],
+                      "title": "New Cosmos Key Loaded",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 1,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        },
+        "filterLocale": {
+          "value": "en-us"
+        },
+        "filters": {
+          "value": {
+            "MsPortalFx_TimeRange": {
+              "model": {
+                "format": "local",
+                "granularity": "auto",
+                "relative": "30m"
+              },
+              "displayCache": {
+                "name": "Local Time",
+                "value": "Past 30 minutes"
+              },
+              "filteredPartIds": [
+                "StartboardPart-MonitorChartPart-8cc9dc6f-5c41-432f-b8ce-28be37430462",
+                "StartboardPart-MonitorChartPart-8cc9dc6f-5c41-432f-b8ce-28be37430464",
+                "StartboardPart-MonitorChartPart-8cc9dc6f-5c41-432f-b8ce-28be37430468",
+                "StartboardPart-MonitorChartPart-8cc9dc6f-5c41-432f-b8ce-28be3743046a",
+                "StartboardPart-MonitorChartPart-8cc9dc6f-5c41-432f-b8ce-28be3743046e",
+                "StartboardPart-MonitorChartPart-8cc9dc6f-5c41-432f-b8ce-28be37430470",
+                "StartboardPart-MonitorChartPart-8cc9dc6f-5c41-432f-b8ce-28be37430474",
+                "StartboardPart-MonitorChartPart-8cc9dc6f-5c41-432f-b8ce-28be37430476"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "helium AKS Dashboard",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "helium AKS Dashboard"
+  },
+  "apiVersion": "2015-08-01-preview"
+}
