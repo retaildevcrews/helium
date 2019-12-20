@@ -1,6 +1,7 @@
 # C#/ASP.NET Developer Documentation
 
-## Index:
+## Index
+
 1. [Managed Identity and Key Vault](#managed-identity-and-key-vault)
 2. [Key Rotation](#key-rotation)
 3. [Cosmos DB](#cosmos-db)
@@ -17,15 +18,16 @@
 
 ## Managed Identity and Key Vault
 
-After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code. This also works in the local development scenario as long as the developer has access to the Key Vault and is logged in to the Azure CLI with az login. 
+After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code. This also works in the local development scenario as long as the developer has access to the Key Vault and is logged in to the Azure CLI with az login.
 
 [Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L240)
+
 ```c#
 
 // use Managed Identity (MSI) for secure access to Key Vault
 var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
 
-// read a key to make sure the connection is valid 
+// read a key to make sure the connection is valid
 await keyVaultClient.GetSecretAsync(kvUrl, Constants.CosmosUrl);
 
 // return the client
@@ -38,6 +40,7 @@ return keyVaultClient;
 ASP.NET IConfiguration does not currently track changes to Key Vault secrets. Helium implements a loop in Program.cs that continuously checks Key Vault for changes to the CosmosDB paramaters and calls IDal::Reconnect so that Key Rotation and other scenarios can be supported.
 
 [Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L83)
+
 ```c#
 
 // reload the config from Key Vault
@@ -66,6 +69,7 @@ if (key != config[Constants.CosmosKey])
 The Reconnect method on IDal allows you to programmatically change your CosmosDB client configuration. If one or more of the connection paramaters changed, Reconnect will attempt to connect to CosmosDB using the new Url, key, database and collection. If it fails, the data access layer will continue using the existing credentials. The force parameter allows you to force the reconnect even if the other parameters don't change.
 
 [dalMain.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L46)
+
 ```c#
 
 public async Task Reconnect(string cosmosUrl, string cosmosKey, string cosmosDatabase, string cosmosCollection, bool force = false)
@@ -99,6 +103,7 @@ public async Task Reconnect(string cosmosUrl, string cosmosKey, string cosmosDat
 Open and test the CosmosDB connection / database / collection. The call to ReadItemAsync retrieves the Action Genre document and verifies that the new parameters can read the collection.
 
 [Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L80)
+
 ```c#
 
 var c = new CosmosClient(cosmosUrl, cosmosKey, _cosmosDetails.CosmosClientOptions);
@@ -112,6 +117,7 @@ await con.ReadItemAsync<dynamic>("action", new PartitionKey("0"));
 In order to directly read a document using 1 RU (assuming the document is 1K or less), you need the document's ID and partition key. A good CosmosDB best practice is to compute the partition key from the ID. In our case, we use the integer portion of the Movie or Actor document mod 10. This gives us 10 partitions ("0" - "9") with good distribution. For a deeper discussion on the document modeling decisions, please read this [document](https://github.com/4-co/imdb)
 
 [Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L119)
+
 ```c#
 
 public static string GetPartitionKey(string id)
@@ -138,6 +144,7 @@ The first time an AKS pod uses a Managed Identity, it has to start a new proxy. 
 Note that once the MI proxy is running, responses are generally under 100ms, so the retry code is not used in that case. The retry code is also not used in the App Service scenario as App Service ensures the proxy is running before starting Helium.
 
 [Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L228)
+
 ```c#
 
 /// <summary>
@@ -160,7 +167,7 @@ static async Task<KeyVaultClient> GetKeyVaultClient(string kvUrl)
             // use Managed Identity (MSI) for secure access to Key Vault
             var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
 
-            // read a key to make sure the connection is valid 
+            // read a key to make sure the connection is valid
             await keyVaultClient.GetSecretAsync(kvUrl, Constants.CosmosUrl);
 
             // return the client
@@ -190,9 +197,10 @@ static async Task<KeyVaultClient> GetKeyVaultClient(string kvUrl)
 
 ## Versioning
 
-Helium dynamically builds a version string based on the assembly version and date time of build. This is displayed in both the Healthz output as well as the Swagger UI. 
+Helium dynamically builds a version string based on the assembly version and date time of build. This is displayed in both the Healthz output as well as the Swagger UI.
 
 [Version.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Version.cs#L12)
+
 ```c#
 
 string file = System.Reflection.Assembly.GetExecutingAssembly().Location;
@@ -208,13 +216,14 @@ return string.Format($"{aVer.Major}.{aVer.Minor}.{dt.ToString("MMdd.HHmm")}");
 
 ASP.Net Core uses Dependency Injection (DI) to share objects across different controllers and modules.
 
-### Key Vault 
+### Key Vault
 
 If you need access to Key Vault in your app, you can retrieve the Key Vault Client from ASP.NET's DI rather than have to track credentials and create a new connection.
 
 #### Adding Key Vault via ASP.NET DI
 
 [KeyVaultConnectionExtension.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/KeyVaultConnectionExtension.cs#L8)
+
 ```c#
 
 public static IServiceCollection AddKeyVaultConnection(this IServiceCollection services, KeyVaultClient client, string uri)
@@ -238,6 +247,7 @@ public static IServiceCollection AddKeyVaultConnection(this IServiceCollection s
 var keyVaultConn = _host.Services.GetService<IKeyVaultConnection>();
 
 ```
+
 ### Data Access Layer (DAL)
 
 The controllers need access to Helium's implementation of IDal in order to retrieve results from CosmosDB, so we add the data access layer via DI as a singleton.
@@ -245,6 +255,7 @@ The controllers need access to Helium's implementation of IDal in order to retri
 #### Adding IDal via ASP.NET DI
 
 [Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L288)
+
 ```c#
 
 IWebHostBuilder builder = WebHost.CreateDefaultBuilder()
@@ -265,10 +276,11 @@ IWebHostBuilder builder = WebHost.CreateDefaultBuilder()
 
 #### Retrieve the Data Access Layer from ASP.NET DI
 
-A controller or other module can retrieve the data access layer from ASP.NET DI by calling GetService<T> or by including IDAL in the controller's constructor.
+A controller or other module can retrieve the data access layer from ASP.NET DI by calling ```GetService<T>``` or by including IDAL in the controller's constructor.
 
 [ActorsController.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Controllers/ActorsController.cs#L20)
 [Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L106)
+
 ```c#
 
 // retrive in constructor
@@ -283,9 +295,10 @@ var dal = _host.Services.GetService<IDAL>();
 
 Optionally store the application insights instrumentation key in Key Vault to configure Helium to use Application Insights. When configured, the DI creates a singleton instance of TelemetryClient that can be used to track custom events and metrics.
 
-#### Adding Application Insights from ASP.NET DI 
+#### Adding Application Insights from ASP.NET DI
 
 [Startup.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Startup.cs#L48)
+
 ```c#
 
 // add App Insights if key set
@@ -301,6 +314,7 @@ if (!string.IsNullOrEmpty(appInsightsKey))
 #### Using the TelemetryClient from DI to track custom metric
 
 [Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L120)
+
 ```c#
 
 // send a NewKeyLoadedMetric to App Insights
@@ -322,6 +336,6 @@ There is a robotsText middleware extension method added to Helium to handle a de
 
 ## Logging
 
-A custom Request Logger extension is added to handle logging Http request information. This can be configured with LoggerOptions to control which requests to log based on status code.  By default, only 4xx and 5xx responses are logged.  This helps make logs easy to search through when debugging errors, rather than having to navigate through several successful requests.  In addition to the request logger, helium logs primarily errors to console to keep output clean.   
+A custom Request Logger extension is added to handle logging Http request information. This can be configured with LoggerOptions to control which requests to log based on status code.  By default, only 4xx and 5xx responses are logged.  This helps make logs easy to search through when debugging errors, rather than having to navigate through several successful requests.  In addition to the request logger, helium logs primarily errors to console to keep output clean.
 
 Code: [requestLogger.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Middleware/requestLogger.cs)
