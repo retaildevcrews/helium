@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Helium
 {
-    public class App
+    public sealed class App
     {
         const string _durationParameterError = "Invalid duration (seconds) parameter: {0}\n";
         const string _fileNotFoundError = "File not found: {0}";
@@ -60,70 +60,68 @@ namespace Helium
                 host = builder.Build();
             }
 
-            using (CancellationTokenSource ctCancel = new CancellationTokenSource())
+            using CancellationTokenSource ctCancel = new CancellationTokenSource();
+            // setup ctl c handler
+            Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
             {
-                // setup ctl c handler
-                Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
-                {
-                    e.Cancel = true;
-                    ctCancel.Cancel();
+                e.Cancel = true;
+                ctCancel.Cancel();
 
-                    Console.WriteLine("Ctl-C Pressed - Starting shutdown ...");
+                Console.WriteLine("Ctl-C Pressed - Starting shutdown ...");
 
                     // give threads a chance to shutdown
                     Thread.Sleep(500);
 
                     // end the app
                     Environment.Exit(0);
-                };
+            };
 
-                // run tests in config.RunLoop
-                if (Config.RunLoop)
+            // run tests in config.RunLoop
+            if (Config.RunLoop)
+            {
+                TaskRunner tr;
+
+                for (int i = 0; i < Config.Threads; i++)
                 {
-                    TaskRunner tr;
+                    tr = new TaskRunner { TokenSource = ctCancel };
 
-                    for (int i = 0; i < Config.Threads; i++)
-                    {
-                        tr = new TaskRunner { TokenSource = ctCancel };
+                    tr.Task = Smoker.RunLoop(i, App.Config, tr.TokenSource.Token);
 
-                        tr.Task = Smoker.RunLoop(i, App.Config, tr.TokenSource.Token);
+                    TaskRunners.Add(tr);
+                }
+            }
 
-                        TaskRunners.Add(tr);
-                    }
+            // run the web server
+            if (Config.RunWeb)
+            {
+                try
+                {
+                    Console.WriteLine($"Version: {Helium.Version.AssemblyVersion}");
+
+                    host.Run();
+                    Console.WriteLine("Web server shutdown");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Web Server Exception\n{ex}");
                 }
 
-                // run the web server
-                if (Config.RunWeb)
+                return;
+            }
+
+            // run the task loop
+            if (Config.RunLoop && TaskRunners.Count > 0)
+            {
+                // Wait for all tasks to complete
+                List<Task> tasks = new List<Task>();
+
+                foreach (var trun in TaskRunners)
                 {
-                    try
-                    {
-                        Console.WriteLine($"Version: {Helium.Version.AssemblyVersion}");
-
-                        host.Run();
-                        Console.WriteLine("Web server shutdown");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Web Server Exception\n{ex}");
-                    }
-
-                    return;
+                    tasks.Add(trun.Task);
                 }
 
-                // run the task loop
-                if (Config.RunLoop && TaskRunners.Count > 0)
-                {
-                    // Wait for all tasks to complete
-                    List<Task> tasks = new List<Task>();
-
-                    foreach (var trun in TaskRunners)
-                    {
-                        tasks.Add(trun.Task);
-                    }
-
-                    // wait for ctrl c
-                    Task.WaitAll(tasks.ToArray());
-                }
+                // wait for ctrl c
+                Task.WaitAll(tasks.ToArray());
             }
         }
 

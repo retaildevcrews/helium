@@ -164,7 +164,7 @@ namespace Smoker
             string body;
             string res;
 
-            int i = 0;
+            int i;
             Request r;
 
             Random rand = new Random(DateTime.UtcNow.Millisecond);

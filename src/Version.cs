@@ -5,7 +5,7 @@ namespace Helium
     /// <summary>
     /// Assembly Versioning
     /// </summary>
-    public class Version
+    public sealed class Version
     {
         static string _version = string.Empty;
 
