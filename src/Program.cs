@@ -69,11 +69,11 @@ namespace Helium
 
                 Console.WriteLine("Ctl-C Pressed - Starting shutdown ...");
 
-                    // give threads a chance to shutdown
-                    Thread.Sleep(500);
+                // give threads a chance to shutdown
+                Thread.Sleep(500);
 
-                    // end the app
-                    Environment.Exit(0);
+                // end the app
+                Environment.Exit(0);
             };
 
             // run tests in config.RunLoop
