@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace Helium
 {
-    public class Metrics
+    public sealed class Metrics
     {
-        public int MaxAge = 240;
+        public int MaxAge { get; set; } = 240;
 
-        public readonly List<Metric> Requests = new List<Metric>();
+        public List<Metric> Requests { get; } = new List<Metric>();
 
         /// <summary>
         /// Remove old entries to keep the list from growing boundless
@@ -113,7 +113,7 @@ namespace Helium
         /// </summary>
         /// <param name="status"></param>
         /// <returns>2xx, 3xx, etc.</returns>
-        public string GetKeyFromStatus(int status)
+        public static string GetKeyFromStatus(int status)
         {
             switch (status / 100)
             {
@@ -123,7 +123,7 @@ namespace Helium
                 case 3:
                 case 4:
                 case 5:
-                    return string.Format($"{status / 100}xx");
+                    return string.Format(System.Globalization.CultureInfo.InvariantCulture, $"{status / 100}xx");
 
                 default:
                     return string.Empty;

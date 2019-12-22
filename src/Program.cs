@@ -443,8 +443,9 @@ namespace Helium
                         // handle duration (--maxage Metrics.MaxAge (minutes))
                         else if (args[i] == "--maxage")
                         {
-                            if (int.TryParse(args[i + 1], out Metrics.MaxAge))
+                            if (int.TryParse(args[i + 1], out int maxAge))
                             {
+                                Metrics.MaxAge = maxAge;
                                 i++;
                             }
                             else
@@ -564,12 +565,17 @@ namespace Helium
             env = Environment.GetEnvironmentVariable("MAXMETRICSAGE");
             if (!string.IsNullOrEmpty(env))
             {
-                if (!int.TryParse(env, out Metrics.MaxAge))
+                if (int.TryParse(env, out int maxAge))
                 {
+                    Metrics.MaxAge = maxAge;
+                }
+                else
+                { 
                     // exit on error
                     Console.WriteLine(_maxAgeParameterError, env);
                     Environment.Exit(-1);
                 }
+
             }
         }
 
