@@ -2,6 +2,7 @@
 
 namespace Smoker
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "can't be read-only")]
     public class Request
     {
         public int SortOrder { get; set; } = 100;
@@ -9,6 +10,7 @@ namespace Smoker
         public string Verb { get; set; } = "GET";
         public string Url { get; set; }
         public string Body { get; set; } = null;
+
         public List<Header> Headers { get; set; } = null;
         public Validation Validation { get; set; } = new Validation();
     }
@@ -19,6 +21,7 @@ namespace Smoker
         public string Value { get; set; }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "can't be read-only")]
     public class Validation
     {
         public int Code { get; set; } = 200;
