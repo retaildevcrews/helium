@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Helium
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "called by runtime DI")]
     public class Startup
     {
         // standard aspnet core startup except for last two lines
@@ -16,6 +17,7 @@ namespace Helium
         }
 
         public IConfiguration Configuration { get; }
+
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
