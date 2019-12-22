@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,13 +23,15 @@ namespace Helium
 
         // necessary for private build - do not delete
         public static readonly List<TaskRunner> TaskRunners = new List<TaskRunner>();
-        public static Smoker.Test Smoker = null;
+        public static Smoker.Test Smoker { get; set; } = null;
 
         public static void Main(string[] args)
         {
             ProcessEnvironmentVariables();
 
+#pragma warning disable CA1062 // null is valid
             ProcessCommandArgs(args);
+#pragma warning restore CA1062
 
             ValidateParameters();
 
@@ -101,7 +104,9 @@ namespace Helium
                     host.Run();
                     Console.WriteLine("Web server shutdown");
                 }
+#pragma warning disable CA1031 // valid
                 catch (Exception ex)
+#pragma warning restore CA1031
                 {
                     Console.WriteLine($"Web Server Exception\n{ex}");
                 }
@@ -144,15 +149,15 @@ namespace Helium
             }
 
             // make it easier to pass host
-            if (!Config.Host.ToLower().StartsWith("http"))
+            if (!Config.Host.StartsWith("http", StringComparison.OrdinalIgnoreCase))
             {
-                if (Config.Host.ToLower().StartsWith("localhost"))
+                if (Config.Host.StartsWith("localhost", StringComparison.OrdinalIgnoreCase))
                 {
                     Config.Host = "http://" + Config.Host;
                 }
                 else
                 {
-                    Config.Host = string.Format($"https://{Config.Host}.azurewebsites.net");
+                    Config.Host = string.Format(CultureInfo.InvariantCulture, $"https://{Config.Host}.azurewebsites.net");
                 }
             }
 
