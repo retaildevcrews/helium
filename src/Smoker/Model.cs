@@ -22,6 +22,7 @@ namespace Smoker
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "can't be read-only")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1724:Naming conflict", Justification = "safe to ignore")]
     public class Validation
     {
         public int Code { get; set; } = 200;

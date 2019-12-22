@@ -599,8 +599,7 @@ namespace Smoker
 
             if (disposing)
             {
-                // Free any other managed objects here.
-                //
+                _client.Dispose();
             }
 
             // Free any unmanaged objects here.
