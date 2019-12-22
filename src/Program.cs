@@ -338,7 +338,7 @@ namespace Helium
             if (args.Length > 0)
             {
                 // display help
-                if (args[0].ToLower() == "--help" || args[0].ToLower() == "-h")
+                if (args[0] == "--help" || args[0] == "-h")
                 {
                     Usage();
                     Environment.Exit(0);
@@ -348,7 +348,7 @@ namespace Helium
 
                 while (i < args.Length)
                 {
-                    if (!args[i].StartsWith("--"))
+                    if (!args[i].StartsWith("--", StringComparison.OrdinalIgnoreCase))
                     {
                         Console.WriteLine($"\nInvalid argument: {args[i]}\n");
                         Usage();
@@ -356,25 +356,25 @@ namespace Helium
                     }
 
                     // handle run loop (---runloop)
-                    if (args[i].ToLower() == "--runloop")
+                    if (args[i] == "--runloop")
                     {
                         Config.RunLoop = true;
                     }
 
                     // handle run web (---runweb)
-                    else if (args[i].ToLower() == "--runweb")
+                    else if (args[i] == "--runweb")
                     {
                         Config.RunWeb = true;
                     }
 
                     // handle --random
-                    else if (args[i].ToLower() == "--random")
+                    else if (args[i] == "--random")
                     {
                         Config.Random = true;
                     }
 
                     // handle --verbose
-                    else if (args[i].ToLower() == "--verbose")
+                    else if (args[i] == "--verbose")
                     {
                         Config.Verbose = true;
                     }
@@ -383,19 +383,19 @@ namespace Helium
                     else if (i < args.Length - 1)
                     {
                         // handle host
-                        if (args[i].ToLower() == "--host")
+                        if (args[i] == "--host")
                         {
                             Config.Host = args[i + 1].Trim();
                             i++;
                         }
 
                         // handle input files (-i inputFile.json input2.json input3.json)
-                        else if (i < args.Length - 1 && (args[i].ToLower() == "--files"))
+                        else if (i < args.Length - 1 && (args[i] == "--files"))
                         {
                             // command line overrides env var
                             Config.FileList.Clear();
 
-                            while (i + 1 < args.Length && !args[i + 1].StartsWith("-"))
+                            while (i + 1 < args.Length && !args[i + 1].StartsWith("-", StringComparison.OrdinalIgnoreCase))
                             {
                                 if (!string.IsNullOrEmpty(args[i + 1]))
                                 {
@@ -407,7 +407,7 @@ namespace Helium
                         }
 
                         // handle sleep (--sleep config.SleepMs)
-                        else if (args[i].ToLower() == "--sleep")
+                        else if (args[i] == "--sleep")
                         {
                             if (int.TryParse(args[i + 1], out int v))
                             {
@@ -425,7 +425,7 @@ namespace Helium
                         }
 
                         // handle config.Threads (--threads config.Threads)
-                        else if (args[i].ToLower() == "--threads")
+                        else if (args[i] == "--threads")
                         {
                             if (int.TryParse(args[i + 1], out int v))
                             {
@@ -457,7 +457,7 @@ namespace Helium
                         }
 
                         // handle duration (--duration config.Duration (seconds))
-                        else if (args[i].ToLower() == "--duration")
+                        else if (args[i] == "--duration")
                         {
                             if (int.TryParse(args[i + 1], out int v))
                             {
@@ -579,11 +579,11 @@ namespace Helium
 
             if (!string.IsNullOrEmpty(file))
             {
-                if (file.Contains("TestFiles"))
+                if (file.Contains("TestFiles", StringComparison.Ordinal))
                 {
                     if (!System.IO.File.Exists(file))
                     {
-                        file = file.Replace("TestFiles/", string.Empty);
+                        file = file.Replace("TestFiles/", string.Empty, StringComparison.Ordinal);
                     }
                 }
                 else
