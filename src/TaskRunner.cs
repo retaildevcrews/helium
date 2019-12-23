@@ -5,7 +5,7 @@ namespace Helium
 {
     public class TaskRunner
     {
-        public Task Task;
-        public CancellationTokenSource TokenSource;
+        public Task Task { get; set; }
+        public CancellationTokenSource TokenSource { get; set; }
     }
 }

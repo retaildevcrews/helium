@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@ namespace Helium
 {
     public static class HomePageMiddlewareExtensions
     {
-        static readonly HashSet<string> validPaths = new HashSet<string> { "/", "/index.html", "/index.htm", "/default.html", "/default.htm" };
+        static readonly HashSet<string> validPaths = new HashSet<string> { "/", "/INDEX.HTML", "/INDEX.HTM", "/DEFAULT.HTML", "/DEFAULT.HTM" };
 
         /// <summary>
         /// Middleware extension method to handle home page request
@@ -24,7 +25,7 @@ namespace Helium
             builder.Use(async (context, next) =>
             {
                 // matches / or index.htm[l] or default.htm[l]
-                if (validPaths.Contains(context.Request.Path.Value.ToLower()))
+                if (validPaths.Contains(context.Request.Path.Value.ToUpperInvariant()))
                 {
                     int maxAge = App.Metrics.MaxAge;
 
@@ -40,7 +41,7 @@ namespace Helium
                     }
 
                     // build the response
-                    string html = string.Format($"Helium Integration Test\nV {Helium.Version.AssemblyVersion}\n\n");
+                    string html = string.Format(CultureInfo.InvariantCulture, $"Helium Integration Test\nV {Helium.Version.AssemblyVersion}\n\n");
                     html += GetConfig();
                     html += GetRunningTime();
                     html += GetMetrics(maxAge);
@@ -50,12 +51,12 @@ namespace Helium
 
                     // return the content
                     context.Response.ContentType = "text/plain";
-                    await context.Response.Body.WriteAsync(responseBytes, 0, responseBytes.Length);
+                    await context.Response.Body.WriteAsync(responseBytes, 0, responseBytes.Length).ConfigureAwait(false);
                 }
                 else
                 {
                     // not a match, so call next middleware handler
-                    await next();
+                    await next().ConfigureAwait(false);
                 }
             });
 
@@ -70,10 +71,10 @@ namespace Helium
         {
             string host = App.Config.Host;
 
-            string html = string.Format($"Healthz: {host}\n");
+            string html = string.Format(CultureInfo.InvariantCulture, $"Healthz: {host}\n");
 
             // build the url
-            if (!host.EndsWith("/"))
+            if (!host.EndsWith("/", StringComparison.OrdinalIgnoreCase))
             {
                 host += "/";
             }
@@ -82,9 +83,9 @@ namespace Helium
             try
             {
                 // get the healthz results
-                HttpClient client = new HttpClient();
-                var response = await client.GetAsync(host);
-                string content = await response.Content.ReadAsStringAsync();
+                using HttpClient client = new HttpClient();
+                var response = await client.GetAsync(new Uri(host)).ConfigureAwait(false);
+                string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
                 // make the json pretty
                 dynamic d = JsonConvert.DeserializeObject<dynamic>(content);
@@ -92,7 +93,9 @@ namespace Helium
 
                 html += content;
             }
+#pragma warning disable CA1031 // implemented by design
             catch (Exception ex)
+#pragma warning restore CA1031
             {
                 html += ex.Message;
             }
@@ -119,19 +122,19 @@ namespace Helium
             // xx minutes
             else if (ts.TotalMinutes <= 90)
             {
-                return string.Format($"{running}{Math.Round(ts.TotalMinutes, 0)} minutes\n\n");
+                return string.Format(CultureInfo.InvariantCulture, $"{running}{Math.Round(ts.TotalMinutes, 0)} minutes\n\n");
             }
 
             // xx hours
             else if (ts.TotalHours <= 36)
             {
-                return string.Format($"{running}{Math.Round(ts.TotalHours, 0)} hours\n\n");
+                return string.Format(CultureInfo.InvariantCulture, $"{running}{Math.Round(ts.TotalHours, 0)} hours\n\n");
             }
 
             // xx.x days
             else
             {
-                return string.Format($"{running}{Math.Round(ts.TotalDays, 1)} days\n\n");
+                return string.Format(CultureInfo.InvariantCulture, $"{running}{Math.Round(ts.TotalDays, 1)} days\n\n");
             }
         }
 
@@ -152,7 +155,7 @@ namespace Helium
             if (DateTime.UtcNow.Subtract(App.StartTime).TotalMinutes > maxAge)
             {
                 // show age of metrics
-                html += string.Format($" (prior {maxAge} minutes)");
+                html += string.Format(CultureInfo.InvariantCulture, $" (prior {maxAge} minutes)");
             }
 
             html += "\n";
@@ -164,7 +167,7 @@ namespace Helium
             var list = App.Metrics.GetMetricList(maxAge);
             foreach (var r in list)
             {
-                html += string.Format($"{r.Key.PadLeft(r.Key.Length + 4).PadRight(24).Substring(0, 24)} {r.Count.ToString().PadLeft(12)} {Math.Round(r.Average, 1).ToString().PadLeft(11)} {r.Min.ToString().PadLeft(11)} {r.Max.ToString().PadLeft(11)} \n");
+                html += string.Format(CultureInfo.InvariantCulture, $"{r.Key.PadLeft(r.Key.Length + 4).PadRight(24).Substring(0, 24)} {r.Count.ToString(CultureInfo.InvariantCulture).PadLeft(12)} {Math.Round(r.Average, 1).ToString(CultureInfo.InvariantCulture).PadLeft(11)} {r.Min.ToString(CultureInfo.InvariantCulture).PadLeft(11)} {r.Max.ToString(CultureInfo.InvariantCulture).PadLeft(11)} \n");
             }
 
             return html + "\n";
@@ -178,16 +181,16 @@ namespace Helium
         {
             string html = "Current Configuration: \n";
 
-            html += string.Format($"\tThreads: {App.Config.Threads}\n\tSleep: {App.Config.SleepMs}\n");
+            html += string.Format(CultureInfo.InvariantCulture, $"\tThreads: {App.Config.Threads}\n\tSleep: {App.Config.SleepMs}\n");
 
             if (App.Config.Random)
             {
-                html += string.Format($"\tRandomize\n");
+                html += string.Format(CultureInfo.InvariantCulture, $"\tRandomize\n");
             }
 
             if (App.Config.Verbose)
             {
-                html += string.Format($"\tVerbose\n");
+                html += string.Format(CultureInfo.InvariantCulture, $"\tVerbose\n");
             }
 
             return html + "\n";

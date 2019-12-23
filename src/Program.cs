@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Helium
 {
-    public class App
+    public sealed class App
     {
         const string _durationParameterError = "Invalid duration (seconds) parameter: {0}\n";
         const string _fileNotFoundError = "File not found: {0}";
@@ -22,13 +23,15 @@ namespace Helium
 
         // necessary for private build - do not delete
         public static readonly List<TaskRunner> TaskRunners = new List<TaskRunner>();
-        public static Smoker.Test Smoker = null;
+        public static Smoker.Test Smoker { get; set; } = null;
 
         public static void Main(string[] args)
         {
             ProcessEnvironmentVariables();
 
+#pragma warning disable CA1062 // null is valid
             ProcessCommandArgs(args);
+#pragma warning restore CA1062
 
             ValidateParameters();
 
@@ -60,70 +63,70 @@ namespace Helium
                 host = builder.Build();
             }
 
-            using (CancellationTokenSource ctCancel = new CancellationTokenSource())
+            using CancellationTokenSource ctCancel = new CancellationTokenSource();
+            // setup ctl c handler
+            Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
             {
-                // setup ctl c handler
-                Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
+                e.Cancel = true;
+                ctCancel.Cancel();
+
+                Console.WriteLine("Ctl-C Pressed - Starting shutdown ...");
+
+                // give threads a chance to shutdown
+                Thread.Sleep(500);
+
+                // end the app
+                Environment.Exit(0);
+            };
+
+            // run tests in config.RunLoop
+            if (Config.RunLoop)
+            {
+                TaskRunner tr;
+
+                for (int i = 0; i < Config.Threads; i++)
                 {
-                    e.Cancel = true;
-                    ctCancel.Cancel();
+                    tr = new TaskRunner { TokenSource = ctCancel };
 
-                    Console.WriteLine("Ctl-C Pressed - Starting shutdown ...");
+                    tr.Task = Smoker.RunLoop(i, App.Config, tr.TokenSource.Token);
 
-                    // give threads a chance to shutdown
-                    Thread.Sleep(500);
+                    TaskRunners.Add(tr);
+                }
+            }
 
-                    // end the app
-                    Environment.Exit(0);
-                };
-
-                // run tests in config.RunLoop
-                if (Config.RunLoop)
+            // run the web server
+            if (Config.RunWeb)
+            {
+                try
                 {
-                    TaskRunner tr;
+                    Console.WriteLine($"Version: {Helium.Version.AssemblyVersion}");
 
-                    for (int i = 0; i < Config.Threads; i++)
-                    {
-                        tr = new TaskRunner { TokenSource = ctCancel };
-
-                        tr.Task = Smoker.RunLoop(i, App.Config, tr.TokenSource.Token);
-
-                        TaskRunners.Add(tr);
-                    }
+                    host.Run();
+                    Console.WriteLine("Web server shutdown");
+                }
+#pragma warning disable CA1031 // valid
+                catch (Exception ex)
+#pragma warning restore CA1031
+                {
+                    Console.WriteLine($"Web Server Exception\n{ex}");
                 }
 
-                // run the web server
-                if (Config.RunWeb)
+                return;
+            }
+
+            // run the task loop
+            if (Config.RunLoop && TaskRunners.Count > 0)
+            {
+                // Wait for all tasks to complete
+                List<Task> tasks = new List<Task>();
+
+                foreach (var trun in TaskRunners)
                 {
-                    try
-                    {
-                        Console.WriteLine($"Version: {Helium.Version.AssemblyVersion}");
-
-                        host.Run();
-                        Console.WriteLine("Web server shutdown");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Web Server Exception\n{ex}");
-                    }
-
-                    return;
+                    tasks.Add(trun.Task);
                 }
 
-                // run the task loop
-                if (Config.RunLoop && TaskRunners.Count > 0)
-                {
-                    // Wait for all tasks to complete
-                    List<Task> tasks = new List<Task>();
-
-                    foreach (var trun in TaskRunners)
-                    {
-                        tasks.Add(trun.Task);
-                    }
-
-                    // wait for ctrl c
-                    Task.WaitAll(tasks.ToArray());
-                }
+                // wait for ctrl c
+                Task.WaitAll(tasks.ToArray());
             }
         }
 
@@ -146,15 +149,15 @@ namespace Helium
             }
 
             // make it easier to pass host
-            if (!Config.Host.ToLower().StartsWith("http"))
+            if (!Config.Host.StartsWith("http", StringComparison.OrdinalIgnoreCase))
             {
-                if (Config.Host.ToLower().StartsWith("localhost"))
+                if (Config.Host.StartsWith("localhost", StringComparison.OrdinalIgnoreCase))
                 {
                     Config.Host = "http://" + Config.Host;
                 }
                 else
                 {
-                    Config.Host = string.Format($"https://{Config.Host}.azurewebsites.net");
+                    Config.Host = string.Format(CultureInfo.InvariantCulture, $"https://{Config.Host}.azurewebsites.net");
                 }
             }
 
@@ -335,7 +338,7 @@ namespace Helium
             if (args.Length > 0)
             {
                 // display help
-                if (args[0].ToLower() == "--help" || args[0].ToLower() == "-h")
+                if (args[0] == "--help" || args[0] == "-h")
                 {
                     Usage();
                     Environment.Exit(0);
@@ -345,7 +348,7 @@ namespace Helium
 
                 while (i < args.Length)
                 {
-                    if (!args[i].StartsWith("--"))
+                    if (!args[i].StartsWith("--", StringComparison.OrdinalIgnoreCase))
                     {
                         Console.WriteLine($"\nInvalid argument: {args[i]}\n");
                         Usage();
@@ -353,25 +356,25 @@ namespace Helium
                     }
 
                     // handle run loop (---runloop)
-                    if (args[i].ToLower() == "--runloop")
+                    if (args[i] == "--runloop")
                     {
                         Config.RunLoop = true;
                     }
 
                     // handle run web (---runweb)
-                    else if (args[i].ToLower() == "--runweb")
+                    else if (args[i] == "--runweb")
                     {
                         Config.RunWeb = true;
                     }
 
                     // handle --random
-                    else if (args[i].ToLower() == "--random")
+                    else if (args[i] == "--random")
                     {
                         Config.Random = true;
                     }
 
                     // handle --verbose
-                    else if (args[i].ToLower() == "--verbose")
+                    else if (args[i] == "--verbose")
                     {
                         Config.Verbose = true;
                     }
@@ -380,19 +383,19 @@ namespace Helium
                     else if (i < args.Length - 1)
                     {
                         // handle host
-                        if (args[i].ToLower() == "--host")
+                        if (args[i] == "--host")
                         {
                             Config.Host = args[i + 1].Trim();
                             i++;
                         }
 
                         // handle input files (-i inputFile.json input2.json input3.json)
-                        else if (i < args.Length - 1 && (args[i].ToLower() == "--files"))
+                        else if (i < args.Length - 1 && (args[i] == "--files"))
                         {
                             // command line overrides env var
                             Config.FileList.Clear();
 
-                            while (i + 1 < args.Length && !args[i + 1].StartsWith("-"))
+                            while (i + 1 < args.Length && !args[i + 1].StartsWith("-", StringComparison.OrdinalIgnoreCase))
                             {
                                 if (!string.IsNullOrEmpty(args[i + 1]))
                                 {
@@ -404,7 +407,7 @@ namespace Helium
                         }
 
                         // handle sleep (--sleep config.SleepMs)
-                        else if (args[i].ToLower() == "--sleep")
+                        else if (args[i] == "--sleep")
                         {
                             if (int.TryParse(args[i + 1], out int v))
                             {
@@ -422,7 +425,7 @@ namespace Helium
                         }
 
                         // handle config.Threads (--threads config.Threads)
-                        else if (args[i].ToLower() == "--threads")
+                        else if (args[i] == "--threads")
                         {
                             if (int.TryParse(args[i + 1], out int v))
                             {
@@ -440,8 +443,9 @@ namespace Helium
                         // handle duration (--maxage Metrics.MaxAge (minutes))
                         else if (args[i] == "--maxage")
                         {
-                            if (int.TryParse(args[i + 1], out Metrics.MaxAge))
+                            if (int.TryParse(args[i + 1], out int maxAge))
                             {
+                                Metrics.MaxAge = maxAge;
                                 i++;
                             }
                             else
@@ -454,7 +458,7 @@ namespace Helium
                         }
 
                         // handle duration (--duration config.Duration (seconds))
-                        else if (args[i].ToLower() == "--duration")
+                        else if (args[i] == "--duration")
                         {
                             if (int.TryParse(args[i + 1], out int v))
                             {
@@ -561,12 +565,17 @@ namespace Helium
             env = Environment.GetEnvironmentVariable("MAXMETRICSAGE");
             if (!string.IsNullOrEmpty(env))
             {
-                if (!int.TryParse(env, out Metrics.MaxAge))
+                if (int.TryParse(env, out int maxAge))
+                {
+                    Metrics.MaxAge = maxAge;
+                }
+                else
                 {
                     // exit on error
                     Console.WriteLine(_maxAgeParameterError, env);
                     Environment.Exit(-1);
                 }
+
             }
         }
 
@@ -576,11 +585,11 @@ namespace Helium
 
             if (!string.IsNullOrEmpty(file))
             {
-                if (file.Contains("TestFiles"))
+                if (file.Contains("TestFiles", StringComparison.Ordinal))
                 {
                     if (!System.IO.File.Exists(file))
                     {
-                        file = file.Replace("TestFiles/", string.Empty);
+                        file = file.Replace("TestFiles/", string.Empty, StringComparison.Ordinal);
                     }
                 }
                 else

@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -13,14 +14,26 @@ using System.Threading.Tasks;
 namespace Smoker
 {
     // integration test for testing Helium (or any REST API)
-    public class Test
+    public class Test : IDisposable
     {
+        private bool disposed = false;
+
         private readonly List<Request> _requestList;
         private readonly string _baseUrl;
         private readonly HttpClient _client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
 
         public Test(List<string> fileList, string baseUrl)
         {
+            if (fileList == null)
+            {
+                throw new ArgumentNullException(nameof(fileList));
+            }
+
+            if (string.IsNullOrEmpty(baseUrl))
+            {
+                throw new ArgumentNullException(nameof(baseUrl));
+            }
+
             this._baseUrl = baseUrl;
             List<Request> list;
             List<Request> fullList = new List<Request>();
@@ -71,10 +84,10 @@ namespace Smoker
                         dt = DateTime.UtcNow;
 
                         // process the response
-                        using HttpResponseMessage resp = await _client.SendAsync(req);
-                        body = await resp.Content.ReadAsStringAsync();
+                        using HttpResponseMessage resp = await _client.SendAsync(req).ConfigureAwait(false);
+                        body = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-                        Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss")}\t{(int)resp.StatusCode}\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
+                        Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t{(int)resp.StatusCode}\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
 
                         // validate the response
                         if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
@@ -96,7 +109,7 @@ namespace Smoker
                 catch (Exception ex)
                 {
                     // ignore any error and keep processing
-                    Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss")}\tException: {ex.Message}");
+                    Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\tException: {ex.Message}");
                     isError = true;
                 }
             }
@@ -109,7 +122,7 @@ namespace Smoker
             DateTime dt;
             HttpRequestMessage req;
             string body;
-            string res = string.Format($"Version: {Helium.Version.AssemblyVersion}\n\n");
+            string res = string.Format(CultureInfo.InvariantCulture, $"Version: {Helium.Version.AssemblyVersion}\n\n");
 
             var reqList = ReadJson("TestFiles/baseline.json");
 
@@ -129,10 +142,10 @@ namespace Smoker
                         dt = DateTime.UtcNow;
 
                         // process the response
-                        using HttpResponseMessage resp = await _client.SendAsync(req);
-                        body = await resp.Content.ReadAsStringAsync();
+                        using HttpResponseMessage resp = await _client.SendAsync(req).ConfigureAwait(false);
+                        body = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-                        res += string.Format($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss")}\t{(int)resp.StatusCode}\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t{resp.Content.Headers.ContentLength}\t{r.Url}\n");
+                        res += string.Format(CultureInfo.InvariantCulture, $"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t{(int)resp.StatusCode}\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t{resp.Content.Headers.ContentLength}\t{r.Url}\n");
 
                         // validate the response
                         if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
@@ -147,7 +160,7 @@ namespace Smoker
                 catch (Exception ex)
                 {
                     // ignore any error and keep processing
-                    Console.WriteLine($"{ex.Message}\tException: {1}", DateTime.UtcNow.ToString("MM/dd hh:mm:ss"));
+                    Console.WriteLine($"{ex.Message}\tException: {1}", DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture));
                 }
             }
 
@@ -157,6 +170,16 @@ namespace Smoker
         // run the tests
         public async Task RunLoop(int id, Helium.Config config, CancellationToken ct)
         {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+            if (ct == null)
+            {
+                throw new ArgumentNullException(nameof(ct));
+            }
+
             DateTime dt = DateTime.UtcNow;
             DateTime nextPrune = DateTime.UtcNow.AddMinutes(1);
             DateTime dtMax = DateTime.MaxValue;
@@ -164,7 +187,7 @@ namespace Smoker
             string body;
             string res;
 
-            int i = 0;
+            int i;
             Request r;
 
             Random rand = new Random(DateTime.UtcNow.Millisecond);
@@ -208,8 +231,8 @@ namespace Smoker
                             dt = DateTime.UtcNow;
 
                             // process the response
-                            using HttpResponseMessage resp = await _client.SendAsync(req);
-                            body = await resp.Content.ReadAsStringAsync();
+                            using HttpResponseMessage resp = await _client.SendAsync(req).ConfigureAwait(false);
+                            body = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
                             res = string.Empty;
 
                             // validate the response
@@ -234,7 +257,7 @@ namespace Smoker
                                 }
                                 else
                                 {
-                                    Console.WriteLine($"{id}\t{DateTime.UtcNow.ToString("MM/dd hh:mm:ss")}\t{duration}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
+                                    Console.WriteLine($"{id}\t{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t{duration}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
                                 }
 
                                 if (!string.IsNullOrEmpty(res))
@@ -298,11 +321,16 @@ namespace Smoker
         // results are not displayed
         public async Task Warmup(string path)
         {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
             try
             {
                 using var req = new HttpRequestMessage(new HttpMethod("GET"), MakeUrl(path));
-                using var resp = await _client.SendAsync(req);
-                string body = await resp.Content.ReadAsStringAsync();
+                using var resp = await _client.SendAsync(req).ConfigureAwait(false);
+                string body = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
 
             catch (Exception ex)
@@ -312,13 +340,23 @@ namespace Smoker
         }
 
         // validate the status code
-        public string ValidateStatusCode(Request r, HttpResponseMessage resp)
+        public static string ValidateStatusCode(Request r, HttpResponseMessage resp)
         {
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
+
+            if (resp == null)
+            {
+                throw new ArgumentNullException(nameof(resp));
+            }
+
             string res = string.Empty;
 
             if ((int)resp.StatusCode != r.Validation.Code)
             {
-                res += string.Format($"\tValidation Failed: StatusCode: {(int)resp.StatusCode} Expected: {r.Validation.Code}\n");
+                res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: StatusCode: {(int)resp.StatusCode} Expected: {r.Validation.Code}\n");
                 App.Metrics.Add(0, 0);
             }
 
@@ -326,15 +364,25 @@ namespace Smoker
         }
 
         // validate the content type header if specified in the test
-        public string ValidateContentType(Request r, HttpResponseMessage resp)
+        public static string ValidateContentType(Request r, HttpResponseMessage resp)
         {
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
+
+            if (resp == null)
+            {
+                throw new ArgumentNullException(nameof(resp));
+            }
+
             string res = string.Empty;
 
             if (!string.IsNullOrEmpty(r.Validation.ContentType))
             {
-                if (!resp.Content.Headers.ContentType.ToString().StartsWith(r.Validation.ContentType))
+                if (!resp.Content.Headers.ContentType.ToString().StartsWith(r.Validation.ContentType, StringComparison.OrdinalIgnoreCase))
                 {
-                    res += string.Format($"\tValidation Failed: ContentType: {resp.Content.Headers.ContentType}\n");
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: ContentType: {resp.Content.Headers.ContentType}\n");
                     App.Metrics.Add(0, 0);
                 }
             }
@@ -343,8 +391,18 @@ namespace Smoker
         }
 
         // validate the content length range if specified in test
-        public string ValidateContentLength(Request r, HttpResponseMessage resp)
+        public static string ValidateContentLength(Request r, HttpResponseMessage resp)
         {
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
+
+            if (resp == null)
+            {
+                throw new ArgumentNullException(nameof(resp));
+            }
+
             string res = string.Empty;
 
             // validate the content min length if specified in test
@@ -352,7 +410,7 @@ namespace Smoker
             {
                 if (resp.Content.Headers.ContentLength < r.Validation.MinLength)
                 {
-                    res = string.Format($"\tValidation Failed: MinContentLength: {resp.Content.Headers.ContentLength}\n");
+                    res = string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MinContentLength: {resp.Content.Headers.ContentLength}\n");
                     App.Metrics.Add(0, 0);
                 }
             }
@@ -362,7 +420,7 @@ namespace Smoker
             {
                 if (resp.Content.Headers.ContentLength > r.Validation.MaxLength)
                 {
-                    res += string.Format($"\tValidation Failed: MaxContentLength: {resp.Content.Headers.ContentLength}\n");
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MaxContentLength: {resp.Content.Headers.ContentLength}\n");
                     App.Metrics.Add(0, 0);
                 }
             }
@@ -371,8 +429,13 @@ namespace Smoker
         }
 
         // validate the contains rules
-        public string ValidateContains(Request r, string body)
+        public static string ValidateContains(Request r, string body)
         {
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
+
             string res = string.Empty;
 
             if (!string.IsNullOrEmpty(body) && r.Validation.Contains != null && r.Validation.Contains.Count > 0)
@@ -383,7 +446,7 @@ namespace Smoker
                     // compare values
                     if (!body.Contains(c.Value, c.IsCaseSensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture))
                     {
-                        res += string.Format($"\tValidation Failed: Contains: {c.Value.PadRight(40).Substring(0, 40).Trim()}\n");
+                        res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: Contains: {c.Value.PadRight(40).Substring(0, 40).Trim()}\n");
                         App.Metrics.Add(0, 0);
                     }
                 }
@@ -393,8 +456,13 @@ namespace Smoker
         }
 
         // run json array validation rules
-        public string ValidateJsonArray(Request r, string body)
+        public static string ValidateJsonArray(Request r, string body)
         {
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
+
             string res = string.Empty;
 
             if (r.Validation.JsonArray != null)
@@ -407,39 +475,39 @@ namespace Smoker
                     // validate count
                     if (r.Validation.JsonArray.Count > 0 && r.Validation.JsonArray.Count != resList.Count)
                     {
-                        res += string.Format($"\tValidation Failed: JsonCount: {r.Validation.JsonArray.Count}  Actual: {resList.Count}\n");
+                        res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: JsonCount: {r.Validation.JsonArray.Count}  Actual: {resList.Count}\n");
                         App.Metrics.Add(0, 0);
                     }
 
                     // validate count is zero
                     if (r.Validation.JsonArray.CountIsZero && 0 != resList.Count)
                     {
-                        res += string.Format($"\tValidation Failed: JsonCountIsZero: Actual: {resList.Count}\n");
+                        res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: JsonCountIsZero: Actual: {resList.Count}\n");
                         App.Metrics.Add(0, 0);
                     }
 
                     // validate min count
                     if (r.Validation.JsonArray.MinCount > 0 && r.Validation.JsonArray.MinCount > resList.Count)
                     {
-                        res += string.Format($"\tValidation Failed: MinJsonCount: {r.Validation.JsonArray.MinCount}  Actual: {resList.Count}\n");
+                        res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MinJsonCount: {r.Validation.JsonArray.MinCount}  Actual: {resList.Count}\n");
                         App.Metrics.Add(0, 0);
                     }
 
                     // validate max count
                     if (r.Validation.JsonArray.MaxCount > 0 && r.Validation.JsonArray.MaxCount < resList.Count)
                     {
-                        res += string.Format($"\tValidation Failed: MaxJsonCount: {r.Validation.JsonArray.MaxCount}  Actual: {resList.Count}\n");
+                        res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MaxJsonCount: {r.Validation.JsonArray.MaxCount}  Actual: {resList.Count}\n");
                         App.Metrics.Add(0, 0);
                     }
                 }
                 catch (SerializationException se)
                 {
-                    res += string.Format($"Exception|{se.Source}|{se.TargetSite}|{se.Message}");
+                    res += string.Format(CultureInfo.InvariantCulture, $"Exception|{se.Source}|{se.TargetSite}|{se.Message}");
                 }
 
                 catch (Exception ex)
                 {
-                    res += string.Format($"Exception|{ex.Source}|{ex.TargetSite}|{ex.Message}");
+                    res += string.Format(CultureInfo.InvariantCulture, $"Exception|{ex.Source}|{ex.TargetSite}|{ex.Message}");
                 }
             }
 
@@ -447,8 +515,13 @@ namespace Smoker
         }
 
         // run json object validation rules
-        public string ValidateJsonObject(Request r, string body)
+        public static string ValidateJsonObject(Request r, string body)
         {
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
+
             string res = string.Empty;
 
             if (r.Validation.JsonObject != null && r.Validation.JsonObject.Count > 0)
@@ -466,12 +539,12 @@ namespace Smoker
                             // used when values are not known
                             if (f.Value != null && !dict[f.Field].Equals(f.Value))
                             {
-                                res += string.Format($"\tValidation Failed: {f.Field}: {f.Value} : Expected: {dict[f.Field]}\n");
+                                res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: {f.Field}: {f.Value} : Expected: {dict[f.Field]}\n");
                             }
                         }
                         else
                         {
-                            res += string.Format($"\tValidation Failed: Field Not Found: {f.Field}\n");
+                            res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: Field Not Found: {f.Field}\n");
                         }
                     }
 
@@ -479,12 +552,12 @@ namespace Smoker
                 }
                 catch (SerializationException se)
                 {
-                    res += string.Format($"Exception|{se.Source}|{se.TargetSite}|{se.Message}");
+                    res += string.Format(CultureInfo.InvariantCulture, $"Exception|{se.Source}|{se.TargetSite}|{se.Message}");
                 }
 
                 catch (Exception ex)
                 {
-                    res += string.Format($"Exception|{ex.Source}|{ex.TargetSite}|{ex.Message}");
+                    res += string.Format(CultureInfo.InvariantCulture, $"Exception|{ex.Source}|{ex.TargetSite}|{ex.Message}");
                 }
             }
 
@@ -492,8 +565,13 @@ namespace Smoker
         }
 
         // read json test file
-        public List<Request> ReadJson(string file)
+        public static List<Request> ReadJson(string file)
         {
+            if (string.IsNullOrWhiteSpace(file))
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
             // check for file exists
             if (string.IsNullOrEmpty(file) || !File.Exists(file))
             {
@@ -547,12 +625,37 @@ namespace Smoker
             string url = _baseUrl;
 
             // avoid // in the URL
-            if (url.EndsWith("/") && path.StartsWith("/"))
+            if (url.EndsWith("/", StringComparison.OrdinalIgnoreCase) && path.StartsWith("/", StringComparison.OrdinalIgnoreCase))
             {
                 url = url[0..^1];
             }
 
             return url + path;
+        }
+
+        // iDisposable::Dispose
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                _client.Dispose();
+            }
+
+            // Free any unmanaged objects here.
+            //
+            disposed = true;
         }
     }
 }
