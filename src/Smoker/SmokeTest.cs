@@ -24,9 +24,15 @@ namespace Smoker
 
         public Test(List<string> fileList, string baseUrl)
         {
-            if (fileList == null) throw new ArgumentNullException(nameof(fileList));
-            
-            if (string.IsNullOrEmpty(baseUrl)) throw new ArgumentNullException(nameof(baseUrl));
+            if (fileList == null)
+            {
+                throw new ArgumentNullException(nameof(fileList));
+            }
+
+            if (string.IsNullOrEmpty(baseUrl))
+            {
+                throw new ArgumentNullException(nameof(baseUrl));
+            }
 
             this._baseUrl = baseUrl;
             List<Request> list;
@@ -164,8 +170,15 @@ namespace Smoker
         // run the tests
         public async Task RunLoop(int id, Helium.Config config, CancellationToken ct)
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            if (ct == null) throw new ArgumentNullException(nameof(ct));
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+            if (ct == null)
+            {
+                throw new ArgumentNullException(nameof(ct));
+            }
 
             DateTime dt = DateTime.UtcNow;
             DateTime nextPrune = DateTime.UtcNow.AddMinutes(1);
@@ -308,7 +321,10 @@ namespace Smoker
         // results are not displayed
         public async Task Warmup(string path)
         {
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
 
             try
             {
@@ -326,8 +342,15 @@ namespace Smoker
         // validate the status code
         public static string ValidateStatusCode(Request r, HttpResponseMessage resp)
         {
-            if (r == null) throw new ArgumentNullException(nameof(r));
-            if (resp == null) throw new ArgumentNullException(nameof(resp));
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
+
+            if (resp == null)
+            {
+                throw new ArgumentNullException(nameof(resp));
+            }
 
             string res = string.Empty;
 
@@ -343,8 +366,15 @@ namespace Smoker
         // validate the content type header if specified in the test
         public static string ValidateContentType(Request r, HttpResponseMessage resp)
         {
-            if (r == null) throw new ArgumentNullException(nameof(r));
-            if (resp == null) throw new ArgumentNullException(nameof(resp));
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
+
+            if (resp == null)
+            {
+                throw new ArgumentNullException(nameof(resp));
+            }
 
             string res = string.Empty;
 
@@ -363,8 +393,15 @@ namespace Smoker
         // validate the content length range if specified in test
         public static string ValidateContentLength(Request r, HttpResponseMessage resp)
         {
-            if (r == null) throw new ArgumentNullException(nameof(r));
-            if (resp == null) throw new ArgumentNullException(nameof(resp));
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
+
+            if (resp == null)
+            {
+                throw new ArgumentNullException(nameof(resp));
+            }
 
             string res = string.Empty;
 
@@ -394,7 +431,10 @@ namespace Smoker
         // validate the contains rules
         public static string ValidateContains(Request r, string body)
         {
-            if (r == null) throw new ArgumentNullException(nameof(r));
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
 
             string res = string.Empty;
 
@@ -418,7 +458,10 @@ namespace Smoker
         // run json array validation rules
         public static string ValidateJsonArray(Request r, string body)
         {
-            if (r == null) throw new ArgumentNullException(nameof(r));
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
 
             string res = string.Empty;
 
@@ -474,7 +517,10 @@ namespace Smoker
         // run json object validation rules
         public static string ValidateJsonObject(Request r, string body)
         {
-            if (r == null) throw new ArgumentNullException(nameof(r));
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
 
             string res = string.Empty;
 
@@ -521,7 +567,10 @@ namespace Smoker
         // read json test file
         public static List<Request> ReadJson(string file)
         {
-            if (string.IsNullOrWhiteSpace(file)) throw new ArgumentNullException(nameof(file));
+            if (string.IsNullOrWhiteSpace(file))
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
 
             // check for file exists
             if (string.IsNullOrEmpty(file) || !File.Exists(file))
@@ -595,7 +644,9 @@ namespace Smoker
         protected virtual void Dispose(bool disposing)
         {
             if (disposed)
+            {
                 return;
+            }
 
             if (disposing)
             {

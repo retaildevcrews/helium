@@ -570,7 +570,7 @@ namespace Helium
                     Metrics.MaxAge = maxAge;
                 }
                 else
-                { 
+                {
                     // exit on error
                     Console.WriteLine(_maxAgeParameterError, env);
                     Environment.Exit(-1);
