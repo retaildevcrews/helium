@@ -92,6 +92,7 @@ namespace Smoker
                         // validate the response
                         if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
                         {
+                            res = ValidateStatusCode(r, resp);
                             res = ValidateContentType(r, resp);
                             res += ValidateContentLength(r, resp);
                             res += ValidateContains(r, body);
@@ -150,10 +151,12 @@ namespace Smoker
                         // validate the response
                         if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
                         {
-                            res += ValidateContentType(r, resp);
+                            res = ValidateStatusCode(r, resp);
+                            res = ValidateContentType(r, resp);
                             res += ValidateContentLength(r, resp);
                             res += ValidateContains(r, body);
                             res += ValidateJsonArray(r, body);
+                            res += ValidateJsonObject(r, body);
                         }
                     }
                 }
@@ -243,6 +246,7 @@ namespace Smoker
                                 res += ValidateContentLength(r, resp);
                                 res += ValidateContains(r, body);
                                 res += ValidateJsonArray(r, body);
+                                res += ValidateJsonObject(r, body);
                             }
 
                             int duration = (int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds;
