@@ -539,7 +539,7 @@ namespace Smoker
                             // used when values are not known
                             if (f.Value != null && !dict[f.Field].Equals(f.Value))
                             {
-                                res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: {f.Field}: {f.Value} : Expected: {dict[f.Field]}\n");
+                                res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: {f.Field}: {dict[f.Field]} : Expected: {f.Value}\n");
                             }
                         }
                         else
