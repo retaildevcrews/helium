@@ -446,7 +446,7 @@ namespace Smoker
             if (!string.IsNullOrEmpty(body) && r.Validation.ExactMatch != null)
             {
                 // compare values
-                if (!body.Contains(r.Validation.ExactMatch.Value, r.Validation.ExactMatch.IsCaseSensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture))
+                if (!body.Equals(r.Validation.ExactMatch.Value, r.Validation.ExactMatch.IsCaseSensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture))
                 {
                     res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: ExactMatch: Expected: {r.Validation.ExactMatch.Value.PadRight(40).Substring(0, 40).Trim()} : Received : {body.PadRight(40).Substring(0, 40).Trim()}\n");
                     App.Metrics.Add(0, 0);
