@@ -30,12 +30,13 @@ namespace Smoker
         public int? MinLength { get; set; }
         public int? MaxLength { get; set; }
         public int? MaxMilliseconds { get; set; }
-        public List<Contain> Contains { get; set; } = new List<Contain>();
+        public List<ValueCheck> Contains { get; set; } = new List<ValueCheck>();
+        public ValueCheck ExactMatch { get; set; }
         public JsonArray JsonArray { get; set; }
         public List<JsonProperty> JsonObject { get; set; }
     }
 
-    public class Contain
+    public class ValueCheck
     {
         public string Value { get; set; }
         public bool IsCaseSensitive { get; set; } = true;
