@@ -96,6 +96,7 @@ namespace Smoker
                             res = ValidateContentType(r, resp);
                             res += ValidateContentLength(r, resp);
                             res += ValidateContains(r, body);
+                            res += ValidateExactMatch(r, body);
                             res += ValidateJsonArray(r, body);
                             res += ValidateJsonObject(r, body);
 
@@ -425,6 +426,29 @@ namespace Smoker
                 if (resp.Content.Headers.ContentLength > r.Validation.MaxLength)
                 {
                     res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MaxContentLength: {resp.Content.Headers.ContentLength}\n");
+                    App.Metrics.Add(0, 0);
+                }
+            }
+
+            return res;
+        }
+
+        // validate the exact match rule
+        public static string ValidateExactMatch(Request r, string body)
+        {
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
+
+            string res = string.Empty;
+
+            if (!string.IsNullOrEmpty(body) && r.Validation.ExactMatch != null)
+            {
+                // compare values
+                if (!body.Contains(r.Validation.ExactMatch.Value, r.Validation.ExactMatch.IsCaseSensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture))
+                {
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: ExactMatch: Expected: {r.Validation.ExactMatch.Value.PadRight(40).Substring(0, 40).Trim()} : Received : {body.PadRight(40).Substring(0, 40).Trim()}\n");
                     App.Metrics.Add(0, 0);
                 }
             }
