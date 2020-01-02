@@ -40,7 +40,7 @@ namespace Helium
             // run one test iteration
             if (!Config.RunLoop && !Config.RunWeb)
             {
-                if (!Smoker.Run().Result)
+                if (!Smoker.RunOnce().Result)
                 {
                     Environment.Exit(-1);
                 }
