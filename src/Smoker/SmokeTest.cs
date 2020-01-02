@@ -34,7 +34,10 @@ namespace Smoker
                 throw new ArgumentNullException(nameof(baseUrl));
             }
 
-            this._baseUrl = baseUrl;
+            // set timeout to 30 seconds
+            _client.Timeout = new TimeSpan(0, 0, 30);
+
+            _baseUrl = baseUrl;
             List<Request> list;
             List<Request> fullList = new List<Request>();
             _requestList = new List<Request>();
@@ -65,7 +68,8 @@ namespace Smoker
             _client.Timeout = new TimeSpan(0, 0, 30);
         }
 
-        public async Task<bool> Run()
+        // run once
+        public async Task<bool> RunOnce()
         {
             bool isError = false;
             DateTime dt;
@@ -90,20 +94,11 @@ namespace Smoker
                         Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t{(int)resp.StatusCode}\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
 
                         // validate the response
-                        if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
-                        {
-                            res = ValidateStatusCode(r, resp);
-                            res = ValidateContentType(r, resp);
-                            res += ValidateContentLength(r, resp);
-                            res += ValidateContains(r, body);
-                            res += ValidateJsonArray(r, body);
-                            res += ValidateJsonObject(r, body);
+                        res = ValidateAll(r, resp, body);
 
-                            if (!string.IsNullOrEmpty(res))
-                            {
-                                Console.Write(res);
-                                res = string.Empty;
-                            }
+                        if (!string.IsNullOrEmpty(res))
+                        {
+                            Console.Write(res);
                         }
                     }
                 }
@@ -118,6 +113,7 @@ namespace Smoker
             return isError;
         }
 
+        // run from the web API
         public async Task<string> RunFromWebRequest()
         {
             DateTime dt;
@@ -149,15 +145,7 @@ namespace Smoker
                         res += string.Format(CultureInfo.InvariantCulture, $"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t{(int)resp.StatusCode}\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t{resp.Content.Headers.ContentLength}\t{r.Url}\n");
 
                         // validate the response
-                        if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
-                        {
-                            res = ValidateStatusCode(r, resp);
-                            res = ValidateContentType(r, resp);
-                            res += ValidateContentLength(r, resp);
-                            res += ValidateContains(r, body);
-                            res += ValidateJsonArray(r, body);
-                            res += ValidateJsonObject(r, body);
-                        }
+                        res += ValidateAll(r, resp, body);
                     }
                 }
                 catch (Exception ex)
@@ -170,8 +158,8 @@ namespace Smoker
             return res;
         }
 
-        // run the tests
-        public async Task RunLoop(int id, Helium.Config config, CancellationToken ct)
+        // run in a loop
+        public async Task RunLoop(int id, Config config, CancellationToken ct)
         {
             if (config == null)
             {
@@ -236,20 +224,11 @@ namespace Smoker
                             // process the response
                             using HttpResponseMessage resp = await _client.SendAsync(req).ConfigureAwait(false);
                             body = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            res = string.Empty;
-
-                            // validate the response
-                            if (resp.StatusCode == System.Net.HttpStatusCode.OK && r.Validation != null)
-                            {
-                                res = ValidateStatusCode(r, resp);
-                                res = ValidateContentType(r, resp);
-                                res += ValidateContentLength(r, resp);
-                                res += ValidateContains(r, body);
-                                res += ValidateJsonArray(r, body);
-                                res += ValidateJsonObject(r, body);
-                            }
 
                             int duration = (int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds;
+
+                            // validate the response
+                            res = ValidateAll(r, resp, body);
 
                             // only log 4XX and 5XX status codes
                             if (config.Verbose || (int)resp.StatusCode > 399 || !string.IsNullOrEmpty(res))
@@ -321,26 +300,25 @@ namespace Smoker
             }
         }
 
-        // send the first request in the list as a warm up request
-        // results are not displayed
-        public async Task Warmup(string path)
+        public static string ValidateAll(Request r, HttpResponseMessage resp, string body)
         {
-            if (string.IsNullOrWhiteSpace(path))
+            string res = string.Empty;
+
+            // validate the response
+            if (resp != null && r?.Validation != null)
             {
-                throw new ArgumentNullException(nameof(path));
+                body ??= string.Empty;
+
+                res += ValidateStatusCode(r, resp);
+                res += ValidateContentType(r, resp);
+                res += ValidateContentLength(r, resp);
+                res += ValidateContains(r, body);
+                res += ValidateExactMatch(r, body);
+                res += ValidateJsonArray(r, body);
+                res += ValidateJsonObject(r, body);
             }
 
-            try
-            {
-                using var req = new HttpRequestMessage(new HttpMethod("GET"), MakeUrl(path));
-                using var resp = await _client.SendAsync(req).ConfigureAwait(false);
-                string body = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
-            }
-
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Warmup Failed: {ex.Message}");
-            }
+            return res;
         }
 
         // validate the status code
@@ -425,6 +403,29 @@ namespace Smoker
                 if (resp.Content.Headers.ContentLength > r.Validation.MaxLength)
                 {
                     res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MaxContentLength: {resp.Content.Headers.ContentLength}\n");
+                    App.Metrics.Add(0, 0);
+                }
+            }
+
+            return res;
+        }
+
+        // validate the exact match rule
+        public static string ValidateExactMatch(Request r, string body)
+        {
+            if (r == null)
+            {
+                throw new ArgumentNullException(nameof(r));
+            }
+
+            string res = string.Empty;
+
+            if (!string.IsNullOrEmpty(body) && r.Validation.ExactMatch != null)
+            {
+                // compare values
+                if (!body.Equals(r.Validation.ExactMatch.Value, r.Validation.ExactMatch.IsCaseSensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture))
+                {
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: ExactMatch: Expected: {r.Validation.ExactMatch.Value.PadRight(40).Substring(0, 40).Trim()} : Received : {body.PadRight(40).Substring(0, 40).Trim()}\n");
                     App.Metrics.Add(0, 0);
                 }
             }
