@@ -1,4 +1,5 @@
 [
+  {"Url":"/healthz/dotnet","Validation":{"JsonObject":[{"Field":"status","Value":"Healthy"}]}},
   {"Url":"/index.html","SortOrder":1,"Validation":{"ContentType":"text/html"}},
   {"Url":"/swagger/helium/swagger.json","Validation":{"Code":200,"ContentType":"application/json","JsonObject":[{"Field":"openapi","Value":null},{"Field":"info","Value":null},{"Field":"paths","Value":null},{"Field":"components","Value":null}]}},
   {"Url": "/robots.txt", "Validation": {"ContentType": "text/plain","MinLength": 48,"MaxLength": 48,"Contains": [{"Value": "User-agent: *"},{"Value": "Disallow: /"}]}},
