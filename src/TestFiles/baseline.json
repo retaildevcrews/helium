@@ -1,6 +1,5 @@
 [
   {"Url":"/healthz","Validation":{"ContentType":"text/plain","ExactMatch":{"Value":"Healthy"}}},
-  {"Url":"/healthz/json","Validation":{"JsonObject":[{"Field":"status","Value":"Healthy"}]}},
   {"Url":"/healthz/ietf","Validation":{"ContentType":"application/health+json","JsonObject":[{"Field":"status","Value":"up"}]}},
   {"Url":"/api/featured/movie","Validation":{"JsonObject":[{"Field":"type","Value":"Movie"},{"Field":"id","Value":null},{"Field":"movieId","Value":null},{"Field":"title","Value":null},{"Field":"year","Value":null}]}},
   {"Url":"/api/featured/movie","Validation":{"JsonObject":[{"Field":"type","Value":"Movie"},{"Field":"id","Value":null},{"Field":"movieId","Value":null},{"Field":"title","Value":null},{"Field":"year","Value":null}]}},
