@@ -1,5 +1,5 @@
 #!/bin/sh
-while getopts :a:r:m:k: option
+while getopts :a:r:m: option
 do
  case "${option}" in
  a) AKS_NAME=${OPTARG};;
@@ -150,7 +150,7 @@ metadata:
  name: ${MSI_NAME}-binding
 spec:
  AzureIdentity: ${MSI_NAME}
- Selector: podid-${MSI_NAME}
+ Selector: ${MSI_NAME}
 EOF
 
 echo "creating deploying aadpodidentitybinding resource into the default namespace"
@@ -175,6 +175,5 @@ echo "**************************************************************************
 echo " "
 echo "******************************************************************************************************************"
 echo "Add the label below to your deployment to assign an aad MSi to those pods:"
-echo " aadpodidentity: podid-${MSI_NAME}"
+echo " aadpodidentity: ${MSI_NAME}"
 echo "******************************************************************************************************************"
-

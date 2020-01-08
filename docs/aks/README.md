@@ -244,25 +244,30 @@ Install AAD Pod Identity for the application
 
 Change directories to the `docs\aks` folder and make the `aad-podid.sh` script executable. Runnig this shell script will deploy AAD Pod Identity to your cluster and assign a Managed Identity.
 
+>NOTE: The second command below has a `.` then a space followed by `./aad-podid.sh ...` this is so the exported variables in the script persist after the script ends in the uder interactive shell
+
 ```shell
+export MSI_Name=${He_Name}-msi
+
 cd $REPO_ROOT/docs/aks
 sudo chmod +x aad-podid.sh
 
-./aad-podid.sh -a ${He_AKS_Name} -r ${He_App_RG} -m ${He_Name}-msi
-```
+. ./aad-podid.sh -a ${He_AKS_Name} -r ${He_App_RG} -m ${MSI_Name}
 
-The output will give the command to provide the MSI with the proper rights to the keyvault created earlier. Run the command as it is shown exactly in the output, (i.e.):
-
-### example
-
-```shell
-az keyvault set-policy -n ejvtst1216 --object-id ff4634eb-662f-4faa-9c44-b03e41a09522 --secret-permissions get list --key-permissions get list --certificate-permissions get list
+cd $REPO_ROOT
+./savenev.sh
 ```
 
 The last line of the output will explain the proper label annotation needed when deploying the application. This will be needed later during the application install
 
 ```shell
-export LABEL="<output from aad-podid.sh>"
+echo $MSI_Name
+```
+
+### Set Keyvault Policy for MSI User
+
+```shell
+az keyvault set-policy -n ${He_Name} --object-id ${MSI_PrincID} --secret-permissions get list --key-permissions get list --certificate-permissions get list
 ```
 
 ## Install Helm 3
@@ -284,7 +289,7 @@ or
 ```shell
 # Linux/WSL
 OS=linux-amd64 && \
-REL=v3.0.1 && \ #Should be lastest release from https://github.com/helm/helm/releases
+REL=v3.0.2 && \
 mkdir -p $HOME/.helm/bin && \
 curl -sSL "https://get.helm.sh/helm-${REL}-${OS}.tar.gz" | tar xvz && \
 chmod +x ${OS}/helm && mv ${OS}/helm $HOME/.helm/bin/helm
@@ -359,7 +364,10 @@ helm install ingress stable/nginx-ingress \
 Get the Public IP of your Ingress Controller. This will be used later in deploying the application.
 
 ```shell
-kubectl get svc -n ingress-nginx
+export INGRESS_PIP = $(kubectl get svc -l component=controller -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
+
+cd $REPO_ROOT
+./saveenv.sh
 ```
 
 ## Deploy the needed componenets of helium, key rotator and the testing harness
@@ -372,14 +380,14 @@ Install the Helm Chart located in the cloned directory
 cd $REPO_ROOT/docs/aks/cluster/charts
 ```
 
-Create a file called helm-config.yaml with the following contents that should be edited to fit the environment being deployed in
+A file called helm-config.yaml with the following contents that needs be edited to fit the environment being deployed in. The file looks like this
 
 ```yaml
 # Default values for helium.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 labels:
-  aadpodidbinding: podid #should be value of $LABEL from the output o aad-podid.sh
+  aadpodidbinding: %%MSI_Name%% #should be value of $MSI_Name from the output of aad-podid.sh
 
 image:
   repository: retaildevcrew #The spceific acr created for this environment
@@ -390,13 +398,27 @@ annotations:
 
 ingress:
   hosts:
-    - host: <PUBLICIP_of_INGRESS>.nip.io # Replace the IP address with the IP of the nginx external IP. kubectl get svc -n ingress-nginx to see the correct IP
+    - host: %%INGRESS_PIP%%.nip.io # Replace the IP address with the IP of the nginx external IP. kubectl get svc -n ingress-nginx to see the correct IP
       paths: /
 
-keyVaultName: helium-aks-kv # Replace with the name of the Key Vault that holds the secrets
+keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets
+```
+
+Replace the values in the file surrounded by `%%` with the proper environment variables
+
+```shell
+sed -i "s/%%MSI_Name%%/${MSI_Name}/g" helm-config.yaml && \
+sed -i "s/%%INGRESS_PIP%%/${INGRESS_PIP}/g" helm-config.yaml && \
+sed -i "s/%%KV_Name%%/${He_Name}/g" helm-config.yaml
 ```
 
 This file can now be given to the the helm install as an override to the default values.
+
+```shell
+helm install helium-aks helium -f helm-config.yaml
+```
+
+optionally if you stored the helium-csharp image in your own Azure Container Registry you can change the registry at the command line as such:
 
 ```shell
 helm install helium-aks helium --set image.repository=<acr_name>.azurecr.io -f helm-config.yaml
