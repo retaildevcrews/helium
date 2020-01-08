@@ -124,13 +124,13 @@ export He_Cosmos_Col=movies
 az cosmosdb create -g $He_Cosmos_RG -n $He_Name
 
 # create the database
-az cosmosdb database create -d $He_Cosmos_DB -g $He_Cosmos_RG -n $He_Name
+az cosmosdb sql database create -a $He_Name -n $He_Cosmos_DB -g $He_Cosmos_RG
 
-# create the collection
+# create the container
 # 400 is the minimum RUs
 # /partitionKey is the partition key
 # partition key is the id mod 10
-az cosmosdb collection create --throughput 400 --partition-key-path /partitionKey -g $He_Cosmos_RG -n $He_Name -d $He_Cosmos_DB -c $He_Cosmos_Col
+az cosmosdb sql container create --throughput "400" -p /partitionKey -g $He_Cosmos_RG -a $He_Name -d $He_Cosmos_DB -n $He_Cosmos_Col
 
 # get Cosmos readonly key (used by App Service)
 export He_Cosmos_RO_Key=$(az cosmosdb keys list -n $He_Name -g $He_Cosmos_RG --query primaryReadonlyMasterKey -o tsv)
