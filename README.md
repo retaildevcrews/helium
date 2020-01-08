@@ -126,7 +126,7 @@ az cosmosdb create -g $He_Cosmos_RG -n $He_Name
 # create the database
 az cosmosdb sql database create -a $He_Name -n $He_Cosmos_DB -g $He_Cosmos_RG
 
-# create the collection
+# create the container
 # 400 is the minimum RUs
 # /partitionKey is the partition key
 # partition key is the id mod 10
