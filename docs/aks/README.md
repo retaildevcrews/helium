@@ -35,7 +35,7 @@ Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally
 
 Fork this repo and clone to your local machine
 
-```shell
+```bash
 cd $HOME
 
 mkdir demo
@@ -47,7 +47,7 @@ git clone https://github.com/retaildevcrews/helium
 
 Change into the base directory of the repo
 
-```shell
+```bash
 cd helium
 
 export REPO_ROOT=$(pwd)
@@ -65,6 +65,22 @@ az account list -o table
 # select the Azure account
 az account set -s {subscription name or Id}
 
+# save the subscriptionID as a variable
+export He_Sub=$(az account show --query id -o tsv)
+```
+
+Save your environment variables for ease of reuse and picking up where you left off.
+
+```bash
+
+# run the saveenv.sh script at any time to save He_* variables to ~/${He_Name}.env
+# make sure you are in the root of the repo
+cd $REPO_ROOT
+./saveenv.sh
+
+# at any point if your terminal environment gets cleared, you can source the file
+# you only need to remember the name of the env file (or set the $He_Name variable again)
+source ~/{yoursameuniquename}.env
 ```
 
 This demo will create resource groups, a CosmosDB instance, Key Vault, Azure Container Registry, and Azure App Service.
@@ -426,9 +442,16 @@ helm install helium-aks helium --set image.repository=<acr_name>.azurecr.io -f h
 
 ## Dashboard setup
 
-Open `AKS Dashboard.json` in an editor and update `{SUBSCRIPTION_GUID}` with your subscription, `{AKS_RESOURCE_GROUP}` with your AKS cluster resource group name, and `{COSMOS_RESOURCE_GROUP}` with your Cosmos resource group name.
+Replace the values in the `AKS_Dashboard.json` file surrounded by `%%` with the proper environment variables
 
-Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `AKS Dashboard.json` file with your correct subscription GUID, resource group names, and app name.
+```shell
+cd $REPO_ROOT/docs/aks/demo
+sed -i "s/%%SUBSCRIPTION_GUID%%/${He_Sub}/g" AKS_Dashboard.json && \
+sed -i "s/%%AKS_RESOURCE_GROUP%%/${He_App_RG}/g" AKS_Dashboard.json && \
+sed -i "s/%%COSMOS_RESOURCE_GROUP%%/${He_Cosmos_RG}/g" AKS_Dashboard.json
+```
+
+Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `AKS_Dashboard.json` file with your correct subscription GUID, resource group names, and app name.
 
 For more documentation on creating and sharing Dashboards, see ([here](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards)).
 
