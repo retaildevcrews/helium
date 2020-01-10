@@ -1,0 +1,4 @@
+[
+  {"Url":"/swagger-ui.html","Validation": {"ContentType": "text/html"}},
+  {"Url":"/swagger","Validation":{"Code":200,"ContentType":"application/json","JsonObject":[{"Field":"swagger","Value":"2.0"},{"Field":"info","Value":null},{"Field":"host","Value":null},{"Field":"basePath","Value":null},{"Field":"tags","Value":null},{"Field":"paths","Value":null},{"Field":"definitions","Value":null}]}},
+]
