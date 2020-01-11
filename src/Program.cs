@@ -195,7 +195,8 @@ namespace Helium
 
             if (Config.FileList.Count == 0)
             {
-                AddAllJsonFiles();
+                Config.FileList.Add("TestFiles/baseline.json");
+                //AddAllJsonFiles();
             }
 
             if (Config.FileList.Count == 0)
