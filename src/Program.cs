@@ -578,6 +578,14 @@ namespace Helium
                 }
 
             }
+
+            // run as web app if running in App Service
+            env = Environment.GetEnvironmentVariable("KUDU_APPPATH");
+            if (!string.IsNullOrEmpty(env))
+            {
+                Config.RunLoop = true;
+                Config.RunWeb = true;
+            }
         }
 
         private static string TestFileExists(string name)
