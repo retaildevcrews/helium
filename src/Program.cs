@@ -99,7 +99,7 @@ namespace Helium
             {
                 try
                 {
-                    Console.WriteLine($"Version: {Helium.Version.AssemblyVersion}");
+                    Console.WriteLine($"Version: {Helium.Version.AssemblyVersion}\nThreads: {Config.Threads}\nSleep: {Config.SleepMs}\nRandomize: {Config.Random}");
 
                     host.Run();
                     Console.WriteLine("Web server shutdown");
@@ -195,7 +195,8 @@ namespace Helium
 
             if (Config.FileList.Count == 0)
             {
-                AddAllJsonFiles();
+                Config.FileList.Add("TestFiles/baseline.json");
+                //AddAllJsonFiles();
             }
 
             if (Config.FileList.Count == 0)
@@ -484,7 +485,16 @@ namespace Helium
         {
             // Get environment variables
 
-            string env = Environment.GetEnvironmentVariable("RUNLOOP");
+            // run as web app if running in App Service
+            string env = Environment.GetEnvironmentVariable("KUDU_APPPATH");
+            if (!string.IsNullOrEmpty(env))
+            {
+                Config.RunLoop = true;
+                Config.RunWeb = true;
+                Config.Random = true;
+            }
+
+            env = Environment.GetEnvironmentVariable("RUNLOOP");
             if (!string.IsNullOrEmpty(env))
             {
                 if (bool.TryParse(env, out bool b))

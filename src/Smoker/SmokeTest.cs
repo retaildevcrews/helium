@@ -362,7 +362,7 @@ namespace Smoker
 
             if (!string.IsNullOrEmpty(r.Validation.ContentType))
             {
-                if (!resp.Content.Headers.ContentType.ToString().StartsWith(r.Validation.ContentType, StringComparison.OrdinalIgnoreCase))
+                if (resp.Content.Headers.ContentType != null && !resp.Content.Headers.ContentType.ToString().StartsWith(r.Validation.ContentType, StringComparison.OrdinalIgnoreCase))
                 {
                     res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: ContentType: {resp.Content.Headers.ContentType}\n");
                     App.Metrics.Add(0, 0);
