@@ -6,6 +6,7 @@ labels: ''
 assignees: ''
 
 ---
+This checklist is for verifing all User Story Acceptance Criteria and Definition of Done (DoD) have been completed in order to move User Story to "Done".
 
 ## USER STORY TITLE 
 
@@ -28,9 +29,9 @@ _[Add user story or References #issue]._
 - [ ] New documentation needed to support the change is created
 - [ ] Code changes checked into master
 - [ ] All existing automated tests (unit and/or e2e) pass successfully, new tests added as needed
-- [ ] Build completes successfully
-- [ ] Deployment completes successfully
+- [ ] CI completes successfully
+- [ ] CD completes successfully
 - [ ] Smoke test production deployment for minimum [INSERT TIMEFRAME]
-- [ ] New changes in smoke test for 48hrs (ongoing)
+- [ ] New changes in smoke test for [INSERT TIMEFRAME]
 
 Engineering Playbook [Definition of Done](https://github.com/microsoft/code-with-engineering-playbook/blob/master/team-agreements/definition-of-done/readme.md)
