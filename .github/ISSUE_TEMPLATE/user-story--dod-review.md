@@ -6,6 +6,7 @@ labels: ''
 assignees: ''
 
 ---
+
 This checklist is for verifing all User Story Acceptance Criteria and Definition of Done (DoD) have been completed in order to move User Story to "Done".
 
 ## USER STORY TITLE 
