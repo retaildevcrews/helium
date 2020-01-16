@@ -1,5 +1,5 @@
 [
-  {"Url":"/api/healthz","Validation":{"ContentType":"application/vnd.spring-boot.actuator.v2+json","Contains":[{"Value":"\"UP\","}]}},
+  {"Url":"/healthz","Validation":{"ContentType":"application/vnd.spring-boot.actuator.v2+json","Contains":[{"Value":"\"UP\","}]}},
   {"Url":"/api/actors","Validation":{"JsonArray":{"Count":100}}},
   {"Url":"/api/genres","Validation":{"JsonArray":{"Count":21}}},
   {"Url":"/api/movies","Validation":{"JsonArray":{"Count":100}}},
