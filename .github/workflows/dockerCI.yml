@@ -42,21 +42,22 @@ jobs:
 
         IMAGE_ID=${{ secrets.DOCKER_REPO }}
 
-        # Strip git ref prefix from version
-        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        # tag the image with :beta
+        docker tag image $IMAGE_ID:beta
 
-        # Only tag and push when a new tag is created
+        # Tag image based on repo tag if a github label
         if [[ "${{ github.ref }}" == "refs/tags/"* ]]
         then
+
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        
           # Strip "v" prefix from tag name
           VERSION=$(echo $VERSION | sed -e 's/^v//')
   
           docker tag image $IMAGE_ID:$VERSION
           docker tag image $IMAGE_ID:stable
-  
-          docker push $IMAGE_ID
-
-          echo "Image pushed"
-        else
-          echo "Image only pushed on tags"
         fi
+
+        # Push to the repo
+        docker push $IMAGE_ID
