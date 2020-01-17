@@ -2,7 +2,7 @@
 name: 'User Story: DoD Review'
 about: Verify User Story meets acceptance criteria, has key features, and meets DoD.
 title: "[DoDREVIEW]"
-labels: ''
+labels: Release
 assignees: ''
 
 ---
