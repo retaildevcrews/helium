@@ -310,12 +310,17 @@ namespace Smoker
                 body ??= string.Empty;
 
                 res += ValidateStatusCode(r, resp);
-                res += ValidateContentType(r, resp);
-                res += ValidateContentLength(r, resp);
-                res += ValidateContains(r, body);
-                res += ValidateExactMatch(r, body);
-                res += ValidateJsonArray(r, body);
-                res += ValidateJsonObject(r, body);
+
+                // don't validate if status code is unexpected
+                if (string.IsNullOrEmpty(res))
+                {
+                    res += ValidateContentType(r, resp);
+                    res += ValidateContentLength(r, resp);
+                    res += ValidateContains(r, body);
+                    res += ValidateExactMatch(r, body);
+                    res += ValidateJsonArray(r, body);
+                    res += ValidateJsonObject(r, body);
+                }
             }
 
             return res;
@@ -364,7 +369,7 @@ namespace Smoker
             {
                 if (resp.Content.Headers.ContentType != null && !resp.Content.Headers.ContentType.ToString().StartsWith(r.Validation.ContentType, StringComparison.OrdinalIgnoreCase))
                 {
-                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: ContentType: {resp.Content.Headers.ContentType}\n");
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: ContentType: {resp.Content.Headers.ContentType} Expected: {r.Validation.ContentType}\n");
                     App.Metrics.Add(0, 0);
                 }
             }
@@ -392,7 +397,7 @@ namespace Smoker
             {
                 if (resp.Content.Headers.ContentLength < r.Validation.MinLength)
                 {
-                    res = string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MinContentLength: {resp.Content.Headers.ContentLength}\n");
+                    res = string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MinContentLength: Actual: {resp.Content.Headers.ContentLength} Expected: {r.Validation.MinLength}\n");
                     App.Metrics.Add(0, 0);
                 }
             }
@@ -402,7 +407,7 @@ namespace Smoker
             {
                 if (resp.Content.Headers.ContentLength > r.Validation.MaxLength)
                 {
-                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MaxContentLength: {resp.Content.Headers.ContentLength}\n");
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MaxContentLength: Actual: {resp.Content.Headers.ContentLength} Expected: {r.Validation.MaxLength}\n");
                     App.Metrics.Add(0, 0);
                 }
             }
