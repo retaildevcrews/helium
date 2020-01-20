@@ -1,7 +1,7 @@
 ---
 name: 'User Story: DoD Review'
 about: Verify User Story meets acceptance criteria, has key features, and meets DoD.
-title: "[DoDREVIEW]"
+title: "[DoD-Review]"
 labels: Release
 assignees: ''
 
@@ -25,14 +25,14 @@ _[Add user story or References #issue]._
 - [ ] 
 
 ### Definition of Done
-- [ ] Code changes reviewed & signed off
+- [ ] Code Review completed
+- [ ] All existing automated tests (unit and e2e) pass successfully, new tests added as needed
+- [ ] Code changes checked into master
+- [ ] Sync github actions from master template
 - [ ] Existing documentation is updated (readme, .md's)
 - [ ] New documentation needed to support the change is created
-- [ ] Code changes checked into master
-- [ ] All existing automated tests (unit and/or e2e) pass successfully, new tests added as needed
 - [ ] CI completes successfully
 - [ ] CD completes successfully
-- [ ] Smoke test production deployment for minimum [INSERT TIMEFRAME]
-- [ ] New changes in smoke test for [INSERT TIMEFRAME]
+- [ ] Smoke test deployed for 48 hours
 
 Engineering Playbook [Definition of Done](https://github.com/microsoft/code-with-engineering-playbook/blob/master/team-agreements/definition-of-done/readme.md)
