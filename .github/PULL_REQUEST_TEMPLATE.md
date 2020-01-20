@@ -4,6 +4,7 @@
 - [ ] Code changes
 - [ ] Test changes
 - [ ] CI-CD changes
+- [ ] GitHub Template changes
 
 ## Purpose of PR
 
