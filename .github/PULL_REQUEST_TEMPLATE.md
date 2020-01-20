@@ -3,6 +3,7 @@
 - [ ] Documentation changes
 - [ ] Code changes
 - [ ] Test changes
+- [ ] CI-CD changes
 
 ## Purpose of PR
 
