@@ -1,9 +1,7 @@
 ---
 name: 'User Story: DoD Review'
-about: Verify User Story meets acceptance criteria, has key features, and meets DoD.
-title: "[DoD-Review]"
+about: Verify User Story meets acceptance criteria, has key features and meets Definition of Done
 labels: Release
-assignees: ''
 
 ---
 
@@ -13,18 +11,18 @@ This checklist is for verifing all User Story Acceptance Criteria and Definition
 
 _[Add user story or References #issue]._
 
-### Acceptance Criteria
+## Acceptance Criteria
 - [ ] 
 - [ ] 
 - [ ] 
 
 
-### Key Features (if applicable)
+## Key Features (if applicable)
 - [ ] 
 - [ ] 
 - [ ] 
 
-### Definition of Done
+## Definition of Done
 - [ ] Code Review completed
 - [ ] All existing automated tests (unit and e2e) pass successfully, new tests added as needed
 - [ ] Code changes checked into master
