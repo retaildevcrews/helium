@@ -1,5 +1,5 @@
 ---
-name: 'User Story: DoD Review'
+name: 'Definiton of Done Review'
 about: Verify User Story meets acceptance criteria, has key features and meets Definition of Done
 labels: Release
 
