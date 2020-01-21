@@ -104,6 +104,11 @@ namespace Smoker
                 }
                 catch (Exception ex)
                 {
+                    if (!string.IsNullOrEmpty(res))
+                    {
+                        Console.Write(res);
+                    }
+
                     // ignore any error and keep processing
                     Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\tException: {ex.Message}");
                     isError = true;
@@ -150,8 +155,7 @@ namespace Smoker
                 }
                 catch (Exception ex)
                 {
-                    // ignore any error and keep processing
-                    Console.WriteLine($"{ex.Message}\tException: {1}", DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture));
+                    Console.WriteLine($"{res}\tException: {ex.Message}");
                 }
             }
 
@@ -176,7 +180,7 @@ namespace Smoker
             DateTime dtMax = DateTime.MaxValue;
             HttpRequestMessage req;
             string body;
-            string res;
+            string res = string.Empty;
 
             int i;
             Request r;
@@ -256,7 +260,6 @@ namespace Smoker
                     catch (System.Threading.Tasks.TaskCanceledException tce)
                     {
                         // request timeout error
-
                         string message = tce.Message;
 
                         if (tce.InnerException != null)
@@ -265,11 +268,22 @@ namespace Smoker
                         }
 
                         Console.WriteLine($"{id}\t500\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t0\t{r.Url}\tSmokerException\t{message}");
+
+                        if (!string.IsNullOrEmpty(res))
+                        {
+                            Console.Write(res);
+                        }
                     }
+
                     catch (Exception ex)
                     {
                         // ignore any error and keep processing
                         Console.WriteLine($"{id}\t500\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t0\t{r.Url}\tSmokerException\t{ex.Message}\n{ex}");
+
+                        if (!string.IsNullOrEmpty(res))
+                        {
+                            Console.Write(res);
+                        }
                     }
 
                     // increment the index
@@ -310,12 +324,22 @@ namespace Smoker
                 body ??= string.Empty;
 
                 res += ValidateStatusCode(r, resp);
-                res += ValidateContentType(r, resp);
-                res += ValidateContentLength(r, resp);
-                res += ValidateContains(r, body);
-                res += ValidateExactMatch(r, body);
-                res += ValidateJsonArray(r, body);
-                res += ValidateJsonObject(r, body);
+
+                // don't validate if status code is incorrect
+                if (string.IsNullOrEmpty(res))
+                {
+                    res += ValidateContentType(r, resp);
+                }
+
+                // don't validate if content-type is incorrect
+                if (string.IsNullOrEmpty(res))
+                {
+                    res += ValidateContentLength(r, resp);
+                    res += ValidateContains(r, body);
+                    res += ValidateExactMatch(r, body);
+                    res += ValidateJsonArray(r, body);
+                    res += ValidateJsonObject(r, body);
+                }
             }
 
             return res;
@@ -364,7 +388,7 @@ namespace Smoker
             {
                 if (resp.Content.Headers.ContentType != null && !resp.Content.Headers.ContentType.ToString().StartsWith(r.Validation.ContentType, StringComparison.OrdinalIgnoreCase))
                 {
-                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: ContentType: {resp.Content.Headers.ContentType}\n");
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: ContentType: {resp.Content.Headers.ContentType} Expected: {r.Validation.ContentType}\n");
                     App.Metrics.Add(0, 0);
                 }
             }
@@ -392,7 +416,7 @@ namespace Smoker
             {
                 if (resp.Content.Headers.ContentLength < r.Validation.MinLength)
                 {
-                    res = string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MinContentLength: {resp.Content.Headers.ContentLength}\n");
+                    res = string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MinContentLength: Actual: {resp.Content.Headers.ContentLength} Expected: {r.Validation.MinLength}\n");
                     App.Metrics.Add(0, 0);
                 }
             }
@@ -402,7 +426,7 @@ namespace Smoker
             {
                 if (resp.Content.Headers.ContentLength > r.Validation.MaxLength)
                 {
-                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MaxContentLength: {resp.Content.Headers.ContentLength}\n");
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tValidation Failed: MaxContentLength: Actual: {resp.Content.Headers.ContentLength} Expected: {r.Validation.MaxLength}\n");
                     App.Metrics.Add(0, 0);
                 }
             }
@@ -507,12 +531,12 @@ namespace Smoker
                 }
                 catch (SerializationException se)
                 {
-                    res += string.Format(CultureInfo.InvariantCulture, $"Exception|{se.Source}|{se.TargetSite}|{se.Message}");
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tException: {se.Message}\n");
                 }
 
                 catch (Exception ex)
                 {
-                    res += string.Format(CultureInfo.InvariantCulture, $"Exception|{ex.Source}|{ex.TargetSite}|{ex.Message}");
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tException: {ex.Message}\n");
                 }
             }
 
@@ -557,12 +581,12 @@ namespace Smoker
                 }
                 catch (SerializationException se)
                 {
-                    res += string.Format(CultureInfo.InvariantCulture, $"Exception|{se.Source}|{se.TargetSite}|{se.Message}");
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tException: {se.Message}\n");
                 }
 
                 catch (Exception ex)
                 {
-                    res += string.Format(CultureInfo.InvariantCulture, $"Exception|{ex.Source}|{ex.TargetSite}|{ex.Message}");
+                    res += string.Format(CultureInfo.InvariantCulture, $"\tException: {ex.Message}\n");
                 }
             }
 
