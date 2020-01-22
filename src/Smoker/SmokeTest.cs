@@ -117,7 +117,7 @@ namespace Smoker
             return log;
         }
 
-        void LogToConsole(Config config, Request r, HttpResponseMessage resp, double duration, PerfLog perfLog, string res)
+        static void LogToConsole(Config config, Request r, HttpResponseMessage resp, double duration, PerfLog perfLog, string res)
         {
             string log = string.Empty;
 
