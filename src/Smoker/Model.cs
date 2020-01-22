@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Smoker
 {
@@ -11,8 +12,24 @@ namespace Smoker
         public string Url { get; set; }
         public string Body { get; set; } = null;
 
+        public PerfTarget PerfTarget { get; set; }
+
         public List<Header> Headers { get; set; } = null;
         public Validation Validation { get; set; } = new Validation();
+    }
+
+    public class PerfLog
+    {
+        public DateTime Date { get; set; } = DateTime.UtcNow;
+        public string Category { get; set; }
+        public int PerfLevel { get; set; }
+        public bool Validated { get; set; } = true;
+    }
+
+    public class PerfTarget
+    {
+        public string Category { get; set; }
+        public List<double> Targets { get; set; }
     }
 
     public class Header

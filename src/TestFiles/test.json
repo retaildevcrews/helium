@@ -1,0 +1,16 @@
+[
+  {"Url":"/healthz","PerfTarget":{"Category": "healthz", "Targets":[800,1200,1800]},"Validation":{"ContentType":"text/plain","ExactMatch":{"Value":"up"}}},
+  {"Url":"/healthz/ietf","PerfTarget":{"Category": "healthz"},"Validation":{"ContentType":"application/health+json","JsonObject":[{"Field":"status","Value":"up"}]}},
+  {"Url":"/api/actors/nm0000173","PerfTarget":{"Category": "DirectRead"},"Validation":{"JsonObject":[{"Field":"type","Value":"Actor"},{"Field":"id","Value":"nm0000173"},{"Field":"actorId","Value":"nm0000173"},{"Field":"name","Value":"Nicole Kidman"},{"Field":"birthYear","Value":1967}]}},
+  {"Url":"/api/movies/tt0133093","PerfTarget":{"Category": "DirectRead"},"Validation":{"JsonObject":[{"Field":"type","Value":"Movie"},{"Field":"id","Value":"tt0133093"},{"Field":"movieId","Value":"tt0133093"},{"Field":"title","Value":"The Matrix"},{"Field":"year","Value":1999}]}},
+  {"Url":"/api/actors","PerfTarget":{"Category": "PagedRead"},"Validation":{"JsonArray":{"Count":100}}},
+  {"Url":"/api/genres","PerfTarget":{"Category": "PagedRead"},"Validation":{"JsonArray":{"Count":21}}},
+  {"Url":"/api/movies","PerfTarget":{"Category": "PagedRead"},"Validation":{"JsonArray":{"Count":100}}},
+  {"Url":"/api/actors?q=nicole","PerfTarget":{"Category": "SearchActors"},"Validation":{"JsonArray":{"Count":5}}},
+  {"Url":"/api/movies?q=ring","PerfTarget":{"Category": "SearchMovies"},"Validation":{"JsonArray":{"Count":7}}},
+  {"Url":"/api/movies?actorid=nm0000206","PerfTarget":{"Category": "SearchMovies"},"Validation":{"JsonArray":{"Count":45}}},
+  {"Url":"/api/movies?genre=action","PerfTarget":{"Category": "SearchMovies"},"Validation":{"JsonArray":{"Count":100}}},
+  {"Url":"/api/movies?toprated=true","PerfTarget":{"Category": "SearchMovies"},"Validation":{"JsonArray":{"Count":10}}},
+  {"Url":"/api/movies?year=1999","PerfTarget":{"Category": "SearchMovies"},"Validation":{"JsonArray":{"Count":39}}},
+  {"Url":"/api/featured/movie","PerfTarget":{"Category": "SearchMovies"},"Validation":{"JsonObject":[{"Field":"type","Value":"Movie"},{"Field":"id","Value":null},{"Field":"movieId","Value":null},{"Field":"title","Value":null},{"Field":"year","Value":null}]}},
+]
