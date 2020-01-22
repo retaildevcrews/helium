@@ -122,7 +122,7 @@ namespace Smoker
             string log = string.Empty;
 
             // date is redundant if running as a web server
-            if (config.RunWeb)
+            if (config == null || !config.RunWeb)
             {
                 log = string.Format(CultureInfo.InvariantCulture, $"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t");
             }
@@ -164,7 +164,7 @@ namespace Smoker
                         // check the performance
                         var perfLog = GetPerfLog(r, string.IsNullOrEmpty(res), duration);
 
-                        LogToConsole(r, resp, duration, perfLog, res);
+                        LogToConsole(null, r, resp, duration, perfLog, res);
                     }
                 }
                 catch (Exception ex)
@@ -309,7 +309,7 @@ namespace Smoker
                             // only log 4XX and 5XX status codes
                             if (config.Verbose || (int)resp.StatusCode > 399 || !string.IsNullOrEmpty(res))
                             {
-                                LogToConsole(r, resp, duration, perfLog, res);
+                                LogToConsole(config, r, resp, duration, perfLog, res);
                             }
 
                             App.Metrics.Add((int)resp.StatusCode, duration, perfLog.Category, perfLog.Validated, perfLog.PerfLevel);
