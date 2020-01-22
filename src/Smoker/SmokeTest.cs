@@ -45,8 +45,21 @@ namespace Smoker
             List<Request> fullList = new List<Request>();
             _requestList = new List<Request>();
 
-            // zzz add error checking
-            Targets = JsonConvert.DeserializeObject<Dictionary<string, PerfTarget>>(File.ReadAllText("TestFiles/perfTargets.json"));
+            // Read Performance Targets
+            const string perfFileName = "TestFiles/perfTargets.json";
+
+            if (File.Exists(perfFileName))
+            {
+                try
+                {
+                    Targets = JsonConvert.DeserializeObject<Dictionary<string, PerfTarget>>(File.ReadAllText(perfFileName));
+                }
+                catch
+                {
+                    Console.WriteLine("Unable to read performance targets");
+                    Targets = new Dictionary<string, PerfTarget>();
+                }
+            }
 
             foreach (string inputFile in fileList)
             {
