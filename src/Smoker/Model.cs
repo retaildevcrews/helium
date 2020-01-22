@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Smoker
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "can't be read-only")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "can't be read-only - json serialization")]
     public class Request
     {
         public int SortOrder { get; set; } = 100;
@@ -26,6 +26,7 @@ namespace Smoker
         public bool Validated { get; set; } = true;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "can't be read-only - json serialization")]
     public class PerfTarget
     {
         public string Category { get; set; }

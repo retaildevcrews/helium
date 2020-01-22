@@ -22,6 +22,7 @@ namespace Smoker
         private readonly string _baseUrl;
         private readonly HttpClient _client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "can't be readonly - json serialization")]
         private Dictionary<string, PerfTarget> Targets = new Dictionary<string, PerfTarget>();
 
         public Test(List<string> fileList, string baseUrl)
@@ -104,6 +105,11 @@ namespace Smoker
             return log;
         }
 
+        static void LogToConsole(Request r, HttpResponseMessage resp, double duration, PerfLog perfLog, string res)
+        {
+            Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t{(int)resp.StatusCode}\t{duration}\t{perfLog.Category.PadRight(13)}\t{perfLog.PerfLevel}\t{perfLog.Validated}\t{resp.Content.Headers.ContentLength}\t{r.Url}{res.Replace("\n", string.Empty, StringComparison.OrdinalIgnoreCase)}");
+        }
+
         // run once
         public async Task<bool> RunOnce()
         {
@@ -136,8 +142,7 @@ namespace Smoker
                         // check the performance
                         var perfLog = GetPerfLog(r, string.IsNullOrEmpty(res), duration);
 
-                        Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t{(int)resp.StatusCode}\t{duration}\t{perfLog.Category.PadRight(13)}\t{perfLog.PerfLevel}\t{perfLog.Validated}\t{resp.Content.Headers.ContentLength}\t{r.Url}{res.Replace("\n", string.Empty)}");
-                        //Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t{(int)resp.StatusCode}\t{duration}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
+                        LogToConsole(r, resp, duration, perfLog, res);
                     }
                 }
                 catch (Exception ex)
