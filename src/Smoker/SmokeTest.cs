@@ -22,7 +22,7 @@ namespace Smoker
         private readonly string _baseUrl;
         private readonly HttpClient _client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
 
-        private readonly Dictionary<string, PerfTarget> Targets = new Dictionary<string, PerfTarget>();
+        private Dictionary<string, PerfTarget> Targets = new Dictionary<string, PerfTarget>();
 
         public Test(List<string> fileList, string baseUrl)
         {
@@ -43,6 +43,9 @@ namespace Smoker
             List<Request> list;
             List<Request> fullList = new List<Request>();
             _requestList = new List<Request>();
+
+            // zzz add error checking
+            Targets = JsonConvert.DeserializeObject<Dictionary<string, PerfTarget>>(File.ReadAllText("TestFiles/perfTargets.json"));
 
             foreach (string inputFile in fileList)
             {
@@ -74,7 +77,7 @@ namespace Smoker
         {
             PerfLog log = new PerfLog
             {
-                Category = r.PerfTarget.Category,
+                Category = r?.PerfTarget?.Category ?? string.Empty,
                 Validated = validated
             };
 
@@ -85,11 +88,11 @@ namespace Smoker
 
                 if (target != null)
                 {
-                    log.PerfLevel = target.Targets.Count;
+                    log.PerfLevel = target.Targets.Count + 1;
 
                     for (int i = 0; i < target.Targets.Count; i++)
                     {
-                        if (duration < target.Targets[i])
+                        if (duration <= target.Targets[i])
                         {
                             log.PerfLevel = i + 1;
                             break;
@@ -642,16 +645,6 @@ namespace Smoker
                 Console.WriteLine($"File Not Found: {file}");
                 return null;
             }
-
-            // TODO - this is a temporary experiment - Categories and quartiles should be in the json files
-            // create perf targets (quartiles) by category
-            Targets.Add("default", new PerfTarget { Category = "default", Targets = new List<double> { 100, 200, 400 } });
-            Targets.Add("static", new PerfTarget { Category = "static", Targets = new List<double> { 40, 80, 160 } });
-            Targets.Add("DirectRead", new PerfTarget { Category = "DirectRead", Targets = new List<double> { 20, 40, 80 } });
-            Targets.Add("PagedRead", new PerfTarget { Category = "PagedRead", Targets = new List<double> { 40, 80, 160 } });
-            Targets.Add("SearchActors", new PerfTarget { Category = "SearchActors", Targets = new List<double> { 100, 200, 400 } });
-            Targets.Add("SearchMovies", new PerfTarget { Category = "SearchMovies", Targets = new List<double> { 100, 200, 400 } });
-            Targets.Add("healthz", new PerfTarget { Category = "healthz", Targets = new List<double> { 400, 800, 1600 } });
 
             // read the file
             string json = File.ReadAllText(file);
