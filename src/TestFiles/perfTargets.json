@@ -1,0 +1,9 @@
+[
+  {"Category":"default","Targets":[100,200,400]},
+  {"Category":"DirectRead","Targets":[20,40,80]},
+  {"Category":"healthz","Targets":[400,800,1600]},
+  {"Category":"PagedRead","Targets":[40,80,160]},
+  {"Category":"SearchActors","Targets":[100,200,400]},
+  {"Category":"SearchMovies","Targets":[100,200,400]},
+  {"Category":"static","Targets":[40,80,160]},
+]
