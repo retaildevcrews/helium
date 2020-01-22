@@ -161,13 +161,14 @@ namespace Helium
             html += "\n";
 
             // add column headers
-            html += ("Count").PadLeft(37) + "         Avg         Min         Max\n";
+            html += ("Count").PadLeft(37) + "    Failures   Validation   Quartile 1     Quartile 2     Quartile 3     Quartile 4         Avg         Min         Max\n";
 
             // display each line
             var list = App.Metrics.GetMetricList(maxAge);
+
             foreach (var r in list)
             {
-                html += string.Format(CultureInfo.InvariantCulture, $"{r.Key.PadLeft(r.Key.Length + 4).PadRight(24).Substring(0, 24)} {r.Count.ToString(CultureInfo.InvariantCulture).PadLeft(12)} {Math.Round(r.Average, 1).ToString(CultureInfo.InvariantCulture).PadLeft(11)} {r.Min.ToString(CultureInfo.InvariantCulture).PadLeft(11)} {r.Max.ToString(CultureInfo.InvariantCulture).PadLeft(11)} \n");
+                html += string.Format(CultureInfo.InvariantCulture, $"{r.Category.PadLeft(r.Category.Length + 4).PadRight(24).Substring(0, 24)} {r.Count.ToString(CultureInfo.InvariantCulture).PadLeft(12)} {r.Failures.ToString(CultureInfo.InvariantCulture).PadLeft(11)}  {r.ValidationErrors.ToString(CultureInfo.InvariantCulture).PadLeft(11)} {r.Q1.ToString(CultureInfo.InvariantCulture).PadLeft(12)} {r.Q2.ToString(CultureInfo.InvariantCulture).PadLeft(14)} {r.Q3.ToString(CultureInfo.InvariantCulture).PadLeft(14)} {r.Q4.ToString(CultureInfo.InvariantCulture).PadLeft(14)} {Math.Round(r.Average, 0).ToString(CultureInfo.InvariantCulture).PadLeft(11)} {r.Min.ToString(CultureInfo.InvariantCulture).PadLeft(11)} {r.Max.ToString(CultureInfo.InvariantCulture).PadLeft(11)} \n");
             }
 
             return html + "\n";

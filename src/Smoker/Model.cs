@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Smoker
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "can't be read-only")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "can't be read-only - json serialization")]
     public class Request
     {
         public int SortOrder { get; set; } = 100;
@@ -11,8 +12,25 @@ namespace Smoker
         public string Url { get; set; }
         public string Body { get; set; } = null;
 
+        public PerfTarget PerfTarget { get; set; }
+
         public List<Header> Headers { get; set; } = null;
         public Validation Validation { get; set; } = new Validation();
+    }
+
+    public class PerfLog
+    {
+        public DateTime Date { get; set; } = DateTime.UtcNow;
+        public string Category { get; set; }
+        public int PerfLevel { get; set; }
+        public bool Validated { get; set; } = true;
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "can't be read-only - json serialization")]
+    public class PerfTarget
+    {
+        public string Category { get; set; }
+        public List<double> Targets { get; set; }
     }
 
     public class Header
