@@ -135,17 +135,20 @@ namespace Helium
         /// </summary>
         /// <param name="status">http status code (or 0 for validation error)</param>
         /// <param name="duration">duration of request in ms</param>
-        public void Add(int status, int duration)
+        /// <param name="category">category of request</param>
+        /// <param name="perfLevel">perf level (quartile)</param>
+        /// <param name="validated">validated successfully</param>
+        public void Add(int status, double duration, string category, bool validated, int perfLevel)
         {
             // only track if MaxAge > 0
             if (MaxAge > 0)
             {
                 // validate status
-                if (status == 0 || (status >= 200 && status < 600))
+                if (status >= 200 && status < 600)
                 {
                     lock (Requests)
                     {
-                        Requests.Add(new Metric { Key = GetKeyFromStatus(status), Duration = duration });
+                        Requests.Add(new Metric { Key = GetKeyFromStatus(status), Duration = duration, Category = category, Validated = validated, PerfLevel = perfLevel });
                     }
                 }
             }
@@ -159,7 +162,10 @@ namespace Helium
     {
         public DateTime Time { get; set; } = DateTime.UtcNow;
         public string Key { get; set; } = string.Empty;
-        public long Duration { get; set; } = 0;
+        public double Duration { get; set; } = 0;
+        public string Category { get; set; } = string.Empty;
+        public int PerfLevel { get; set; } = 0;
+        public bool Validated { get; set; } = true;
     }
 
     /// <summary>
@@ -169,9 +175,9 @@ namespace Helium
     {
         public string Key { get; set; } = string.Empty;
         public long Count { get; set; } = 0;
-        public long Duration { get; set; } = 0;
+        public double Duration { get; set; } = 0;
         public double Average { get; set; } = 0;
-        public long Min { get; set; } = 0;
-        public long Max { get; set; } = 0;
+        public double Min { get; set; } = 0;
+        public double Max { get; set; } = 0;
     }
 }

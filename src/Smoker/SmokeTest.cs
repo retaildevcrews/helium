@@ -175,6 +175,7 @@ namespace Smoker
         }
 
         // run from the web API
+        // used in private build
         public async Task<string> RunFromWebRequest()
         {
             DateTime dt;
@@ -285,32 +286,22 @@ namespace Smoker
                             using HttpResponseMessage resp = await _client.SendAsync(req).ConfigureAwait(false);
                             body = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-                            int duration = (int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds;
+                            double duration = Math.Round(DateTime.UtcNow.Subtract(dt).TotalMilliseconds, 0);
 
                             // validate the response
                             res = ValidateAll(r, resp, body);
 
+
+                            // check the performance
+                            var perfLog = GetPerfLog(r, string.IsNullOrEmpty(res), duration);
+
                             // only log 4XX and 5XX status codes
                             if (config.Verbose || (int)resp.StatusCode > 399 || !string.IsNullOrEmpty(res))
                             {
-                                if (config.RunWeb)
-                                {
-                                    // datetime is redundant for web app
-                                    Console.WriteLine($"{id}\t{(int)resp.StatusCode}\t{duration}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"{id}\t{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t{duration}\t{resp.Content.Headers.ContentLength}\t{r.Url}");
-                                }
-
-                                if (!string.IsNullOrEmpty(res))
-                                {
-                                    // res has a LF appended, so don't use writeline
-                                    Console.Write(res);
-                                }
+                                LogToConsole(r, resp, duration, perfLog, res);
                             }
 
-                            App.Metrics.Add((int)resp.StatusCode, duration);
+                            App.Metrics.Add((int)resp.StatusCode, duration, perfLog.Category, perfLog.Validated, perfLog.PerfLevel);
                         }
                     }
                     catch (System.Threading.Tasks.TaskCanceledException tce)
@@ -323,7 +314,7 @@ namespace Smoker
                             message = tce.InnerException.Message;
                         }
 
-                        Console.WriteLine($"{id}\t500\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t0\t{r.Url}\tSmokerException\t{message}");
+                        Console.WriteLine($"{id}\t500\t{Math.Round(DateTime.UtcNow.Subtract(dt).TotalMilliseconds, 0)}\t0\t{r.Url}\tSmokerException\t{message}");
 
                         if (!string.IsNullOrEmpty(res))
                         {
@@ -334,7 +325,7 @@ namespace Smoker
                     catch (Exception ex)
                     {
                         // ignore any error and keep processing
-                        Console.WriteLine($"{id}\t500\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t0\t{r.Url}\tSmokerException\t{ex.Message}\n{ex}");
+                        Console.WriteLine($"{id}\t500\t{Math.Round(DateTime.UtcNow.Subtract(dt).TotalMilliseconds, 0)}\t0\t{r.Url}\tSmokerException\t{ex.Message}\n{ex}");
 
                         if (!string.IsNullOrEmpty(res))
                         {
@@ -419,7 +410,6 @@ namespace Smoker
             if ((int)resp.StatusCode != r.Validation.Code)
             {
                 res += string.Format(CultureInfo.InvariantCulture, $"\tStatusCode: {(int)resp.StatusCode} Expected: {r.Validation.Code}\n");
-                App.Metrics.Add(0, 0);
             }
 
             return res;
@@ -445,7 +435,6 @@ namespace Smoker
                 if (resp.Content.Headers.ContentType != null && !resp.Content.Headers.ContentType.ToString().StartsWith(r.Validation.ContentType, StringComparison.OrdinalIgnoreCase))
                 {
                     res += string.Format(CultureInfo.InvariantCulture, $"\tContentType: {resp.Content.Headers.ContentType} Expected: {r.Validation.ContentType}\n");
-                    App.Metrics.Add(0, 0);
                 }
             }
 
@@ -473,7 +462,6 @@ namespace Smoker
                 if (resp.Content.Headers.ContentLength < r.Validation.MinLength)
                 {
                     res = string.Format(CultureInfo.InvariantCulture, $"\tMinContentLength: Actual: {resp.Content.Headers.ContentLength} Expected: {r.Validation.MinLength}\n");
-                    App.Metrics.Add(0, 0);
                 }
             }
 
@@ -483,7 +471,6 @@ namespace Smoker
                 if (resp.Content.Headers.ContentLength > r.Validation.MaxLength)
                 {
                     res += string.Format(CultureInfo.InvariantCulture, $"\tMaxContentLength: Actual: {resp.Content.Headers.ContentLength} Expected: {r.Validation.MaxLength}\n");
-                    App.Metrics.Add(0, 0);
                 }
             }
 
@@ -506,7 +493,6 @@ namespace Smoker
                 if (!body.Equals(r.Validation.ExactMatch.Value, r.Validation.ExactMatch.IsCaseSensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture))
                 {
                     res += string.Format(CultureInfo.InvariantCulture, $"\tExactMatch: Actual : {body.PadRight(40).Substring(0, 40).Trim()} : Expected: {r.Validation.ExactMatch.Value.PadRight(40).Substring(0, 40).Trim()}\n");
-                    App.Metrics.Add(0, 0);
                 }
             }
 
@@ -532,7 +518,6 @@ namespace Smoker
                     if (!body.Contains(c.Value, c.IsCaseSensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture))
                     {
                         res += string.Format(CultureInfo.InvariantCulture, $"\tContains: {c.Value.PadRight(40).Substring(0, 40).Trim()}\n");
-                        App.Metrics.Add(0, 0);
                     }
                 }
             }
@@ -561,28 +546,24 @@ namespace Smoker
                     if (r.Validation.JsonArray.Count > 0 && r.Validation.JsonArray.Count != resList.Count)
                     {
                         res += string.Format(CultureInfo.InvariantCulture, $"\tJsonCount: {r.Validation.JsonArray.Count}  Actual: {resList.Count}\n");
-                        App.Metrics.Add(0, 0);
                     }
 
                     // validate count is zero
                     if (r.Validation.JsonArray.CountIsZero && 0 != resList.Count)
                     {
                         res += string.Format(CultureInfo.InvariantCulture, $"\tJsonCountIsZero: Actual: {resList.Count}\n");
-                        App.Metrics.Add(0, 0);
                     }
 
                     // validate min count
                     if (r.Validation.JsonArray.MinCount > 0 && r.Validation.JsonArray.MinCount > resList.Count)
                     {
                         res += string.Format(CultureInfo.InvariantCulture, $"\tMinJsonCount: {r.Validation.JsonArray.MinCount}  Actual: {resList.Count}\n");
-                        App.Metrics.Add(0, 0);
                     }
 
                     // validate max count
                     if (r.Validation.JsonArray.MaxCount > 0 && r.Validation.JsonArray.MaxCount < resList.Count)
                     {
                         res += string.Format(CultureInfo.InvariantCulture, $"\tMaxJsonCount: {r.Validation.JsonArray.MaxCount}  Actual: {resList.Count}\n");
-                        App.Metrics.Add(0, 0);
                     }
                 }
                 catch (SerializationException se)
