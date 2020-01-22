@@ -47,62 +47,53 @@ namespace Helium
         public List<MetricAggregate> GetMetricList(int maxAge)
         {
             // Build the list of expected results
-            List<MetricAggregate> res = new List<MetricAggregate>
-            {
-                new MetricAggregate { Key = "Total Requests" },
-                new MetricAggregate { Key = "2xx" },
-                new MetricAggregate { Key = "3xx" },
-                new MetricAggregate { Key = "4xx" },
-                new MetricAggregate { Key = "5xx" },
-                new MetricAggregate { Key = "Validation Errors" }
-            };
+            List<MetricAggregate> res = new List<MetricAggregate>();
 
             DateTime minDate = DateTime.UtcNow.AddMinutes(-1 * maxAge);
+
+            List<dynamic> query;
 
             // run the aggregate query
             lock (Requests)
             {
-                var query = Requests.Where(r => r.Time >= minDate)
-                    .GroupBy(r => r.Key,
-                    (key, reqs) => new
+                query = Requests.Where(r => r.Time >= minDate)
+                    .GroupBy(r => r.Category,
+                    (cat, reqs) => new
                     {
-                        Key = key,
+                        Category = cat,
                         Count = reqs.Count(),
+                        Failures = reqs.Count(d => d.StatusCode >= 400),
+                        ValidationErrors = reqs.Count(d => !d.Validated),
+                        Q1 = reqs.Count(d => d.PerfLevel == 1),
+                        Q2 = reqs.Count(d => d.PerfLevel == 2),
+                        Q3 = reqs.Count(d => d.PerfLevel == 3),
+                        Q4 = reqs.Count(d => d.PerfLevel == 4),
                         Duration = reqs.Sum(d => d.Duration),
                         Min = reqs.Min(d => d.Duration),
                         Max = reqs.Max(d => d.Duration)
-                    });
-
-                // update the result list based on the aggregate
-                foreach (var r in query)
-                {
-                    foreach (var m3 in res)
-                    {
-                        if (m3.Key == r.Key)
-                        {
-                            m3.Count = r.Count;
-                            m3.Duration = r.Duration;
-                            m3.Min = r.Min;
-                            m3.Max = r.Max;
-                            m3.Average = m3.Count > 0 ? m3.Duration / m3.Count : 0;
-                            break;
-                        }
-                    }
-                }
+                    }).OrderBy(d => d.Category).ToList<dynamic>();
             }
 
-            // set min value high
-            res[0].Min = 256 * 1024;
+            MetricAggregate m3;
 
-            // sum the 2xx, 3xx, 4xx, 5xx for total results
-            for (int i = 1; i < 5; i++)
+            // update the result list based on the aggregate
+            foreach (var r in query)
             {
-                res[0].Count += res[i].Count;
-                res[0].Duration += res[i].Duration;
+                m3 = new MetricAggregate();
+                res.Add(m3);
 
-                res[0].Average = res[0].Count > 0 ? res[0].Duration / res[0].Count : 0;
-                res[0].Min = res[i].Min > 0 && res[0].Min > res[i].Min ? res[i].Min : res[0].Min;
-                res[0].Max = res[0].Max < res[i].Max ? res[i].Max : res[0].Max;
+                m3.Category = r.Category;
+                m3.Count = r.Count;
+                m3.Failures = r.Failures;
+                m3.ValidationErrors = r.ValidationErrors;
+                m3.Q1 = r.Q1;
+                m3.Q2 = r.Q2;
+                m3.Q3 = r.Q3;
+                m3.Q4 = r.Q4;
+                m3.Duration = r.Duration;
+                m3.Min = r.Min;
+                m3.Max = r.Max;
+                m3.Average = m3.Count > 0 ? m3.Duration / m3.Count : 0;
             }
 
             return res;
@@ -148,7 +139,7 @@ namespace Helium
                 {
                     lock (Requests)
                     {
-                        Requests.Add(new Metric { Key = GetKeyFromStatus(status), Duration = duration, Category = category, Validated = validated, PerfLevel = perfLevel });
+                        Requests.Add(new Metric { StatusCode = status, Duration = duration, Category = category, Validated = validated, PerfLevel = perfLevel });
                     }
                 }
             }
@@ -162,6 +153,7 @@ namespace Helium
     {
         public DateTime Time { get; set; } = DateTime.UtcNow;
         public string Key { get; set; } = string.Empty;
+        public int StatusCode { get; set; } = 0;
         public double Duration { get; set; } = 0;
         public string Category { get; set; } = string.Empty;
         public int PerfLevel { get; set; } = 0;
@@ -169,11 +161,18 @@ namespace Helium
     }
 
     /// <summary>
-    /// Metric aggregation by Key
+    /// Metric aggregation by Category
     /// </summary>
     public class MetricAggregate
     {
-        public string Key { get; set; } = string.Empty;
+        public string Category { get; set; }
+        public int Total { get; set; }
+        public int Failures { get; set; }
+        public int ValidationErrors { get; set; }
+        public int Q1 { get; set; }
+        public int Q2 { get; set; }
+        public int Q3 { get; set; }
+        public int Q4 { get; set; }
         public long Count { get; set; } = 0;
         public double Duration { get; set; } = 0;
         public double Average { get; set; } = 0;

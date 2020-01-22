@@ -291,7 +291,6 @@ namespace Smoker
                             // validate the response
                             res = ValidateAll(r, resp, body);
 
-
                             // check the performance
                             var perfLog = GetPerfLog(r, string.IsNullOrEmpty(res), duration);
 
