@@ -645,8 +645,10 @@ namespace Smoker
 
             // TODO - this is a temporary experiment - Categories and quartiles should be in the json files
             // create perf targets (quartiles) by category
-            Targets.Add("DirectRead", new PerfTarget { Category = "DirectRead", Targets = new List<double> { 10, 20, 40 } });
-            Targets.Add("PagedRead", new PerfTarget { Category = "PagedRead", Targets = new List<double> { 40, 60, 100 } });
+            Targets.Add("default", new PerfTarget { Category = "default", Targets = new List<double> { 100, 200, 400 } });
+            Targets.Add("static", new PerfTarget { Category = "static", Targets = new List<double> { 40, 80, 160 } });
+            Targets.Add("DirectRead", new PerfTarget { Category = "DirectRead", Targets = new List<double> { 20, 40, 80 } });
+            Targets.Add("PagedRead", new PerfTarget { Category = "PagedRead", Targets = new List<double> { 40, 80, 160 } });
             Targets.Add("SearchActors", new PerfTarget { Category = "SearchActors", Targets = new List<double> { 100, 200, 400 } });
             Targets.Add("SearchMovies", new PerfTarget { Category = "SearchMovies", Targets = new List<double> { 100, 200, 400 } });
             Targets.Add("healthz", new PerfTarget { Category = "healthz", Targets = new List<double> { 400, 800, 1600 } });
