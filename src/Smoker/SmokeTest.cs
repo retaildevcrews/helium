@@ -57,7 +57,6 @@ namespace Smoker
                 catch
                 {
                     Console.WriteLine("Unable to read performance targets");
-                    Targets = new Dictionary<string, PerfTarget>();
                 }
             }
 
@@ -118,9 +117,19 @@ namespace Smoker
             return log;
         }
 
-        static void LogToConsole(Request r, HttpResponseMessage resp, double duration, PerfLog perfLog, string res)
+        void LogToConsole(Config config, Request r, HttpResponseMessage resp, double duration, PerfLog perfLog, string res)
         {
-            Console.WriteLine($"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t{(int)resp.StatusCode}\t{duration}\t{perfLog.Category.PadRight(13)}\t{perfLog.PerfLevel}\t{perfLog.Validated}\t{resp.Content.Headers.ContentLength}\t{r.Url}{res.Replace("\n", string.Empty, StringComparison.OrdinalIgnoreCase)}");
+            string log = string.Empty;
+
+            // date is redundant if running as a web server
+            if (config.RunWeb)
+            {
+                log = string.Format(CultureInfo.InvariantCulture, $"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t");
+            }
+
+            log += string.Format(CultureInfo.InvariantCulture, $"{(int)resp.StatusCode}\t{duration}\t{perfLog.Category.PadRight(13)}\t{perfLog.PerfLevel}\t{perfLog.Validated}\t{resp.Content.Headers.ContentLength}\t{r.Url}{res.Replace("\n", string.Empty, StringComparison.OrdinalIgnoreCase)}");
+
+            Console.WriteLine(log);
         }
 
         // run once
@@ -204,10 +213,13 @@ namespace Smoker
                         using HttpResponseMessage resp = await _client.SendAsync(req).ConfigureAwait(false);
                         body = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 
+                        // TODO - refactor / reformat / add perf logging
+
                         res += string.Format(CultureInfo.InvariantCulture, $"{DateTime.UtcNow.ToString("MM/dd hh:mm:ss", CultureInfo.InvariantCulture)}\t{(int)resp.StatusCode}\t{(int)DateTime.UtcNow.Subtract(dt).TotalMilliseconds}\t{resp.Content.Headers.ContentLength}\t{r.Url}\n");
 
                         // validate the response
                         res += ValidateAll(r, resp, body);
+
                     }
                 }
                 catch (Exception ex)
