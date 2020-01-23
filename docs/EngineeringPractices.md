@@ -11,6 +11,7 @@
 - [ ] CD completes successfully
 - [ ] Smoke test production deployment for minimum of 2 weeks
 - [ ] New changes in smoke test for 48hrs (ongoing)
+- [ ] Create task for required artifacts
 
 Engineering Playbook [Definition of Done](https://github.com/microsoft/code-with-engineering-playbook/blob/master/team-agreements/definition-of-done/readme.md)
 
