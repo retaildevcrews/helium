@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.0.0
+- Jan 31, 2020
+- Moved integration test source code to retaildevcrews/webvalidate
+- Updated docs
+
 ## V0.4.0
 
 - Dec 19, 2019

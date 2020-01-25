@@ -1,9 +1,0 @@
-{
-  "default":{"Category":"default","Targets":[100,200,400]},
-  "DirectRead":{"Category":"DirectRead","Targets":[40,80,120]},
-  "healthz":{"Category":"healthz","Targets":[400,800,1600]},
-  "PagedRead":{"Category":"PagedRead","Targets":[40,80,160]},
-  "SearchActors":{"Category":"SearchActors","Targets":[100,200,400]},
-  "SearchMovies":{"Category":"SearchMovies","Targets":[100,200,400]},
-  "static":{"Category":"static","Targets":[40,80,160]}
-}
