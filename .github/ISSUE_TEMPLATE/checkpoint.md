@@ -15,7 +15,6 @@ This checklist is for verifying the necessary details for a checkpoint review.
 - Review Date: 
 
 ### Demo
-
 _Encouraged to just replay "best of" Sprint Demo_
 
 - [ ] Demo completed
@@ -26,7 +25,6 @@ _Encouraged to just replay "best of" Sprint Demo_
 - [ ] What was actually done this month?
 - [ ] Changes in plan versus last
 - [ ] Key design decisions and their outcomes
-
 
 ### Key Project Risks and Concerns
 
