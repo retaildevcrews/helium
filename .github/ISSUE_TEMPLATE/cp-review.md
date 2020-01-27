@@ -12,7 +12,7 @@ This checklist is for verifying the necessary details for a checkpoint review.
 ## Checkpoint Review
 - [Date]
 - [Milestone, Sprint]
-- [Review Date: ]
+- Review Date: [Add Date/Month scheduled]
 
 ### "DoneLog" Review
 - [ ] What was planned to be done this month?
