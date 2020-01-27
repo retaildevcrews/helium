@@ -246,24 +246,11 @@ Deploy the container to App Service or AKS
 
 Run the Integration Test
 
-```bash
-
-cd src
-
-dotnet run -- --host https://${He_Name}.azurewebsites.net --files baseline.json
-
-```
-
-(Alternative) Run the Integration Test as a Docker container
 
 ```bash
-
-# build the Docker image
-# make sure you are in the root of the repo
-docker build . -t helium-integration
 
 # run the tests in the container
-docker run -it --rm helium-integration --host https://${He_Name}.azurewebsites.net --files baseline.json
+docker run -it --rm retaildevcrew/webvalidate --host https://${He_Name}.azurewebsites.net --files baseline.json
 
 ```
 
