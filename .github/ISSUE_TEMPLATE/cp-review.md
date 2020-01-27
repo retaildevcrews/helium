@@ -10,8 +10,7 @@ assignees: ''
 This checklist is for verifying the necessary details for a checkpoint review. 
 
 ## Checkpoint Review
-- [Date]
-- [Milestone, Sprint]
+- [Milestone, Sprint, Date]
 - Review Date: [Add Date/Month scheduled]
 
 ### "DoneLog" Review
