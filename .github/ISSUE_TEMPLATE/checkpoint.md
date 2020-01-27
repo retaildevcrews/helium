@@ -14,6 +14,11 @@ This checklist is for verifying the necessary details for a checkpoint review.
 - [ Milestone, Sprint, Date ]
 - Review Date: [Add Date/Month scheduled]
 
+### Demo
+
+- [ ] 5m target
+- [ ] Encouraged to just replay "best of" Sprint Demo
+
 ### "DoneLog" Review
 
 - [ ] What was planned to be done this month?
@@ -21,10 +26,6 @@ This checklist is for verifying the necessary details for a checkpoint review.
 - [ ] Changes in plan versus last
 - [ ] Key design decisions and their outcomes
 
-### Demo
-
-- [ ] 5m target
-- [ ] Encouraged to just replay "best of" Sprint Demo
 
 ### Key Project Risks and Concerns
 
