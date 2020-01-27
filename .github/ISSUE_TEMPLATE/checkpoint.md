@@ -11,13 +11,14 @@ This checklist is for verifying the necessary details for a checkpoint review.
 
 ## Checkpoint Review
 
-- [ Milestone, Sprint, Date ]
-- Review Date: [Add Date/Month scheduled]
+- [ Milestone, Period]
+- Review Date: 
 
 ### Demo
 
-- [ ] 5m target
-- [ ] Encouraged to just replay "best of" Sprint Demo
+_Encouraged to just replay "best of" Sprint Demo_
+
+- [ ] Demo completed
 
 ### "DoneLog" Review
 
@@ -29,10 +30,15 @@ This checklist is for verifying the necessary details for a checkpoint review.
 
 ### Key Project Risks and Concerns
 
-- [ ] Present Retro outcomes from the month
-- [ ] Discuss open risks and mitigations
+- [ ] Present Retro
+- [ ] Discuss open risks and mitigation plans
 
 ### Backlog Review
 
-- [ ] What is envisioned to be worked on in the sprints this month?
-- [ ] Multi-checkpoint roadmap update (if applicable)
+- [ ] What is the planned for work in future sprints?
+- [ ] Is additional checkpoint review needed?
+- [ ] Is additional Game Plan review needed?
+
+### Tasks
+
+- [ ] Upload checkpoint review to Artifact Hub
