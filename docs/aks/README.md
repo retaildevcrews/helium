@@ -486,6 +486,9 @@ optionally if you stored the helium-csharp image in your own Azure Container Reg
 
 helm install helium-aks helium --set image.repository=<acr_name>.azurecr.io -f helm-config.yaml
 
+# curl the health check endpoint
+curl ${INGRESS_PIP}.nip.io/healthz
+
 ```
 
 ## Dashboard setup
