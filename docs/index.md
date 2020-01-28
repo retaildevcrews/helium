@@ -38,6 +38,4 @@ This is a Web API reference application designed to "fork and code" with the fol
 
 ### [ACR Tasks](CI-CD/ACRTask.md)
 
-### [Azure DevOps](CI-CD/AzureDevOps.md)
-
 ### [GitHub Actions](CI-CD/GithubActions.md)

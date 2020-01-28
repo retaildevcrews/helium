@@ -39,7 +39,7 @@ return keyVaultClient;
 
 ASP.NET IConfiguration does not currently track changes to Key Vault secrets. Helium implements a loop in Program.cs that continuously checks Key Vault for changes to the CosmosDB paramaters and calls IDal::Reconnect so that Key Rotation and other scenarios can be supported.
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L83)
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L87)
 
 ```c#
 
@@ -68,7 +68,7 @@ if (key != config[Constants.CosmosKey])
 
 The Reconnect method on IDal allows you to programmatically change your CosmosDB client configuration. If one or more of the connection paramaters changed, Reconnect will attempt to connect to CosmosDB using the new Url, key, database and collection. If it fails, the data access layer will continue using the existing credentials. The force parameter allows you to force the reconnect even if the other parameters don't change.
 
-[dalMain.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L46)
+[dalMain.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L53)
 
 ```c#
 
@@ -102,7 +102,7 @@ public async Task Reconnect(string cosmosUrl, string cosmosKey, string cosmosDat
 
 Open and test the CosmosDB connection / database / collection. The call to ReadItemAsync retrieves the Action Genre document and verifies that the new parameters can read the collection.
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L80)
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L92)
 
 ```c#
 
@@ -114,9 +114,9 @@ await con.ReadItemAsync<dynamic>("action", new PartitionKey("0"));
 
 ### Partition Key Function
 
-In order to directly read a document using 1 RU (assuming the document is 1K or less), you need the document's ID and partition key. A good CosmosDB best practice is to compute the partition key from the ID. In our case, we use the integer portion of the Movie or Actor document mod 10. This gives us 10 partitions ("0" - "9") with good distribution. For a deeper discussion on the document modeling decisions, please read this [document](https://github.com/4-co/imdb)
+In order to directly read a document using 1 RU (assuming the document is 1K or less), you need the document's ID and partition key. A good CosmosDB best practice is to compute the partition key from the ID. In our case, we use the integer portion of the Movie or Actor document mod 10. This gives us 10 partitions ("0" - "9") with good distribution. For a deeper discussion on the document modeling decisions, please read this [document](https://github.com/retaildevcrews/imdb).
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L119)
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L132)
 
 ```c#
 
@@ -143,7 +143,7 @@ The first time an AKS pod uses a Managed Identity, it has to start a new proxy. 
 
 Note that once the MI proxy is running, responses are generally under 100ms, so the retry code is not used in that case. The retry code is also not used in the App Service scenario as App Service ensures the proxy is running before starting Helium.
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L228)
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L230)
 
 ```c#
 
@@ -222,7 +222,7 @@ If you need access to Key Vault in your app, you can retrieve the Key Vault Clie
 
 #### Adding Key Vault via ASP.NET DI
 
-[KeyVaultConnectionExtension.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/KeyVaultConnectionExtension.cs#L8)
+[KeyVaultConnectionExtension.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/KeyVault.Extensions/KeyVaultConnectionExtension.cs#L8)
 
 ```c#
 
