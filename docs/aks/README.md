@@ -164,13 +164,13 @@ export He_Cosmos_Col=movies
 az cosmosdb create -g $He_Cosmos_RG -n $He_Name
 
 # create the database
-az cosmosdb database create -d $He_Cosmos_DB -g $He_Cosmos_RG -n $He_Name
+az cosmosdb sql database create -a $He_Name -n $He_Cosmos_DB -g $He_Cosmos_RG
 
-# create the collection
+# create the container
 # 400 is the minimum RUs
 # /partitionKey is the partition key
 # partition key is the id mod 10
-az cosmosdb collection create --throughput 400 --partition-key-path /partitionKey -g $He_Cosmos_RG -n $He_Name -d $He_Cosmos_DB -c $He_Cosmos_Col
+az cosmosdb sql container create --throughput "400" -p /partitionKey -g $He_Cosmos_RG -a $He_Name -d $He_Cosmos_DB -n $He_Cosmos_Col
 
 # get Cosmos readonly key (used by App Service)
 export He_Cosmos_RO_Key=$(az cosmosdb keys list -n $He_Name -g $He_Cosmos_RG --query primaryReadonlyMasterKey -o tsv)
@@ -236,33 +236,45 @@ Create your AKS Cluster
 
 Set local variables to use in AKS deployment
 
-```shell
+```bash
+
 export He_AKS_Name="${He_Name}-aks"
+
 ```
 
 Determine the latest version of Kubernetes supported by AKS. It is recommended to choose the latest version not in preview for production purposes, otherwise choose the latest in the list.
 
-```shell
+```bash
+
 az aks get-versions -l $He_Location -o table
 
 export He_K8S_VER=1.15.5
+
 ```
 
-```shell
+```bash
+
+# note: if you see the following failure, navigate to your .azure\ directory
+# and delete the file "aksServicePrincipal.json": 
+#    Waiting for AAD role to propagate[################################    ]  90.0000%Could not create a
+#    role assignment for ACR. Are you an Owner on this subscription?
+
 az aks create --name $He_AKS_Name --resource-group $He_App_RG --location $He_Location --enable-cluster-autoscaler --min-count 3 --max-count 6 --node-count 3 --kubernetes-version $He_K8S_VER --attach-acr $He_Name  --no-ssh-key
 
 az aks get-credentials -n $He_AKS_Name -g $He_App_RG
 
 kubectl get nodes
+
 ```
 
 Install AAD Pod Identity for the application
 
-Change directories to the `docs\aks` folder and make the `aad-podid.sh` script executable. Runnig this shell script will deploy AAD Pod Identity to your cluster and assign a Managed Identity.
+Change directories to the `docs/aks` folder and make the `aad-podid.sh` script executable. Running this shell script will deploy AAD Pod Identity to your cluster and assign a Managed Identity.
 
 >NOTE: The second command below has a `.` then a space followed by `./aad-podid.sh ...` this is so the exported variables in the script persist after the script ends in the uder interactive shell
 
-```shell
+```bash
+
 export MSI_Name=${He_Name}-msi
 
 cd $REPO_ROOT/docs/aks
@@ -271,26 +283,32 @@ sudo chmod +x aad-podid.sh
 . ./aad-podid.sh -a ${He_AKS_Name} -r ${He_App_RG} -m ${MSI_Name}
 
 cd $REPO_ROOT
-./savenev.sh
+./saveenv.sh
+
 ```
 
 The last line of the output will explain the proper label annotation needed when deploying the application. This will be needed later during the application install
 
-```shell
+```bash
+
 echo $MSI_Name
+
 ```
 
 ### Set Keyvault Policy for MSI User
 
-```shell
+```bash
+
 az keyvault set-policy -n ${He_Name} --object-id ${MSI_PrincID} --secret-permissions get list --key-permissions get list --certificate-permissions get list
+
 ```
 
 ## Install Helm 3
 
 Install the latest version of Helm by download the latest [release](https://github.com/helm/helm/releases):
 
-```shell
+```bash
+
 # mac os
 OS=darwin-amd64 && \
 REL=v3.0.1 && \ #Should be lastest release from https://github.com/helm/helm/releases
@@ -298,11 +316,13 @@ mkdir -p $HOME/.helm/bin && \
 curl -sSL "https://get.helm.sh/helm-${REL}-${OS}.tar.gz" | tar xvz && \
 chmod +x ${OS}/helm && mv ${OS}/helm $HOME/.helm/bin/helm
 rm -R ${OS}
+
 ```
 
 or
 
-```shell
+```bash
+
 # Linux/WSL
 OS=linux-amd64 && \
 REL=v3.0.2 && \
@@ -310,80 +330,99 @@ mkdir -p $HOME/.helm/bin && \
 curl -sSL "https://get.helm.sh/helm-${REL}-${OS}.tar.gz" | tar xvz && \
 chmod +x ${OS}/helm && mv ${OS}/helm $HOME/.helm/bin/helm
 rm -R ${OS}
+
 ```
 
 Add the helm binary to your path and set Helm home:
 
-```shell
+```bash
+
 export PATH=$PATH:$HOME/.helm/bin
 export HELM_HOME=$HOME/.helm
+
 ```
 
 >NOTE: This will only set the helm command during the existing terminal session. Copy the 2 lines above to your bash or zsh profile so that the helm command can be run any time.
 
 Verify the installation with:
 
-```shell
+```bash
+
 helm version
+
 ```
 
 Add the required helm repositories
 
-```shell
+```bash
+
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
 helm repo add application-gateway-kubernetes-ingress https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
 helm repo update
+
 ```
 
 ## Install Linkerd Service Mesh into the cluster
 
 Download the Linkerd v2 CLI:
 
-```shell
+```bash
+
 # macOS and linux/WSL
 
 curl -sL https://run.linkerd.io/install | sh
 export PATH=$PATH:$HOME/.linkerd2/bin
+
 ```
 
 Install the Linkerd control plane in the linkerd namespace:
 
-```shell
+```bash
+
 linkerd install | kubectl apply -f -
+
 ```
 
 Validate the install with:
 
-```shell
+```bash
+
 linkerd check
+
 ```
 
 ## Install the NGNIX ingress controller
 
 Create a namespace for your ingress resources. There is a yaml file located in the clones repository under `$REPO_ROOT/docs/aks/cluster/manifests/ingress-nginx-namespace.yaml`
 
-```shell
+```bash
+
 kubectl apply -f $REPO_ROOT/docs/aks/cluster/manifests/ingress-nginx-namespace.yaml
+
 ```
 
 Use Helm to deploy an NGINX ingress controller
 
-```shell
+```bash
+
 helm install ingress stable/nginx-ingress \
     --namespace ingress-nginx \
     --set controller.replicaCount=2 \
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+
 ```
 
 Get the Public IP of your Ingress Controller. This will be used later in deploying the application.
 
-```shell
-export INGRESS_PIP = $(kubectl get svc -l component=controller -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
+```bash
+
+export INGRESS_PIP=$(kubectl --namespace ingress-nginx get svc -l component=controller -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
 
 cd $REPO_ROOT
 ./saveenv.sh
+
 ```
 
 ## Deploy the needed componenets of helium, key rotator and the testing harness
@@ -392,21 +431,23 @@ An helm chart is included for the reference application ([helium](https://github
 
 Install the Helm Chart located in the cloned directory
 
-```shell
-cd $REPO_ROOT/docs/aks/cluster/charts
+```bash
+
+cd $REPO_ROOT/docs/aks/cluster/charts/helium
+
 ```
 
-A file called helm-config.yaml with the following contents that needs be edited to fit the environment being deployed in. The file looks like this
+A file called helm-config.yaml with the following contents that needs be to edited to fit the environment being deployed in. The file looks like this
 
 ```yaml
 # Default values for helium.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 labels:
-  aadpodidbinding: %%MSI_Name%% #should be value of $MSI_Name from the output of aad-podid.sh
+  aadpodidbinding: %%MSI_Name%% # Should be value of $MSI_Name from the output of aad-podid.sh
 
 image:
-  repository: retaildevcrew #The spceific acr created for this environment
+  repository: retaildevcrew # The spceific acr created for this environment
   name: helium-csharp # The name of the image for the helium-csharp repo
 
 annotations:
@@ -414,41 +455,51 @@ annotations:
 
 ingress:
   hosts:
-    - host: %%INGRESS_PIP%%.nip.io # Replace the IP address with the IP of the nginx external IP. kubectl get svc -n ingress-nginx to see the correct IP
+    - host: %%INGRESS_PIP%%.nip.io # Replace the IP address with the IP of the nginx external IP (value of $INGRESS_PIP or run kubectl get svc -n ingress-nginx to see the correct IP)
       paths: /
 
-keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets
+keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets (value of $He_Name)
 ```
 
 Replace the values in the file surrounded by `%%` with the proper environment variables
 
-```shell
+```bash
+
 sed -i "s/%%MSI_Name%%/${MSI_Name}/g" helm-config.yaml && \
 sed -i "s/%%INGRESS_PIP%%/${INGRESS_PIP}/g" helm-config.yaml && \
 sed -i "s/%%KV_Name%%/${He_Name}/g" helm-config.yaml
+
 ```
 
 This file can now be given to the the helm install as an override to the default values.
 
-```shell
-helm install helium-aks helium -f helm-config.yaml
+```bash
+
+cd $REPO_ROOT/docs/aks/cluster/charts
+
+helm install helium-aks helium -f ./helium/helm-config.yaml
+
 ```
 
 optionally if you stored the helium-csharp image in your own Azure Container Registry you can change the registry at the command line as such:
 
-```shell
+```bash
+
 helm install helium-aks helium --set image.repository=<acr_name>.azurecr.io -f helm-config.yaml
+
 ```
 
 ## Dashboard setup
 
 Replace the values in the `AKS_Dashboard.json` file surrounded by `%%` with the proper environment variables
 
-```shell
+```bash
+
 cd $REPO_ROOT/docs/aks/demo
 sed -i "s/%%SUBSCRIPTION_GUID%%/${He_Sub}/g" AKS_Dashboard.json && \
 sed -i "s/%%AKS_RESOURCE_GROUP%%/${He_App_RG}/g" AKS_Dashboard.json && \
 sed -i "s/%%COSMOS_RESOURCE_GROUP%%/${He_Cosmos_RG}/g" AKS_Dashboard.json
+
 ```
 
 Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `AKS_Dashboard.json` file with your correct subscription GUID, resource group names, and app name.
@@ -457,15 +508,17 @@ For more documentation on creating and sharing Dashboards, see ([here](https://d
 
 ## Optional
 
-A testing application was written to stress test the application and drive the Request Units on the CsomsoDB. You can deploy the application to AKS as a cronjob. The cronjobs can be deployed to your cluster via a helm chart located at `REPO_ROOT/docs/aks/cluster/charts`.
+A testing application was written to stress test the application and drive the Request Units on the CosmosDB. You can deploy the application to AKS as a cronjob. The cronjobs can be deployed to your cluster via a helm chart located at `REPO_ROOT/docs/aks/cluster/charts`.
 
-```shell
+```bash
+
 cd $REPO_ROOT/docs/aks/cluster/charts
 
 helm install helium-smoker smoker --set ingressURL=http://<IP_OF_INGRESS>.nip.io
 
 #Verify the CronJobs are in the cluster
 kubectl get cronjobs
+
 ```
 
 The cronjobs are set to run for 7.5 minutes every 20 minutes.
