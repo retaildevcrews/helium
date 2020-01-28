@@ -446,7 +446,7 @@ labels:
   aadpodidbinding: %%MSI_Name%% # Should be value of $MSI_Name from the output of aad-podid.sh
 
 image:
-  repository: retaildevcrew # The spceific acr created for this environment
+  repository: retaildevcrew # The specific acr created for this environment
   name: helium-csharp # The name of the image for the helium-csharp repo
 
 annotations:
