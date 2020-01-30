@@ -41,8 +41,8 @@ _Issues that the Dev Team is actively working on_
 - If a design review is required, schedule meeting when moving issue to backlog
 - If task is bigger than "Size:L", break into smaller tasks to ensure completion during week sprint
 
-### PR Submitted
-_Pull Requests to create or update code, documentation, templates, etc_
+### PR Submitted / Review
+_Pull Requests to create or update code, documentation, templates, etc and issues that need reviewed_
 - Complete the PR Template (ensure original issue is closed or referenced)
 - Assign reviewers, assign yourself, add Project board, and Milestone
 - Move original issue above the PR item that is auto-created
@@ -52,3 +52,5 @@ _Pull Requests to create or update code, documentation, templates, etc_
 _Issue is completed, no further action rquired
 - Ensure task checklist is complete
 
+### Burndown
+_During the final sprint of the milestone, create a burndown column for issues pivotal to achieve goal_
