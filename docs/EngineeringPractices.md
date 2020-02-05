@@ -19,6 +19,7 @@ Engineering Playbook [Definition of Done](https://github.com/microsoft/code-with
 
 - Use [markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint) add-in for VS Code
 - Use "-" for unordered lists
+- Add a blank line before and after ``` for visualization
 
 ## Kanban Management Best Practices
 
