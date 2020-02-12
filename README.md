@@ -241,7 +241,6 @@ Deploy the container to App Service or AKS
 
 Run the Integration Test
 
-
 ```bash
 
 # run the tests in the container

@@ -35,6 +35,7 @@ Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally
 Fork this repo and clone to your local machine
 
 ```bash
+
 cd $HOME
 
 mkdir demo
@@ -42,14 +43,17 @@ mkdir demo
 cd demo
 
 git clone https://github.com/retaildevcrews/helium
+
 ```
 
 Change into the base directory of the repo
 
 ```bash
+
 cd helium
 
 export REPO_ROOT=$(pwd)
+
 ```
 
 Login to Azure and select subscription
@@ -66,6 +70,7 @@ az account set -s {subscription name or Id}
 
 # save the subscriptionID as a variable
 export He_Sub=$(az account show --query id -o tsv)
+
 ```
 
 Save your environment variables for ease of reuse and picking up where you left off.
@@ -80,6 +85,7 @@ cd $REPO_ROOT
 # at any point if your terminal environment gets cleared, you can source the file
 # you only need to remember the name of the env file (or set the $He_Name variable again)
 source ~/{yoursameuniquename}.env
+
 ```
 
 This demo will create resource groups, a Cosmos DB instance, Key Vault, Azure Container Registry, and Azure App Service.
@@ -122,12 +128,10 @@ export He_Location=centralus
 # resource group names
 export He_ACR_RG=${He_Name}-rg-acr
 export He_App_RG=${He_Name}-rg-app
-# TODO Remove export He_Cosmos_RG=${He_Name}-rg-cosmos
 
 # create the resource groups
 az group create -n $He_App_RG -l $He_Location
 az group create -n $He_ACR_RG -l $He_Location
-# TODO Remove az group create -n $He_Cosmos_RG -l $He_Location
 
 ```
 
@@ -196,6 +200,7 @@ Setup Container Registry
 
 # create the ACR
 az acr create --sku Standard --admin-enabled false -g $He_ACR_RG -n $He_Name
+
 ```
 
 Create Azure Monitor
@@ -240,7 +245,7 @@ export He_K8S_VER=1.15.5
 ```bash
 
 # note: if you see the following failure, navigate to your .azure\ directory
-# and delete the file "aksServicePrincipal.json": 
+# and delete the file "aksServicePrincipal.json":
 #    Waiting for AAD role to propagate[################################    ]  90.0000%Could not create a
 #    role assignment for ACR. Are you an Owner on this subscription?
 
