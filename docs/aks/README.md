@@ -2,7 +2,7 @@
 
 ## Background
 
-Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally Azure App Services (Web Apps for Containers). The goal is to have a best practices implementation of a C# (TypeScript/Node & Java Springboot are under development) + CosmosDB + Key Vault + Azure Monitor application that project teams can use to build applications that support security, HA, DR and Business Continuity.
+Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally Azure App Services (Web Apps for Containers). The goal is to have a best practices implementation of a C# (TypeScript/Node & Java Springboot are under development) + Cosmos DB + Key Vault + Azure Monitor application that project teams can use to build applications that support security, HA, DR and Business Continuity.
 
 ### Azure Components in Use
 
@@ -13,7 +13,7 @@ Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally
   - Azure Application Gateway Ingress Controller
   - Azure AAD Pod Identity
 - Azure Key Vault
-- Azure CosmosDB
+- Azure Cosmos DB
 - Application Insights
 
 ## Demo Install
@@ -21,7 +21,7 @@ Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally
 ### Prerequisites
 
 - Azure subscription with permissions to create:
-  - Resource Groups, Service Principals, Keyvault, CosmosDB, App Service, Azure Container Registry, Azure Monitor
+  - Resource Groups, Service Principals, Keyvault, Cosmos DB, App Service, Azure Container Registry, Azure Monitor
 - Bash shell (tested on Mac, Ubuntu, Windows with WSL2)
   - Will not work in Cloud Shell unless you have a remote dockerd
 - Azure CLI 2.0.72+ ([download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest))
@@ -72,7 +72,7 @@ Save your environment variables for ease of reuse and picking up where you left 
 
 ```bash
 
-# run the saveenv.sh script at any time to save He_* variables to ~/${He_Name}.env
+# run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/${He_Name}.env
 # make sure you are in the root of the repo
 cd $REPO_ROOT
 ./saveenv.sh
@@ -82,7 +82,7 @@ cd $REPO_ROOT
 source ~/{yoursameuniquename}.env
 ```
 
-This demo will create resource groups, a CosmosDB instance, Key Vault, Azure Container Registry, and Azure App Service.
+This demo will create resource groups, a Cosmos DB instance, Key Vault, Azure Container Registry, and Azure App Service.
 
 Choose a unique name for DNS and resource name prefix.
 
@@ -110,9 +110,9 @@ Create Resource Groups
   - If you use an existing resource group, please make sure to apply resource locks to avoid accidentally deleting resources
 
 - You will create 3 resource groups
-  - One for CosmosDB
   - One for ACR
-  - One for App Service, Key Vault and Azure Monitor
+  - One for App Service or AKS, Key Vault and Azure Monitor
+  - One for Cosmos DB (see create and load sample data to Cosmos DB step)
 
 ```bash
 
@@ -122,12 +122,12 @@ export He_Location=centralus
 # resource group names
 export He_ACR_RG=${He_Name}-rg-acr
 export He_App_RG=${He_Name}-rg-app
-export He_Cosmos_RG=${He_Name}-rg-cosmos
+# TODO Remove export He_Cosmos_RG=${He_Name}-rg-cosmos
 
 # create the resource groups
 az group create -n $He_App_RG -l $He_Location
 az group create -n $He_ACR_RG -l $He_Location
-az group create -n $He_Cosmos_RG -l $He_Location
+# TODO Remove az group create -n $He_Cosmos_RG -l $He_Location
 
 ```
 
@@ -146,41 +146,27 @@ source ~/{yoursameuniquename}.env
 
 ```
 
-Create and load sample data into CosmosDB
+Create and load sample data into Cosmos DB
 
 - This takes several minutes to run
-- This sample is designed to use a simple dataset from IMDb of 100 movies and their associated actors and genres
-  - See full explanation of data model design decisions [here:](https://github.com/4-co/imdb)
+- This reference app is designed to use a simple dataset from IMDb of 13000 movies and their associated actors and genres
+- Follow the guidance in the [IMDb Repo](https://github.com/retaildevcrews/imdb) to create a Cosmos DB server (SQL API), a database, and a collection and then load the IMDb data. The repo readme also provides an explanation of the data model design decisions.
+- Recommendation is to set $Imdb_Name the same value as $He_Name
 
 ```bash
 
-# set the other Cosmos environment variables
-export He_Cosmos_URL=https://${He_Name}.documents.azure.com:443/
-export He_Cosmos_DB=imdb
-export He_Cosmos_Col=movies
+# Run saveenv.sh to save the Imdb variables
+./saveenv.sh
 
-# create the CosmosDB server
-az cosmosdb create -g $He_Cosmos_RG -n $He_Name
+# Verify the output of the script shows the newly created Imdb_* variables
 
-# create the database
-az cosmosdb sql database create -a $He_Name -n $He_Cosmos_DB -g $He_Cosmos_RG
+```
 
-# create the container
-# 400 is the minimum RUs
-# /partitionKey is the partition key
-# partition key is the id mod 10
-az cosmosdb sql container create --throughput "400" -p /partitionKey -g $He_Cosmos_RG -a $He_Name -d $He_Cosmos_DB -n $He_Cosmos_Col
+Get the Cosmos DB read only key used by App Service
 
-# get Cosmos readonly key (used by App Service)
-export He_Cosmos_RO_Key=$(az cosmosdb keys list -n $He_Name -g $He_Cosmos_RG --query primaryReadonlyMasterKey -o tsv)
+```bash
 
-# get readwrite key (used by the imdb import)
-export He_Cosmos_RW_Key=$(az cosmosdb keys list -n $He_Name -g $He_Cosmos_RG --query primaryMasterKey -o tsv)
-
-# run the IMDb Import
-docker run -it --rm retaildevcrew/imdb-import $He_Name $He_Cosmos_RW_Key $He_Cosmos_DB $He_Cosmos_Col
-
-# Optional: Run ./saveenv.sh to save latest variables
+export Imdb_Cosmos_RO_Key=$(az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query primaryMasterKey -o tsv)
 
 ```
 
@@ -194,11 +180,11 @@ Create Azure Key Vault
 ## create the Key Vault and add secrets
 az keyvault create -g $He_App_RG -n $He_Name
 
-# add CosmosDB keys
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosUrl" --value $He_Cosmos_URL
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosKey" --value $He_Cosmos_RO_Key
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosDatabase" --value $He_Cosmos_DB
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosCollection" --value $He_Cosmos_Col
+# add Cosmos DB keys
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosUrl" --value https://${Imdb_Name}.documents.azure.com:443/
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosKey" --value $Imdb_Cosmos_RO_Key
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosDatabase" --value $Imdb_DB
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosCollection" --value $Imdb_Col
 
 ```
 
@@ -500,7 +486,7 @@ Replace the values in the `AKS_Dashboard.json` file surrounded by `%%` with the 
 cd $REPO_ROOT/docs/aks/demo
 sed -i "s/%%SUBSCRIPTION_GUID%%/${He_Sub}/g" AKS_Dashboard.json && \
 sed -i "s/%%AKS_RESOURCE_GROUP%%/${He_App_RG}/g" AKS_Dashboard.json && \
-sed -i "s/%%COSMOS_RESOURCE_GROUP%%/${He_Cosmos_RG}/g" AKS_Dashboard.json
+sed -i "s/%%COSMOS_RESOURCE_GROUP%%/${Imdb_RG}/g" AKS_Dashboard.json
 
 ```
 
@@ -510,7 +496,7 @@ For more documentation on creating and sharing Dashboards, see ([here](https://d
 
 ## Optional
 
-A testing application was written to stress test the application and drive the Request Units on the CosmosDB. You can deploy the application to AKS as a cronjob. The cronjobs can be deployed to your cluster via a helm chart located at `REPO_ROOT/docs/aks/cluster/charts`.
+A testing application was written to stress test the application and drive the Request Units on the Cosmos DB. You can deploy the application to AKS as a cronjob. The cronjobs can be deployed to your cluster via a helm chart located at `REPO_ROOT/docs/aks/cluster/charts`.
 
 ```bash
 
