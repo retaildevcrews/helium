@@ -32,6 +32,9 @@
 | Metrics reporting to App Insights  | Yes | | |
 | Unit Tests  | Yes | | |
 | | | | |
+| **Versioning** | | | |
+| Version is set to 0.[Milestone].MmDd.Hhmm (UTC) | Yes | Yes | Yes |
+| | | | |
 | **API Spec** | | | |
 | Endpoint /api/secret returns value of MySecret in KV | Yes | | |
 | Endpoint /healthz returns "Healthy" | Yes | | |
