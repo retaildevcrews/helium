@@ -25,7 +25,7 @@
 | /api/movie?pagenumber= |  Invalid parameters : pagenumber   | < 1 , foo      | 400             | text/plain   | Invalid pagenumber parameter
 | /api/movie?actorid=nm0000246&pagenumber=1&pagesize=100 | actorid, pagenumber, pagesize   | Valid parameters : actor id from IMDB db   | 200             | application/json   | List of all movies filtered by actorid as [{}, {}, {}]|
 | /api/movie?actorid=foo&pagenumber=1&pagesize=100 |  actorid, pagenumber, pagesize   | Invalid parameters : actorid      | 400             | text/plain   | Invalid actorid parameter
-| api/movies?genre=horror&actorid=nm0000246&pagenumber=1&pagesize=100 |  genre, actorid, pagenumber, pagesize   | Valid parameters : actor id from IMDB db      | 200             | application/json   | List of all movies filtered by actorid as [{}, {}, {}]|
-| /api/movie?genre=foo&actorid=foo&pagenumber=1&pagesize=100 |  genre, actorid, pagenumber, pagesize  | Invalid parameters : genre (throw the first invalid parameter)      | 400             | text/plain   | Invalid actorid parameter
+| api/movies?genre=horror&actorid=nm0000246 |  genre, actorid, pagenumber, pagesize   | Valid parameters : actor id from IMDB db      | 200             | application/json   | List of all movies filtered by actorid as [{}, {}, {}]|
+| /api/movie?genre=foo&actorid=foo |  genre, actorid, pagenumber, pagesize  | Invalid parameters : genre (throw the first invalid parameter)      | 400             | text/plain   | Invalid actorid parameter
 | /api/movie/{movieid} |  movieid     |   Valid parameters : valid movieid from IMDB db                     | 200             | application/json   | Single movie object
 | /api/movie/{movieid} |  movieid     |   Invalid parameters : foo   | 404             | text/plain   | Movie with {id} not found
