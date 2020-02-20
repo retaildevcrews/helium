@@ -2,7 +2,7 @@
 
 ## Movies
 
-[Source](https://jsonapi.org/examples/#error-objects)
+[Specification for building API and Parameters](https://jsonapi.org/examples/#error-objects)
 
 
    API       |   Params  |   Parameters                                                           | Status Code     |  Content-Type      | Response                           |
