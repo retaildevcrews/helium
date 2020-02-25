@@ -96,7 +96,7 @@ This goals of this document is to define valid/invalid API/Query parameters and 
          * Status : 200
          * Content-Type: application/json
          * Response Body: List of movies filtered by default pagesize as [{}, {},..]
-    * Invalid input - 100.23
+    * Invalid input - Non integers are invalid Example : 100.23
          * Status : 400
          * Content-Type: text/plain
          * Response Body: Invalid pagesize parameter
