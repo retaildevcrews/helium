@@ -2,12 +2,12 @@
 
 This goals of this document is to define valid/invalid API and Query parameters and provide specifications on resulting behavior of the Helium API.
 
-## Common Status code rules followed for all APIs :
+## Common Status code rules followed for all APIs
 
 ### Searches
 
 - Valid input returns 200 with JSON Array [{},{}...]
-- Valid input with no results returns 200 with empty list []
+- Valid input with no results returns 200 with empty array
 - Invalid input returns 400 text/plain with Invalid error response
 
 ### Single Reads
@@ -45,12 +45,11 @@ This goals of this document is to define valid/invalid API and Query parameters 
   - Valid input range : [1874 , currentYear+5]
     - Status : 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies filtered by year as [{}, {},..], , empty [] when no results
+    - Response Body: JSON Array of movies filtered by year as [{}, {},..], , empty array when no results
   - Invalid input - input that does not parse or is out of range
     - Status : 400
     - Content-Type: text/plain
     - Response Body: Invalid year parameter
-
 
 - Name : rating
 - Type: double
@@ -60,7 +59,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
   - Example: round off 7.253896 to 7.3
     - Status : 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies filtered by rating as [{}, {},..], empty [] when no results where movie.rating >= rating
+    - Response Body: JSON Array of movies filtered by rating as [{}, {},..], empty array when no results, where movie.rating >= rating
   - Invalid input - input that does not parse or is out of range
     - Status : 400
     - Content-Type: text/plain
@@ -73,7 +72,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
   - Example 'nm1265067'
     - Status : 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies filtered by actorid as [{}, {},..] , empty [] when no results where actorId was in movie
+    - Response Body: JSON Array of movies filtered by actorid as [{}, {},..] , empty array, when no results where actorId was in movie
   - Invalid input - empty, foo, values not conforming to well formed actorid rule.  Example: 'nm1234', 'ab1234'
     - Status : 400
     - Content-Type: text/plain
@@ -86,7 +85,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
   - Example 'War' , 'Documentary'
     - Status : 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies filtered by genre as [{}, {},..] , empty [] when no results where movie.genres contains genre
+    - Response Body: JSON Array of movies filtered by genre as [{}, {},..] , empty array when no results where movie.genres contains genre
   - Invalid input - genre length < 3 or >20 characters
     - Status : 400
     - Content-Type: text/plain
@@ -100,7 +99,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
   - Valid input range : [1, 1000]
     - Status : 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies limited to pageSize as [{}, {},..], empty [] when no results
+    - Response Body: JSON Array of movies limited to pageSize as [{}, {},..], empty array when no results
   - Invalid input - input that does not parse
     - Example : 100.23
     - Status : 400
@@ -115,7 +114,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
   - Valid input range : [1, 10000]
     - Status : 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies based on pageNumber as [{}, {},..], empty [] when no results
+    - Response Body: JSON Array of movies based on pageNumber as [{}, {},..], empty array when no results
   - Invalid input - input that does not parse
     - Example : 100.23
     - Status : 400
