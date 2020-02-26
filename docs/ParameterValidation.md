@@ -16,7 +16,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
 - Valid single reads with no results returns 400 with No {entity} found error response
 - Invalid single reads like /api/movies/tt1234 , /api/actorid/nm1234 returns 400 with No {entity} found
 
-## Multiple Error Scenarios
+### Multiple Error Scenarios
 
 - Add each error to the errors array in alphabetical order.
 
@@ -26,7 +26,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
 
 ### Movies Query Parameters
 
-- Name : q (search)
+- Name : query (search)
 - Description : This a search query string on the title field.
 - Type: string
 - Parameter Validation:
@@ -47,7 +47,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
          - Status : 200
          - Content-Type: application/json
          - Response Body: List of movies filtered by year as [{}, {},..], , empty [] when no results
-    - Invalid input - empty, foo, values not in valid range
+    - Invalid input - input that does not parse
          - Status : 400
          - Content-Type: text/plain
          - Response Body: Invalid year parameter
@@ -61,7 +61,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
          - Status : 200
          - Content-Type: application/json
          - Response Body: List of movies filtered by rating as [{}, {},..], empty [] when no results
-    - Invalid input - empty, foo, values not in valid range [<0.0 , >10.0]
+    - Invalid input - input that does not parse
          - Status : 400
          - Content-Type: text/plain
          - Response Body: Invalid rating parameter
@@ -102,7 +102,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
          - Status : 200
          - Content-Type: application/json
          - Response Body: List of movies limited to pagesize as [{}, {},..], empty [] when no results
-    - Invalid input - Non integers are invalid. Example : 100.23
+    - Invalid input - input that does not parse. Example : 100.23
          - Status : 400
          - Content-Type: text/plain
          - Response Body: Invalid pagesize parameter
@@ -116,7 +116,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
          - Status : 200
          - Content-Type: application/json
          - Response Body: List of movies limited to pageNumber as [{}, {},..], empty [] when no results
-    - Invalid input - Non integers are invalid. Example : 100.23
+    - Invalid input - input that does not parse. Example : 100.23
          - Status : 400
          - Content-Type: text/plain
          - Response Body: Invalid pageNumber parameter
@@ -155,7 +155,7 @@ This goals of this document is to define valid/invalid API and Query parameters 
 - Name : actorId
 - Type: string
 - Parameter Validation:
-    - Valid input - well formed actorId rule - starts with 'nm' followed by upto a 9 digit integer converted to string. Example 'nm9877392'
+    - Valid input - well formed actorId rule - starts with 'nm' followed by upto a 5-9 digits, parsed as an int. Example 'nm9877392'
          - Status : 200
          - Content-Type: application/json
          - Response Body: Single actor document as JSON
