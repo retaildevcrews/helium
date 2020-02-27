@@ -19,5 +19,5 @@ assignees: ''
 3. Scroll down to '....'
 4. See error
 
-## Additional Context (if applicable)
-- _(Add any other context about the problem here; for example: doc changes, screenshots, logs, links, etc)_
+## Additional Context 
+- _(If applicable: Add any other context about the problem here; for example: doc changes, screenshots, logs, links, etc)_
