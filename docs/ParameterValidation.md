@@ -56,7 +56,7 @@ This goals of this document are to define valid/invalid API and Query parameters
 - Type: double
 - Parameter Validation:
   - Valid input range: [0.0, 10.0]
-  - Round off more than single decimal to a single decimal
+  - Round off more than single decimal to a single decimal based on round function for the language.
     - Example: round off 7.253896 to 7.3
     - Status: 200
     - Content-Type: application/json
