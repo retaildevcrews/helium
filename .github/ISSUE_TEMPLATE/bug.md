@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: To reporting an issue in code or documentation for improvement
 title: ''
 labels: Bug
 assignees: ''
@@ -19,11 +19,5 @@ assignees: ''
 3. Scroll down to '....'
 4. See error
 
-## Additional Context
-- Add any other context about the problem here.
-
-## Doc Changes
-- Confirm if needed & identify which repos and docs are impacted.
-
-## Screenshots
-If applicable, add screenshots to help explain your problem.
+## Additional Context (if applicable)
+- _(Add any other context about the problem here; for example: doc changes, screenshots, logs, links, etc)_

@@ -2,11 +2,10 @@
 name: Comparison
 about: Compare features/benefits across multiple languages/repos
 title: ''
-labels: '' 
+labels: ''
 assignees: ''
 
 ---
-
 
 # Comparison
 
