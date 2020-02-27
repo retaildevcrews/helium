@@ -31,6 +31,7 @@ This goals of this document are to define valid/invalid API and Query parameters
 - Type: string
 - Parameter Validation:
   - Valid input: query length >= 3 non-whitespace characters
+    - Example: 'ring', 'Ring'
     - Status: 200
     - Content-Type: application/json
     - Response Body: JSON Array of movies filtered by search query on title or actor name field as [{}, {},..], empty array when no results
@@ -122,7 +123,7 @@ This goals of this document are to define valid/invalid API and Query parameters
     - Content-Type: text/plain
     - Response Body: Invalid pageNumber parameter
 
-### API Parameters
+### Movies API Parameters
 
 - API /api/movies/{movieId}
 - Name: movieId
