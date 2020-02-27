@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: To report an issue in code or documentation for improvement
+about: For reporting an issue in code or documentation for improvement
 title: ''
 labels: Bug
 assignees: ''
