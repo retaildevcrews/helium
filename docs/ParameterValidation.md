@@ -14,7 +14,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
 
 - Valid single reads returns 200 with JSON document
 - Valid single reads with no results returns 404 with No {entity} found error response
-- Invalid single reads like /api/movies/tt1234, /api/actors/nm1234 returns 400 with Invalid error response
+- Invalid single reads like /api/movies/tt1234 , /api/actors/nm1234 returns 400 with Invalid error response
 
 ### Multiple Error Scenarios
 
@@ -25,6 +25,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
 ### API /api/movies
 
 ### Movies Query Parameters
+
 
 - Name: q (search)
 - Description: This is a case insensitive search query (q) string on movie title or actor name field
