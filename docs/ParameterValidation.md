@@ -75,7 +75,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
     - Content-Type: application/json
     - Response Body: JSON Array of movies filtered by actorid as [{}, {},..],empty array when no results,where actorId was in movie
   - Invalid input: values not conforming to well-formed actorid rule  
-    - Example: 'nm1234','ab1234'
+    - Example: 'nm1234','ab1234', 'NM1265067'
     - Status : 400
     - Content-Type: text/plain
     - Response Body: Invalid actorId parameter
@@ -160,8 +160,8 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
 - Name: actorId
 - Type: string
 - Parameter Validation:
-  - Valid input: well-formed actorId rule - starts with 'nm' followed by 5-9 digits,parsed as an int
-    - Example: 'nm1265067','NM123456'
+  - Valid input: well-formed actorId rule - starts with lower case 'nm' followed by 5-9 digits,parsed as an int
+    - Example: 'nm1265067'
     - Status: 200
     - Content-Type: application/json
     - Response Body: Single actor document as JSON
@@ -171,7 +171,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
     - Content-Type: text/plain
     - Response Body: actor not found
   - Invalid input: actorId not conforming to well-formed actorId rule
-    - Example: 'nm1234','tt0114746'
+    - Example: 'nm1234','tt0114746', 'NM123456'
     - Status: 400
     - Content-Type: text/plain
     - Response Body: Invalid actorId parameter
