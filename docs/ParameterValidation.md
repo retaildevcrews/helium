@@ -14,7 +14,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
 
 - Valid single reads returns 200 with JSON document
 - Valid single reads with no results returns 404 with No {entity} found error response
-- Invalid single reads like /api/movies/tt1234,/api/actors/nm1234 returns 400 with Invalid error response
+- Invalid single reads like /api/movies/tt1234, /api/actors/nm1234 returns 400 with Invalid error response
 
 ### Multiple Error Scenarios
 
@@ -31,10 +31,10 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
 - Type: string
 - Parameter Validation:
   - Valid input: query length >= 3 non-whitespace characters
-    - Example: 'ring','Ring'
+    - Example: 'ring', 'Ring'
     - Status: 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies filtered by search query on title or actor name field as [{},{},..],empty array when no results
+    - Response Body: JSON Array of movies filtered by search query on title or actor name field as [{},{},..], empty array when no results
   - Invalid input: query length < 3 characters
     - Status: 400
     - Content-Type: text/plain
@@ -46,7 +46,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
   - Valid input range: [1874,currentYear+5]
     - Status: 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies filtered by year as [{},{},..],empty array when no results
+    - Response Body: JSON Array of movies filtered by year as [{},{},..], empty array when no results
   - Invalid input: input that does not parse or is out of range
     - Status: 400
     - Content-Type: text/plain
@@ -60,7 +60,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
     - Example: round off 7.253896 to 7.3
     - Status: 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies filtered by rating as [{},{},..],empty array when no results,where movie.rating >= rating
+    - Response Body: JSON Array of movies filtered by rating as [{},{},..], empty array when no results, where movie.rating >= rating
   - Invalid input: input that does not parse or is out of range
     - Status: 400
     - Content-Type: text/plain
@@ -69,13 +69,13 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
 - Name: actorId
 - Type: string
 - Parameter Validation
-  - Valid input : well-formed actorId rule - starts with lower case 'nm' followed by 5-9 digits,parsed as an int. This is case sensitive input.
+  - Valid input : well-formed actorId rule - starts with lower case 'nm' followed by 5-9 digits, parsed as an int. This is case sensitive input.
     - Example: 'nm1265067'
     - Status : 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies filtered by actorid as [{}, {},..],empty array when no results,where actorId was in movie
+    - Response Body: JSON Array of movies filtered by actorid as [{}, {},..], empty array when no results, where actorId was in movie
   - Invalid input: values not conforming to well-formed actorid rule  
-    - Example: 'nm1234','ab1234', 'NM1265067'
+    - Example: 'nm1234', 'ab1234', 'NM1265067'
     - Status : 400
     - Content-Type: text/plain
     - Response Body: Invalid actorId parameter
@@ -84,10 +84,10 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
 - Type: string
 - Parameter Validation:
   - Valid input: case insensitive genre,length [3,20]
-    - Example: 'War','war','Documentary','documentary'
+    - Example: 'War', 'war', 'Documentary', 'documentary'
     - Status: 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies filtered by genre as [{},{},..],empty array when no results,where movie.genres contains genre
+    - Response Body: JSON Array of movies filtered by genre as [{},{},..], empty array when no results, where movie.genres contains genre
   - Invalid input: genre length < 3 or >20 characters
     - Status: 400
     - Content-Type: text/plain
@@ -116,7 +116,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
   - Valid input range: [1,10000]
     - Status: 200
     - Content-Type: application/json
-    - Response Body: JSON Array of movies based on pageNumber as [{},{},..],empty array when no results
+    - Response Body: JSON Array of movies based on pageNumber as [{},{},..], empty array when no results
   - Invalid input: input that does not parse or is out of range
     - Example: 100.23
     - Status: 400
@@ -129,7 +129,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
 - Name: movieId
 - Type: string
 - Parameter Validation:
-  - Valid input: well-formed movieId rule - starts with lower case 'tt' followed by 5-9 digits,parsed as an int. This is case sensitive input
+  - Valid input: well-formed movieId rule - starts with lower case 'tt' followed by 5-9 digits, parsed as an int. This is case sensitive input
     - Example 'tt0114746'
     - Status: 200
     - Content-Type: application/json
@@ -140,7 +140,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
     - Content-Type: text/plain
     - Response Body: movie not found
   - Invalid input: movieId not conforming to well-formed movieId rule
-    - Example:'tt1234','nm1234','TT123456','nm1265067'
+    - Example:'tt1234', 'nm1234', 'TT123456', 'nm1265067'
     - Status: 400
     - Content-Type: text/plain
     - Response Body: Invalid movieId parameter
@@ -151,7 +151,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
 
 ### Actors Query Parameters
 
-- Query parameters for actors are q,pageSize,pageNumber
+- Query parameters for actors are q, pageSize, pageNumber
 - [Refer to the rules for Query Parameters for Movies](###movies-query-parameters)
 
 ### Actors API Parameters
@@ -160,7 +160,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
 - Name: actorId
 - Type: string
 - Parameter Validation:
-  - Valid input: well-formed actorId rule - starts with lower case 'nm' followed by 5-9 digits,parsed as an int
+  - Valid input: well-formed actorId rule - starts with lower case 'nm' followed by 5-9 digits, parsed as an int
     - Example: 'nm1265067'
     - Status: 200
     - Content-Type: application/json
@@ -171,7 +171,7 @@ The goal of this document is to define valid/invalid APIs and Query parameters a
     - Content-Type: text/plain
     - Response Body: actor not found
   - Invalid input: actorId not conforming to well-formed actorId rule
-    - Example: 'nm1234','tt0114746', 'NM123456'
+    - Example: 'nm1234', 'tt0114746', 'NM123456'
     - Status: 400
     - Content-Type: text/plain
     - Response Body: Invalid actorId parameter
