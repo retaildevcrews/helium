@@ -71,9 +71,9 @@ Create Resource Groups
   - If you use an existing resource group, please make sure to apply resource locks to avoid accidentally deleting resources
 
 - You will create 3 resource groups
-  - One for Cosmos DB
   - One for ACR
   - One for App Service or AKS, Key Vault and Azure Monitor
+  - One for Cosmos DB (see create and load sample data to Cosmos DB step)
 
 ```bash
 
@@ -83,12 +83,10 @@ export He_Location=centralus
 # resource group names
 export He_ACR_RG=${He_Name}-rg-acr
 export He_App_RG=${He_Name}-rg-app
-export He_Cosmos_RG=${He_Name}-rg-cosmos
 
 # create the resource groups
 az group create -n $He_App_RG -l $He_Location
 az group create -n $He_ACR_RG -l $He_Location
-az group create -n $He_Cosmos_RG -l $He_Location
 
 ```
 
@@ -96,7 +94,7 @@ Save your environment variables for ease of reuse and picking up where you left 
 
 ```bash
 
-# run the saveenv.sh script at any time to save He_* variables to ~/${He_Name}.env
+# run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/${He_Name}.env
 # make sure you are in the root of the repo
 ./saveenv.sh
 
@@ -109,38 +107,24 @@ source ~/{yoursameuniquename}.env
 Create and load sample data into Cosmos DB
 
 - This takes several minutes to run
-- This app is designed to use a simple dataset from IMDb of 100 movies and their associated actors and genres
-  - See full explanation of data model design decisions [here](https://github.com/retaildevcrews/imdb)
+- This reference app is designed to use a simple dataset from IMDb of 13000 movies and their associated actors and genres
+- Follow the guidance in the [IMDb Repo](https://github.com/retaildevcrews/imdb) to create a Cosmos DB server (SQL API), a database, and a collection and then load the IMDb data. The repo readme also provides an explanation of the data model design decisions.
+- Recommendation is to set $Imdb_Name the same value as $He_Name
 
 ```bash
 
-# set the other Cosmos environment variables
-export He_Cosmos_URL=https://${He_Name}.documents.azure.com:443/
-export He_Cosmos_DB=imdb
-export He_Cosmos_Col=movies
+# Run saveenv.sh to save the Imdb variables
+./saveenv.sh
 
-# create the Cosmos DB server
-az cosmosdb create -g $He_Cosmos_RG -n $He_Name
+# Verify the output of the script shows the newly created Imdb_* variables
 
-# create the database
-az cosmosdb sql database create -a $He_Name -n $He_Cosmos_DB -g $He_Cosmos_RG
+```
 
-# create the container
-# 400 is the minimum RUs
-# /partitionKey is the partition key
-# partition key is the id mod 10
-az cosmosdb sql container create --throughput "400" -p /partitionKey -g $He_Cosmos_RG -a $He_Name -d $He_Cosmos_DB -n $He_Cosmos_Col
+Get the Cosmos DB read only key used by App Service
 
-# get Cosmos readonly key (used by App Service)
-export He_Cosmos_RO_Key=$(az cosmosdb keys list -n $He_Name -g $He_Cosmos_RG --query primaryReadonlyMasterKey -o tsv)
+```bash
 
-# get readwrite key (used by the imdb import)
-export He_Cosmos_RW_Key=$(az cosmosdb keys list -n $He_Name -g $He_Cosmos_RG --query primaryMasterKey -o tsv)
-
-# run the IMDb Import
-docker run -it --rm retaildevcrew/imdb-import $He_Name $He_Cosmos_RW_Key $He_Cosmos_DB $He_Cosmos_Col
-
-# Optional: Run ./saveenv.sh to save latest variables
+export Imdb_Cosmos_RO_Key=$(az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query primaryMasterKey -o tsv)
 
 ```
 
@@ -155,10 +139,10 @@ Create Azure Key Vault
 az keyvault create -g $He_App_RG -n $He_Name
 
 # add Cosmos DB keys
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosUrl" --value $He_Cosmos_URL
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosKey" --value $He_Cosmos_RO_Key
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosDatabase" --value $He_Cosmos_DB
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosCollection" --value $He_Cosmos_Col
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosUrl" --value https://${Imdb_Name}.documents.azure.com:443/
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosKey" --value $Imdb_Cosmos_RO_Key
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosDatabase" --value $Imdb_DB
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosCollection" --value $Imdb_Col
 
 ```
 
@@ -176,6 +160,18 @@ az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissio
 
 ```
 
+Choose your app language
+
+- Choose which language version of the Helium container you want to build
+- Options are: [csharp](https://github.com/retaildevcrews/helium-csharp), [java (WIP)](https://github.com/retaildevcrews/helium-java), or [typescript (WIP)](https://github.com/retaildevcrews/helium-typescript)
+
+```bash
+
+# set to either csharp, java, or typescript
+export He_Language=csharp
+
+```
+
 Setup Container Registry
 
 - Create the Container Registry with admin access _disabled_
@@ -188,10 +184,10 @@ az acr create --sku Standard --admin-enabled false -g $He_ACR_RG -n $He_Name
 # Login to ACR
 az acr login -n $He_Name
 
-# If you get an error that the login server isn't available, it's a DNS issue that will resolve in a minute or two, just retry
+# if you get an error that the login server isn't available, it's a DNS issue that will resolve in a minute or two, just retry
 
 # Build the container with az acr build
-az acr build -r $He_Name -t $He_Name.azurecr.io/helium-csharp https://github.com/retaildevcrews/helium-csharp.git
+az acr build -r $He_Name -t $He_Name.azurecr.io/helium-${He_Language} https://github.com/retaildevcrews/helium-${He_Language}.git
 
 ```
 
@@ -241,10 +237,9 @@ az keyvault secret set -o table --vault-name $He_Name --name "AppInsightsKey" --
 Deploy the container to App Service or AKS
 
 - Instructions for [App Service](docs/AppService.md)
-- Instructions for [AKS](docs/aks/README.md#L233)
+- Instructions for [AKS](docs/aks/README.md#L233) (currently requires csharp)
 
 Run the Integration Test
-
 
 ```bash
 

@@ -24,7 +24,7 @@ az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissio
 export He_CICD_URL=$(az webapp deployment container config -n $He_Name -g $He_App_RG --enable-cd true --query CI_CD_URL -o tsv)
 
 # add the webhook
-az acr webhook create -r $He_Name -n ${He_Name} --actions push --uri $He_CICD_URL --scope helium-csharp:latest
+az acr webhook create -r $He_Name -n ${He_Name} --actions push --uri $He_CICD_URL --scope helium-${He_Language}:latest
 
 # set the Key Vault name app setting (environment variable)
 az webapp config appsettings set --settings KeyVaultName=$He_Name -g $He_App_RG -n $He_Name
@@ -42,7 +42,7 @@ export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "Ac
 # configure the Web App to use Container Registry
 # get Service Principal Id and Key from Key Vault
 az webapp config container set -n $He_Name -g $He_App_RG \
--i ${He_Name}.azurecr.io/helium-csharp \
+-i ${He_Name}.azurecr.io/helium-${He_Language} \
 -r https://${He_Name}.azurecr.io \
 -u "@Microsoft.KeyVault(SecretUri=${He_AcrUserId})" \
 -p "@Microsoft.KeyVault(SecretUri=${He_AcrPassword})"
