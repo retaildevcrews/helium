@@ -19,6 +19,9 @@ Define valid Query String and URL parameters for the Helium API
 ### Error Handling
 
 - Parameter validation fails on the first error
+- Additional query string parameters are ignored
+- Additional URL paramaters result in 404 Not Found
+  - example: /api/movies/tt12345/foo
 
 ## Common Parameters
 
