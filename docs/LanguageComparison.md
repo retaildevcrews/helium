@@ -1,60 +1,5 @@
 # Language Comparison
 
-## Managed Identity + Key Vault (MIKV)
-
-|   Resource/Set-up/Behavior    |   C-Sharp     |   Typescript      | Java |
-| ------------- | ------------- | ------------- | ------------- |
-| Repo | [mikv-csharp](https://github.com/Azure-Samples/app-service-managed-identity-key-vault-csharp) | not impl. | not impl. |
-| **Key Vault Secrets** | | | |
-| Secret Name: MySecret | Yes | | |
-| Retrieved and used from Key Vault | Yes | | |
-| Secret Name: AcrPassword | Yes | | |
-| Retrieved and used from Key Vault | Yes | | |
-| Secret Name: AcrUserId | Yes | | |
-| Retrieved and used from Key Vault | Yes | | |
-| Secret Name: AppInsightsKey | Yes | | |
-| Retrieved and used from Key Vault | Yes | | |
-| Runs successfully without App Insights Key secret set  | Yes | | |
-| | | | |
-| **Container Settings** | | | |
-| KeyVaultName (env var) | Yes | | |
-| KeyVaultName (cmd line) | Yes | | |
-| APPINSIGHTS_INSTRUMENTATIONKEY | | | |
-| | | | |
-| **MSI to access Key Vault** | | | |
-| App Services | Yes | | |
-| Local | Yes | | |
-| | | | |
-| **Logging Behavior** | | | |
-| Logging only Exceptions/Failures | Yes | | |
-| | | | |
-| **Observability/Testing** | | | |
-| Metrics reporting to App Insights  | Yes | | |
-| Unit Tests  | Yes | | |
-| | | | |
-| **Versioning** | | | |
-| Version is set to 0.[Milestone].MmDd.Hhmm (UTC) | Yes | Yes | Yes |
-| | | | |
-| **API Spec** | | | |
-| Endpoint /api/secret returns value of MySecret in KV | Yes | | |
-| Endpoint /healthz returns "Healthy" | Yes | | |
-| | | | |
-| **CI-CD/Build/Deployment** | | | |
-| Includes Dockerfile | Yes | Yes | Yes |
-| Includes Dockerfile-Dev that runs locally with MSI | Yes | Yes | No |
-| Can be deployed with App Services | Yes | Yes | Yes |
-| | | | |
-| **Linting** | | | |
-| Linter being used | fxcop | tslint | |
-| No lint errors | Yes | | |
-| Linter running in Dockerfile, fails to build if errors | Needs Update | | |
-| | | | |
-| **Documentation** | | | |
-| Readme specific to language | Needs update | | |
-| Swagger Docs | Needs update | | |
-| Publish and use shared Swagger | No | No | No |
-| | | | |
-
 ## Helium (with Cosmos DB, Key Rotation, AKS)
 
 |   Resource/Set-up/Behavior    |   C-Sharp     |   Typescript      | Java |
@@ -148,6 +93,61 @@
 | Developer docs | Need updates | No | Need updates |
 | Readme specific to language | Need updates | Need updates | Need updates |
 | Swagger Docs | Yes | Yes | Need updates |
+| | | | |
+
+## Managed Identity + Key Vault (MIKV)
+
+|   Resource/Set-up/Behavior    |   C-Sharp     |   Typescript      | Java |
+| ------------- | ------------- | ------------- | ------------- |
+| Repo | [mikv-csharp](https://github.com/Azure-Samples/app-service-managed-identity-key-vault-csharp) | not impl. | not impl. |
+| **Key Vault Secrets** | | | |
+| Secret Name: MySecret | Yes | | |
+| Retrieved and used from Key Vault | Yes | | |
+| Secret Name: AcrPassword | Yes | | |
+| Retrieved and used from Key Vault | Yes | | |
+| Secret Name: AcrUserId | Yes | | |
+| Retrieved and used from Key Vault | Yes | | |
+| Secret Name: AppInsightsKey | Yes | | |
+| Retrieved and used from Key Vault | Yes | | |
+| Runs successfully without App Insights Key secret set  | Yes | | |
+| | | | |
+| **Container Settings** | | | |
+| KeyVaultName (env var) | Yes | | |
+| KeyVaultName (cmd line) | Yes | | |
+| APPINSIGHTS_INSTRUMENTATIONKEY | | | |
+| | | | |
+| **MSI to access Key Vault** | | | |
+| App Services | Yes | | |
+| Local | Yes | | |
+| | | | |
+| **Logging Behavior** | | | |
+| Logging only Exceptions/Failures | Yes | | |
+| | | | |
+| **Observability/Testing** | | | |
+| Metrics reporting to App Insights  | Yes | | |
+| Unit Tests  | Yes | | |
+| | | | |
+| **Versioning** | | | |
+| Version is set to 0.[Milestone].MmDd.Hhmm (UTC) | Yes | Yes | Yes |
+| | | | |
+| **API Spec** | | | |
+| Endpoint /api/secret returns value of MySecret in KV | Yes | | |
+| Endpoint /healthz returns "Healthy" | Yes | | |
+| | | | |
+| **CI-CD/Build/Deployment** | | | |
+| Includes Dockerfile | Yes | Yes | Yes |
+| Includes Dockerfile-Dev that runs locally with MSI | Yes | Yes | No |
+| Can be deployed with App Services | Yes | Yes | Yes |
+| | | | |
+| **Linting** | | | |
+| Linter being used | fxcop | tslint | |
+| No lint errors | Yes | | |
+| Linter running in Dockerfile, fails to build if errors | Needs Update | | |
+| | | | |
+| **Documentation** | | | |
+| Readme specific to language | Needs update | | |
+| Swagger Docs | Needs update | | |
+| Publish and use shared Swagger | No | No | No |
 | | | | |
 
 ## I think everything below here can be removed
