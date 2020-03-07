@@ -34,13 +34,17 @@ az webapp config appsettings set --settings KeyVaultName=$He_Name -g $He_App_RG 
 az webapp log config --docker-container-logging filesystem -g $He_App_RG -n $He_Name
 
 # get the Service Principal Id and Key from Key Vault
+# note these are full URLs
 export He_AcrUserId=$(az keyvault secret show --vault-name $He_Name --name "AcrUserId" --query id -o tsv)
 export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "AcrPassword" --query id -o tsv)
 
 # Optional: Run ./saveenv.sh to save latest variables
 
+### App Service cannot currently use Managed Identity to access ACR
+### We pull the Service Principal ID and Key from Key Vault via
+### the @Microsoft.KeyVault() format used in -u and -p below
+
 # configure the Web App to use Container Registry
-# get Service Principal Id and Key from Key Vault
 az webapp config container set -n $He_Name -g $He_App_RG \
 -i ${He_Name}.azurecr.io/helium-${He_Language} \
 -r https://${He_Name}.azurecr.io \
