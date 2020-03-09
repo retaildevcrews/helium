@@ -22,6 +22,10 @@ Define valid Query String and URL parameters for the Helium API
 - Additional query string parameters are ignored
 - Additional URL paramaters result in 404 Not Found
   - example: /api/movies/tt12345/foo
+- Specifying multiple instances of a query string is an error and results are unpredictable
+  - Results are idiomatic to the language / framework used
+    - i.e. /api/movies?year=1998&year=1999 will return 400 on some frameworks
+    - while /api/movies?genre=action&genre=comedy will use the first value
 
 ## Common Parameters
 
