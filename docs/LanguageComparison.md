@@ -20,8 +20,8 @@
 | Retrieved and used from Key Vault | Yes | Yes | Yes |
 | Secret Name: CosmosUrl | Yes | Yes | No: azure-cosmosdb-uri - this can be changed  |
 | Retrieved and used from Key Vault | Yes | Yes | Yes |
-| Runs successfully without App Insights Key secret set  | Yes | No | ? |
-| Runs as expected without Cosmos secrets provided  | Yes | (need to test) | ? |
+| Runs successfully without App Insights Key secret set  | Yes | Yes | ? |
+| Runs as expected without Cosmos secrets provided  | Yes | Yes | ? |
 | Key Rotation Handling Implemented  | Yes | No | No |
 | | | | |
 | **Cosmos DB** | | | |
@@ -43,21 +43,21 @@
 | Logging only Exceptions/Failures | Yes | Yes | No |
 | | | | |
 | **Observability/Testing** | | | |
-| Unit Tests  | Yes | Yes | Yes |
+| Unit Tests  | Yes | Not yet complete | Yes |
 | Metrics reporting to dashboard  | Yes | Yes | Yes |
 | E2E integration testing running  | Yes | Yes | Yes |
 | Alerts configured  | Yes | Yes | ? |
 | | | | |
 | **Versioning** | | | |
-| Version is set to 0.[Milestone].MmDd.Hhmm (UTC) | Yes | Yes | Yes |
+| Version is set to 0.0.[Milestone]+MmDd.Hhmm (UTC) | Yes | Yes | Yes |
 | | | | |
 | **API Spec** | | | |
-| Movie direct reads return expected values |  Yes |
-| Actor direct reads return expected values |  Yes |
-| Movie queries return expected values |  Yes |
-| Actor queries return expected values |  Yes |
-| Genre query returns expected value |  Yes |
-| Featured query returns expected values |  Yes |
+| Movie direct reads return expected values | Yes | No | No |
+| Actor direct reads return expected values | Yes | No | No |
+| Movie queries return expected values | Yes | No | No |
+| Actor queries return expected values | Yes | No | No |
+| Genre query returns expected value | Yes | No | No |
+| Featured query returns expected values | Yes | No | No |
 | | | | |
 | **API Endpoints** | | | |
 | Implemented /api/movies?q={}&genre={}&year={}&rating={}&actorId={}&pageNumber={}$pageSize={} | Yes | Yes | Yes |
@@ -85,14 +85,15 @@
 | Can be deployed with AKS (using Pod Identity) | Yes | No | No |
 | | | | |
 | **Linting** | | | |
-| Linter being used | fxcop | tslint |  |
+| Linter being used | fxcop | eslint |  |
 | No lint errors | Yes | Yes |  |
 | Linter running in Dockerfile, fails to build if errors (may not be possible in all 3) | Yes | Yes |  |
 | | | | |
 | **Documentation** | | | |
 | Developer docs | Need updates | No | Need updates |
-| Readme specific to language | Need updates | Need updates | Need updates |
+| Readme specific to language | Yes | Yes | Need updates |
 | Swagger Docs | Yes | Yes | Need updates |
+| Publish and use shared Swagger | No | No | No |
 | | | | |
 
 ## Managed Identity + Key Vault (MIKV)
@@ -128,19 +129,19 @@
 | Unit Tests  | Yes | | |
 | | | | |
 | **Versioning** | | | |
-| Version is set to 0.[Milestone].MmDd.Hhmm (UTC) | Yes | Yes | Yes |
+| Version is set to 0.[Milestone].MmDd.Hhmm (UTC) | Yes | | |
 | | | | |
 | **API Spec** | | | |
 | Endpoint /api/secret returns value of MySecret in KV | Yes | | |
 | Endpoint /healthz returns "Healthy" | Yes | | |
 | | | | |
 | **CI-CD/Build/Deployment** | | | |
-| Includes Dockerfile | Yes | Yes | Yes |
-| Includes Dockerfile-Dev that runs locally with MSI | Yes | Yes | No |
-| Can be deployed with App Services | Yes | Yes | Yes |
+| Includes Dockerfile | Yes | | |
+| Includes Dockerfile-Dev that runs locally with MSI | Yes | | |
+| Can be deployed with App Services | Yes | | |
 | | | | |
 | **Linting** | | | |
-| Linter being used | fxcop | tslint | |
+| Linter being used | fxcop | | |
 | No lint errors | Yes | | |
 | Linter running in Dockerfile, fails to build if errors | Needs Update | | |
 | | | | |
