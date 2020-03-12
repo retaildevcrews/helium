@@ -176,6 +176,8 @@ Setup Container Registry
 
 - Create the Container Registry with admin access _disabled_
 
+> Currently, App Service cannot access ACR via the Managed Identity, so we have to setup a separate Service Principal and grant access to that SP.
+
 ```bash
 
 # create the ACR
