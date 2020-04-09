@@ -31,25 +31,25 @@ You can also add additional filters (varies by metric) to the condition when app
 ```bash
 
 # get the full scope of the app insights instance
-export He_App_Insights_Scope=$(az monitor app-insights component show -g $He_Name-rg-app --query [0].id -o tsv)
+export He_App_Insights_Scope=$(az monitor app-insights component show -g $He_Name-rg-app -a $He_Name --query id -o tsv)
 
-# create an alert for when the number of server requests per minute exceeds 600
+# create an alert for when the number of server requests per 15 minutes exceeds 600
 # default severity is 2
 az monitor metrics alert create -n $He_Name-Max-Requests -g $He_Name-rg-app \
 --description "Requests over 600" \
 --scopes $He_App_Insights_Scope \
 --condition "count requests/count > 600" \
---window-size 1m \
---evaluation-frequency 1m \
+--window-size 15m \
+--evaluation-frequency 15m \
 -a $He_Name-email-list \
 
-# create an alert for when the number of server requests per minute drops below 300
+# create an alert for when the number of server requests per 30 minutes drops below 300
 az monitor metrics alert create -n $He_Name-Min-Requests -g $He_Name-rg-app \
 --description "Requests under 300" \
 --scopes $He_App_Insights_Scope \
 --condition "count requests/count < 300" \
---window-size 1m \
---evaluation-frequency 1m \
+--window-size 30m \
+--evaluation-frequency 30m \
 -a $He_Name-email-list
 
 # run az monitor metrics alert create -h to see all available arguments.
