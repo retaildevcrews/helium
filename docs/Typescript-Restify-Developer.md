@@ -2,19 +2,82 @@
 
 ## Index
 
-1. [Managed Identity and Key Vault](#managed-identity-and-key-vault)
-2. [Key Rotation](#key-rotation)
-3. [Cosmos DB](#cosmos-db)
+1. [Async/Await](#async-await)
+2. [Restify vs. Express](#restify-vs.-express)
+3. [Dependency Injection (DI)](#dependency-injection-(di))
+4. [Managed Identity and Key Vault](#managed-identity-and-key-vault)
+5. [Key Rotation](#key-rotation)
+6. [Cosmos DB](#cosmos-db)
     - [SQL Injection Protection](#sql-injection-protection)
     - [Partition Key Function](#partition-key-function)
-4. [AKS Pod Identity Support](#aks-pod-identity-support)
-5. [Versioning](#versioning)
-6. [Dependency Injection (DI)](#dependency-injection-(di))
-    - [Key Vault](#key-vault)
-    - [Data Access Layer (DAL)](#data-access-layer-(DAL))
-    - [Application Insights](#application-insights)
-7. [Robots Middleware](#robots-middleware)
-8. [Logging](#logging)
+7. [AKS Pod Identity Support](#aks-pod-identity-support)
+8. [Versioning](#versioning)
+9. [Middleware](#middleware)
+    - [Robots](#robots)
+    - [Endpoint Logger](#endpoint-logger)
+10. [Logging](#logging)
+
+## Async/Await
+
+Helium uses the typescript async pattern to simplify the code handling Promises. Find a deep dive into the explanation and various patterns available in this [discussion post](https://github.com/orgs/retaildevcrews/teams/helium/discussions/8).
+
+## Restify vs. Express
+
+Restify is written specifically for maintainable and observable REST API's, whereas Express includes a larger set of features for full-fledged web applications. Because Helium does not have the goal of expanding to leverage these features, we decided to use Restify. If there is interest in an Express version, please submit an issue for us to triage in our backlog.
+
+## Dependency Injection (DI)
+
+Helium uses inversify to implement DI. To do this, we create an inversify Container and map, or bind, interfaces with concrete classes. Note that some classes are bound in Singleton Scope, this allows for the same instance of the class to be injected, which we want for our LogService, DataService, and TelemetryService.
+
+[server.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/server.ts)
+
+```typescript
+
+    const container: Container = new Container();
+
+    // setup logService (we need it for configuration)
+    container.bind<LogService>("LogService").to(BunyanLogService).inSingletonScope();
+    const logService = container.get<LogService>("LogService");
+
+    // parse command line arguments to get the key vault url and auth type
+    const consoleController = new ConsoleController(logService);
+    const config = await consoleController.run();
+
+    // setup ioc container
+    container.bind<ConfigValues>("ConfigValues").toConstantValue(config);
+    container.bind<interfaces.Controller>(TYPE.Controller).to(ActorController).whenTargetNamed("ActorController");
+    container.bind<interfaces.Controller>(TYPE.Controller).to(FeaturedController).whenTargetNamed("FeaturedController");
+    container.bind<interfaces.Controller>(TYPE.Controller).to(GenreController).whenTargetNamed("GenreController");
+    container.bind<interfaces.Controller>(TYPE.Controller).to(MovieController).whenTargetNamed("MovieController");
+    container.bind<interfaces.Controller>(TYPE.Controller).to(HealthzController).whenTargetNamed("HealthzController");
+    container.bind<DataService>("DataService").to(CosmosDBService).inSingletonScope();
+    container.bind<TelemetryService>("TelemetryService").to(AppInsightsService).inSingletonScope();
+
+```
+
+To enable this behavior, each class must be decorated with the @injectable attribute. See the CosmosDBService example below.
+
+```typescript
+
+@injectable()
+export class CosmosDBService implements DataService {
+
+```
+
+To use the injected object, use the get method. Continuing the Cosmos DB example, below shows the container resolving the DataService dependency when attempting to set up the Cosmos DB connection.
+
+[server.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/server.ts)
+
+```typescript
+
+    // connect to cosmos db
+    let cosmosDbService: DataService;
+    try {
+        cosmosDbService = container.get<DataService>("DataService");
+        await cosmosDbService.connect();
+    }
+
+```
 
 ## Managed Identity and Key Vault
 
@@ -48,11 +111,11 @@ Not yet implemented: <https://github.com/retaildevcrews/helium-typescript/issues
 
 To protect against SQL injection attacks, Helium leverages the parameterized query spec for Cosmos DB queries instead of simply building out the sql query string directly from the provided query parameters from the request.
 
-todo: add link to code
+TODO: add link to code
 
 ```typescript
 
-// todo: include code snip using query spec and parameters
+// TODO: include code snip using query spec and parameters
 
 ```
 
@@ -60,21 +123,22 @@ todo: add link to code
 
 In order to directly read a document using 1 RU (assuming the document is 1K or less), you need the document's ID and partition key. A good CosmosDB best practice is to compute the partition key from the ID. In our case, we use the integer portion of the Movie or Actor document mod 10. This gives us 10 partitions ("0" - "9") with good distribution. For a deeper discussion on the document modeling decisions, please read this [document](https://github.com/retaildevcrews/imdb).
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L132)
+[queryUtilities.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/utilities/queryUtilities.ts)
 
-```c#
+```typescript
 
-public static string GetPartitionKey(string id)
-{
-    // validate id
-    if (id.Length > 5 &&
-        (id.StartsWith("tt") || id.StartsWith("nm")) &&
-        Int32.TryParse(id.Substring(2), out int idInt))
-    {
-        return (idInt % 10).ToString();
+/* Compute the partition key based on the movieId or actorId
+    * For this sample, the partition key is mod 10 of the numeric portion of the id
+    * Returns "0" by default */
+public static getPartitionKey(id: string): string {
+    let idInt = 0;
+
+    if ( id.length > 5 && (id.startsWith("tt") || id.startsWith("nm"))) {
+        idInt = parseInt(id.substring(2), 10);
+        return isNaN(idInt) ? "0" : (idInt % 10).toString();
     }
 
-    throw new ArgumentException("GetPartitionKey");
+    return idInt.toString();
 }
 
 ```
@@ -87,51 +151,38 @@ The first time an AKS pod uses a Managed Identity, it has to start a new proxy. 
 
 Note that once the MI proxy is running, responses are generally under 100ms, so the retry code is not used in that case. The retry code is also not used in the App Service scenario as App Service ensures the proxy is running before starting Helium.
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L230)
+[KeyVaultService.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/services/KeyVaultService.ts#L27)
 
-```c#
+```typescript
 
-/// <summary>
-/// Get a valid key vault client
-/// AKS takes time to spin up the first pod identity, so
-///   we retry for up to 90 seconds
-/// </summary>
-/// <param name="kvUrl">URL of the key vault</param>
-/// <returns></returns>
-static async Task<KeyVaultClient> GetKeyVaultClient(string kvUrl)
-{
-    // retry Managed Identity for 90 seconds
-    //   AKS has to spin up an MI pod which can take a while the first time on the pod
-    DateTime timeout = DateTime.Now.AddSeconds(90.0);
+// connect to the Key Vault client
+// AKS can take longer to spin up pod identity for the first pod, so
+//      we retry for up to 90 seconds
+public async connect() {
+    // retry managed identity for 90 seconds
+    const MAX_RETRIES = 90;
 
-    while (true)
-    {
-        try
-        {
-            // use Managed Identity (MSI) for secure access to Key Vault
-            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
+    let retries = 0;
+    while (retries < MAX_RETRIES){
+        try {
+            // use specified authentication type (either MSI or CLI)
+            const creds: any = this.authType === "MSI" ?
+                new azureIdentity.ManagedIdentityCredential() :
+                await msRestNodeAuth.AzureCliCredentials.create({ resource: "https://vault.azure.net" });
 
-            // read a key to make sure the connection is valid
-            await keyVaultClient.GetSecretAsync(kvUrl, Constants.CosmosUrl);
+            this.client = new SecretClient(this.url, creds);
 
-            // return the client
-            return keyVaultClient;
-        }
-        catch (Exception ex)
-        {
-            if (DateTime.Now <= timeout)
-            {
-                // log and retry
-
-                Console.WriteLine($"KeyVault:Retry: {ex.Message}");
-                await Task.Delay(1000);
-            }
-            else
-            {
-                // log and fail
-
-                Console.WriteLine($"KeyVault:Exception: {ex.Message}\n{ex}");
-                Environment.Exit(-1);
+            // test getSecret to validate successful Key Vault connection
+            await this.getSecret(cosmosUrl);
+            return;
+        } catch (e) {
+            retries++;
+            if (this.authType === "MSI" && retries < MAX_RETRIES) {
+                this.logger.trace("KeyVault: Retry");
+                // wait 1 second and retry (continue while loop)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            } else {
+                throw new Error("Failed to connect to Key Vault with MSI");
             }
         }
     }
@@ -141,145 +192,41 @@ static async Task<KeyVaultClient> GetKeyVaultClient(string kvUrl)
 
 ## Versioning
 
-Helium dynamically builds a version string based on the assembly version and date time of build. This is displayed in both the Healthz output as well as the Swagger UI.
+Helium dynamically builds a version string based on the package version and date time of build. This is output to the console logs at app startup and displayed in the both the /version and healthz/ietf endpoint responses. The addition of date time to the version string in combination with the /version endpoint allows for quick verification that the latest build has been deployed with CI/CD.
 
-[Version.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Version.cs#L12)
+[versionUtilities.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/utilities/versionUtilities.ts)
 
-```c#
+```typescript
 
-string file = System.Reflection.Assembly.GetExecutingAssembly().Location;
-DateTime dt = System.IO.File.GetCreationTime(file);
+// build and return the version string based on last build date time
+// build time based on dist/server.js file
+public static getBuildVersion(): string {
 
-var aVer = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+    // get the build time (i.e. 2020-04-02T05:11:04.483Z) and pull out the interesting parts
+    const buildTime = fs.statSync("./dist/server.js").mtime.toISOString();
+    const [, month, day, hour, minute] = /\d*-(\d*)-(\d*)T(\d*):(\d*):.*Z/.exec(buildTime);
 
-return string.Format($"{aVer.Major}.{aVer.Minor}.{dt.ToString("MMdd.HHmm")}");
-
-```
-
-## Dependency Injection (DI)
-
-ASP.Net Core uses Dependency Injection (DI) to share objects across different controllers and modules.
-
-### Key Vault
-
-If you need access to Key Vault in your app, you can retrieve the Key Vault Client from ASP.NET's DI rather than have to track credentials and create a new connection.
-
-#### Adding Key Vault via ASP.NET DI
-
-[KeyVaultConnectionExtension.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/KeyVault.Extensions/KeyVaultConnectionExtension.cs#L8)
-
-```c#
-
-public static IServiceCollection AddKeyVaultConnection(this IServiceCollection services, KeyVaultClient client, string uri)
-{
-    // add the KeyVaultConnection as a singleton
-    services.AddSingleton<IKeyVaultConnection>(new KeyVaultConnection
-    {
-        Client = client,
-        Uri = uri
-    });
-
-    return services;
+    return `${pkg.version}+${month}${day}.${hour}${minute}`;
 }
 
 ```
 
-#### Retrieving the Key Vault Client from ASP.NET DI
+## Middleware
 
-```c#
+### Robots
 
-var keyVaultConn = _host.Services.GetService<IKeyVaultConnection>();
+There is a robotsText middleware extension method added to Helium to handle a default warmup request of /robots43245.txt (43245 is random) when deploying to Azure App Service. Because Helium does not expect this request as part of its normal app logic, it would cause a 404 error, or in this case a false (expected) error, to appear in Azure Monitor reporting. This extension helps keep reporting clean and only contain true errors warranting investigation.
 
-```
+Code: [robotsText.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/middleware/robotsText.ts)
 
-### Data Access Layer (DAL)
+### Endpoint Logger
 
-The controllers need access to Helium's implementation of IDal in order to retrieve results from CosmosDB, so we add the data access layer via DI as a singleton.
+A custom Request Logger extension is added to handle logging Http request information. As implemented, only 4xx and 5xx responses are logged. This helps make logs easy to search through when debugging errors, rather than having to navigate through several successful requests. In addition to the request logger, helium logs primarily errors to console to keep output clean.
 
-#### Adding IDal via ASP.NET DI
-
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L288)
-
-```c#
-
-IWebHostBuilder builder = WebHost.CreateDefaultBuilder()
-.UseConfiguration(config)
-.UseKestrel()
-.UseUrls(string.Format($"http://*:{Constants.Port}/"))
-.UseStartup<Startup>()
-.ConfigureServices(services =>
-{
-    // add the data access layer via DI
-    services.AddDal(config.GetValue<string>(Constants.CosmosUrl),
-        config.GetValue<string>(Constants.CosmosKey),
-        config.GetValue<string>(Constants.CosmosDatabase),
-        config.GetValue<string>(Constants.CosmosCollection));
-});
-
-```
-
-#### Retrieve the Data Access Layer from ASP.NET DI
-
-A controller or other module can retrieve the data access layer from ASP.NET DI by calling ```GetService<T>``` or by including IDAL in the controller's constructor.
-
-[ActorsController.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Controllers/ActorsController.cs#L20)
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L106)
-
-```c#
-
-// retrive in constructor
-public ActorsController(ILogger<ActorsController> logger, IDAL dal)
-
-// retrive via code
-var dal = _host.Services.GetService<IDAL>();
-
-```
-
-### Application Insights
-
-Optionally store the application insights instrumentation key in Key Vault to configure Helium to use Application Insights. When configured, the DI creates a singleton instance of TelemetryClient that can be used to track custom events and metrics.
-
-#### Adding Application Insights from ASP.NET DI
-
-[Startup.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Startup.cs#L48)
-
-```c#
-
-// add App Insights if key set
-string appInsightsKey = Configuration.GetValue<string>(Constants.AppInsightsKey);
-
-if (!string.IsNullOrEmpty(appInsightsKey))
-{
-    services.AddApplicationInsightsTelemetry(appInsightsKey);
-}
-
-```
-
-#### Using the TelemetryClient from DI to track custom metric
-
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L120)
-
-```c#
-
-// send a NewKeyLoadedMetric to App Insights
-if (!string.IsNullOrEmpty(config[Constants.AppInsightsKey]))
-{
-    var telemetryClient = _host.Services.GetService<TelemetryClient>();
-
-    if (telemetryClient != null)
-    {
-        telemetryClient.TrackMetric(Constants.NewKeyLoadedMetric, 1);
-    }
-}
-
-```
-
-## Robots Middleware
-
-There is a robotsText middleware extension method added to Helium to handle a default warmup request of /robots43245.txt (43245 is random) when deploying to Azure App Service. Because Helium does not expect this request as part of its normal app logic, it would cause a 404 error, or in this case a false (expected) error, to appear in Azure Monitor reporting. This extension helps keep reporting clean and only contain true errors warranting investigation. Code: [robotsText.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Middleware/robotsText.cs)
+Code: [EndpointLogger.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/middleware/EndpointLogger.ts)
 
 ## Logging
 
-A custom Request Logger extension is added to handle logging Http request information. This can be configured with LoggerOptions to control which requests to log based on status code.  By default, only 4xx and 5xx responses are logged.  This helps make logs easy to search through when debugging errors, rather than having to navigate through several successful requests.  In addition to the request logger, helium logs primarily errors to console to keep output clean.
+Helium uses the Bunyan log service. Bunyan supports 6 logging levels, Helium currently implements 4: trace (10), info (30), warn (40), and error (50). The stream logging level definition determines which logs are output to the stream. For instance, if the stream logging level is set to warn, only warn logs and higher (error) will be logged. The default stream logging level is info (30), this can be changed via command line (-l argument) or environment variable (LOG_LEVEL).
 
-Code: [requestLogger.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Middleware/requestLogger.cs)
+Code: [BunyanLogService.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/services/BunyanLogService.ts)
