@@ -18,9 +18,9 @@
 
 ## Managed Identity and Key Vault
 
-After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code. This also works in the local development scenario as long as the developer has access to the Key Vault and is logged in to the Azure CLI with az login.
+After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code. For the local development scenario, we use a different credential specifically for Azure CLI credentials.  This works as long as the developer has access to the Key Vault and is logged in to the Azure CLI with az login. The authentication type can be specified as an environment variable or command line argument, defaulting to MSI.
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L240)
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L433)
 
 ```c#
 
@@ -39,7 +39,7 @@ return keyVaultClient;
 
 ASP.NET IConfiguration does not currently track changes to Key Vault secrets. Helium implements a loop in Program.cs that continuously checks Key Vault for changes to the CosmosDB paramaters and calls IDal::Reconnect so that Key Rotation and other scenarios can be supported.
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L87)
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L262)
 
 ```c#
 
@@ -72,29 +72,33 @@ The Reconnect method on IDal allows you to programmatically change your CosmosDB
 
 ```c#
 
-public async Task Reconnect(string cosmosUrl, string cosmosKey, string cosmosDatabase, string cosmosCollection, bool force = false)
+public async Task Reconnect(Uri cosmosUrl, string cosmosKey, string cosmosDatabase, string cosmosCollection, bool force = false)
 {
-    if (force ||
-        _cosmosDetails.CosmosCollection != cosmosCollection ||
-        _cosmosDetails.CosmosDatabase != cosmosDatabase ||
-        _cosmosDetails.CosmosKey != cosmosKey ||
-        _cosmosDetails.CosmosUrl != cosmosUrl)
+    if (cosmosUrl == null)
     {
-        CosmosDetails d = new CosmosDetails
+        throw new ArgumentNullException(nameof(cosmosUrl));
+    }
+
+    if (force ||
+        cosmosDetails.CosmosCollection != cosmosCollection ||
+        cosmosDetails.CosmosDatabase != cosmosDatabase ||
+        cosmosDetails.CosmosKey != cosmosKey ||
+        cosmosDetails.CosmosUrl != cosmosUrl.AbsoluteUri)
+    {
+        CosmosConfig d = new CosmosConfig
         {
             CosmosCollection = cosmosCollection,
             CosmosDatabase = cosmosDatabase,
             CosmosKey = cosmosKey,
-            CosmosUrl = cosmosUrl
+            CosmosUrl = cosmosUrl.AbsoluteUri
         };
 
         // open and test a new client / container
-        // this will throw an exception if the parameters are not valid
-        d.Client = await OpenAndTestCosmosClient(cosmosUrl, cosmosKey, cosmosDatabase, cosmosCollection);
+        d.Client = await OpenAndTestCosmosClient(cosmosUrl, cosmosKey, cosmosDatabase, cosmosCollection).ConfigureAwait(false);
         d.Container = d.Client.GetContainer(cosmosDatabase, cosmosCollection);
 
         // set the current CosmosDetail
-        _cosmosDetails = d;
+        cosmosDetails = d;
     }
 }
 
@@ -102,10 +106,11 @@ public async Task Reconnect(string cosmosUrl, string cosmosKey, string cosmosDat
 
 Open and test the CosmosDB connection / database / collection. The call to ReadItemAsync retrieves the Action Genre document and verifies that the new parameters can read the collection.
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L92)
+[dalMain.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L99)
 
 ```c#
 
+// open and test a new client / container
 var c = new CosmosClient(cosmosUrl, cosmosKey, _cosmosDetails.CosmosClientOptions);
 var con = c.GetContainer(cosmosDatabase, cosmosCollection);
 await con.ReadItemAsync<dynamic>("action", new PartitionKey("0"));
@@ -116,7 +121,7 @@ await con.ReadItemAsync<dynamic>("action", new PartitionKey("0"));
 
 In order to directly read a document using 1 RU (assuming the document is 1K or less), you need the document's ID and partition key. A good CosmosDB best practice is to compute the partition key from the ID. In our case, we use the integer portion of the Movie or Actor document mod 10. This gives us 10 partitions ("0" - "9") with good distribution. For a deeper discussion on the document modeling decisions, please read this [document](https://github.com/retaildevcrews/imdb).
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L132)
+[dalMain.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L132)
 
 ```c#
 
@@ -143,7 +148,7 @@ The first time an AKS pod uses a Managed Identity, it has to start a new proxy. 
 
 Note that once the MI proxy is running, responses are generally under 100ms, so the retry code is not used in that case. The retry code is also not used in the App Service scenario as App Service ensures the proxy is running before starting Helium.
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L230)
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L400)
 
 ```c#
 
@@ -153,41 +158,61 @@ Note that once the MI proxy is running, responses are generally under 100ms, so 
 ///   we retry for up to 90 seconds
 /// </summary>
 /// <param name="kvUrl">URL of the key vault</param>
+/// <param name="authType">MSI, CLI or VS</param>
 /// <returns></returns>
-static async Task<KeyVaultClient> GetKeyVaultClient(string kvUrl)
+static async Task<KeyVaultClient> GetKeyVaultClient(string kvUrl, string authType)
 {
     // retry Managed Identity for 90 seconds
     //   AKS has to spin up an MI pod which can take a while the first time on the pod
     DateTime timeout = DateTime.Now.AddSeconds(90.0);
 
+    // use MSI as default
+    string authString;
+
+    switch (authType.ToUpperInvariant())
+    {
+        case "MSI":
+            authString = "RunAs=App";
+            break;
+        case "CLI":
+            authString = "RunAs=Developer; DeveloperTool=AzureCli";
+            break;
+        case "VS":
+            authString = "RunAs=Developer; DeveloperTool=VisualStudio";
+            break;
+        default:
+            Console.WriteLine("Invalid Key Vault Authentication Type");
+            return null;
+    }
+
     while (true)
     {
         try
         {
+            var tokenProvider = new AzureServiceTokenProvider(authString);
+
             // use Managed Identity (MSI) for secure access to Key Vault
-            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
+            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
 
             // read a key to make sure the connection is valid
-            await keyVaultClient.GetSecretAsync(kvUrl, Constants.CosmosUrl);
+            await keyVaultClient.GetSecretAsync(kvUrl, Constants.CosmosUrl).ConfigureAwait(false);
 
             // return the client
             return keyVaultClient;
         }
         catch (Exception ex)
         {
-            if (DateTime.Now <= timeout)
+            if (DateTime.Now <= timeout && authType == "MSI")
             {
-                // log and retry
-
-                Console.WriteLine($"KeyVault:Retry: {ex.Message}");
-                await Task.Delay(1000);
+                // retry MSI connections for pod identity
+                Console.WriteLine($"KeyVault:Retry");
+                await Task.Delay(1000).ConfigureAwait(false);
             }
             else
             {
                 // log and fail
-
                 Console.WriteLine($"KeyVault:Exception: {ex.Message}\n{ex}");
-                Environment.Exit(-1);
+                return null;
             }
         }
     }
@@ -197,18 +222,40 @@ static async Task<KeyVaultClient> GetKeyVaultClient(string kvUrl)
 
 ## Versioning
 
-Helium dynamically builds a version string based on the assembly version and date time of build. This is displayed in both the Healthz output as well as the Swagger UI.
+Helium builds a version string in version attribute in the assembly version following the pattern: x.y.z+MMdd.hhmm (appending date time of build).
 
-[Version.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Version.cs#L12)
+[helium.csproj](https://github.com/retaildevcrews/helium-csharp/blob/master/src/app/helium.csproj)
 
 ```c#
 
-string file = System.Reflection.Assembly.GetExecutingAssembly().Location;
-DateTime dt = System.IO.File.GetCreationTime(file);
+<Version>1.0.7+$([System.DateTime]::UtcNow.ToString(`MMdd-HHmm`))</Version>
 
-var aVer = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+```
 
-return string.Format($"{aVer.Major}.{aVer.Minor}.{dt.ToString("MMdd.HHmm")}");
+The version is displayed at app startup, in the healthz/ietf endpoint output, and the /version endpoint output. The app version string is retrieved from the assembly in the version middleware.
+
+[version.cs](https://github.com/retaildevcrews/helium-csharp/blob/master/src/app/Middleware/version.cs)
+
+```c#
+
+/// <summary>
+/// Get the app version
+/// </summary>
+public static string Version
+{
+    get
+    {
+        if (string.IsNullOrEmpty(version))
+        {
+            if (Attribute.GetCustomAttribute(Assembly.GetEntryAssembly(), typeof(AssemblyInformationalVersionAttribute)) is AssemblyInformationalVersionAttribute v)
+            {
+                version = v.InformationalVersion;
+            }
+        }
+
+        return version;
+    }
+}
 
 ```
 
@@ -240,11 +287,12 @@ public static IServiceCollection AddKeyVaultConnection(this IServiceCollection s
 
 ```
 
-#### Retrieving the Key Vault Client from ASP.NET DI
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L474)
 
 ```c#
 
-var keyVaultConn = _host.Services.GetService<IKeyVaultConnection>();
+// add the KeyVaultConnection via DI
+services.AddKeyVaultConnection(kvClient, new Uri(kvUrl));
 
 ```
 
@@ -254,7 +302,7 @@ The controllers need access to Helium's implementation of IDal in order to retri
 
 #### Adding IDal via ASP.NET DI
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L288)
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L474)
 
 ```c#
 
@@ -279,7 +327,7 @@ IWebHostBuilder builder = WebHost.CreateDefaultBuilder()
 A controller or other module can retrieve the data access layer from ASP.NET DI by calling ```GetService<T>``` or by including IDAL in the controller's constructor.
 
 [ActorsController.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Controllers/ActorsController.cs#L20)
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L106)
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L279)
 
 ```c#
 
@@ -287,7 +335,7 @@ A controller or other module can retrieve the data access layer from ASP.NET DI 
 public ActorsController(ILogger<ActorsController> logger, IDAL dal)
 
 // retrive via code
-var dal = _host.Services.GetService<IDAL>();
+var dal = host.Services.GetService<IDAL>();
 
 ```
 
@@ -313,14 +361,14 @@ if (!string.IsNullOrEmpty(appInsightsKey))
 
 #### Using the TelemetryClient from DI to track custom metric
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L120)
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L288)
 
 ```c#
 
 // send a NewKeyLoadedMetric to App Insights
 if (!string.IsNullOrEmpty(config[Constants.AppInsightsKey]))
 {
-    var telemetryClient = _host.Services.GetService<TelemetryClient>();
+    var telemetryClient = host.Services.GetService<TelemetryClient>();
 
     if (telemetryClient != null)
     {
