@@ -8,7 +8,7 @@
 4. [Managed Identity and Key Vault](#managed-identity-and-key-vault)
 5. [Key Rotation](#key-rotation)
 6. [Cosmos DB](#cosmos-db)
-    - [SQL Injection Protection](#sql-injection-protection)
+    - [SQL Parameterization](#sql-parameterization)
     - [Partition Key Function](#partition-key-function)
 7. [AKS Pod Identity Support](#aks-pod-identity-support)
 8. [Versioning](#versioning)
@@ -107,15 +107,41 @@ Not yet implemented: <https://github.com/retaildevcrews/helium-typescript/issues
 
 ## Cosmos DB
 
-### SQL Injection Protection
+### SQL Parameterization
 
-To protect against SQL injection attacks, Helium leverages the parameterized query spec for Cosmos DB queries instead of simply building out the sql query string directly from the provided query parameters from the request.
+Helium leverages the parameterized query for Cosmos DB queries instead of simply building out the sql query string directly from the provided query parameters from the request.
 
-TODO: add link to code
+[CosmosDBService.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/services/CosmosDBService.ts#L46)
 
 ```typescript
 
-// TODO: include code snip using query spec and parameters
+ public async queryActors(queryParams: any): Promise<Actor[]> {
+        const SELECT = "select m.id, m.partitionKey, m.actorId, m.type, m.name, m.birthYear, m.deathYear, m.profession, m.textSearch, m.movies from m where m.type = 'Actor' ";
+        const ORDER_BY = " order by m.textSearch, m.actorId";
+        const parameters = [];
+
+        let sql = SELECT;
+
+        let actorName: string = queryParams.q;
+
+        const { size: pageSize, number: pageNumber } = this.setPagingParameters(queryParams.pageSize, queryParams.pageNumber);
+
+        const offsetLimit = " offset " + (pageNumber * pageSize) + " limit " + pageSize + " ";
+
+        // apply search term if provided in query
+        if (actorName) {
+            actorName = actorName.trim().toLowerCase().replace("'", "''");
+
+            if (actorName) {
+                sql += " and contains(m.textSearch, @actorName)";
+                parameters.push({name: "@actorName", value: actorName});
+            }
+        }
+
+        sql += ORDER_BY + offsetLimit;
+
+        return await this.queryDocuments({ query: sql, parameters: parameters });
+    }
 
 ```
 

@@ -52,6 +52,15 @@ az monitor metrics alert create -n $He_Name-Min-Requests -g $He_Name-rg-app \
 --evaluation-frequency 30m \
 -a $He_Name-email-list
 
+# create an alert for when the average server response time exceeds 30ms
+az monitor metrics alert create -n $He_AppInsights_Name-Response-Time -g $He_Name-rg-app \
+--description "Server Response Time over 30ms" \
+--scopes $He_App_Insights_Scope \
+--condition "avg requests/duration > 30" \
+--window-size 15m \
+--evaluation-frequency 15m \
+-a $He_Name-email-list
+
 # run az monitor metrics alert create -h to see all available arguments.
 
 ```
