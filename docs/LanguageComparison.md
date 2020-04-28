@@ -96,7 +96,7 @@
 | Readme specific to language | Yes | Yes | Yes |
 | Swagger Docs | Yes | Yes | Yes |
 | Publish and use shared Swagger | Yes | Yes | Yes |
-|
+| |
 | ***Managed Identity + Key Vault (MIKV)*** |
 |   Repo    | [csharp](https://github.com/Azure-Samples/app-service-managed-identity-key-vault-csharp) |         |  |
 | **Key Vault Secrets** |
