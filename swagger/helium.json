@@ -791,7 +791,7 @@
       },
       "/healthz": {
         "get": {
-          "tags": [ "Healthz" ],
+          "tags": [ "Health Check" ],
           "summary": "Health Check (simple)",
           "description": "Returns a text/plain health status (pass, warn or fail)",
           "responses": {
@@ -811,7 +811,7 @@
       },
       "/healthz/ietf": {
         "get": {
-          "tags": [ "Healthz" ],
+          "tags": [ "Health Check" ],
           "summary": "Health Check (IETF)",
           "description": "Returns an `IetfHealthCheck` document from the Health Check",
           "responses": {
@@ -824,46 +824,51 @@
                   },
                   "example": {
                     "status": "pass",
-                    "serviceId": "helium-csharp",
-                    "description": "Helium C# Health Check",
+                    "serviceId": "helium",
+                    "description": "Helium Health Check",
                     "instance": "0",
-                    "version": "1.0.0302.0026",
+                    "version": "1.0.0502.0026",
                     "checks": {
-                      "getGenres": {
+                      "getGenres:responseTime": {
                         "status": "pass",
-                        "componentType": "CosmosDB",
+                        "componentId": "getGenres",
+                        "componentType":"datastore",
                         "observedUnit": "ms",
                         "observedValue": 6.17,
                         "targetValue": 400,
                         "time": "2020-03-02T01:49:17Z"
                       },
-                      "getActorById": {
+                      "getActorById:responseTime": {
                         "status": "pass",
-                        "componentType": "CosmosDB",
+                        "componentId": "getActorById",
+                        "componentType":"datastore",
                         "observedUnit": "ms",
                         "observedValue": 3.78,
                         "targetValue": 250,
                         "time": "2020-03-02T01:49:17Z"
                       },
-                      "getMovieById": {
+                      "getMovieById:responseTime": {
                         "status": "pass",
-                        "componentType": "CosmosDB",
+                        "componentId": "getMovieById",
+                        "componentType":"datastore",
                         "observedUnit": "ms",
                         "observedValue": 1.4,
                         "targetValue": 400,
                         "time": "2020-03-02T01:49:17Z"
                       },
-                      "searchMovies": {
+                      "searchMovies:responseTime": {
                         "status": "pass",
-                        "componentType": "CosmosDB",
+                        "componentId": "searchMovies",
+                        "componentType":"datastore",
                         "observedUnit": "ms",
                         "observedValue": 38.11,
                         "targetValue": 400,
                         "time": "2020-03-02T01:49:17Z"
                       },
-                      "searchActors": {
+                      "searchActors:responseTime": {
                         "status": "pass",
-                        "componentType": "CosmosDB",
+                        "componentId": "searchActors",
+                        "componentType":"datastore",
                         "observedUnit": "ms",
                         "observedValue": 57.27,
                         "targetValue": 400,
@@ -1043,7 +1048,7 @@
             "checks": {
               "type": "object",
               "properties": {
-                "getGenres": {
+                "getGenres:responseTime": {
                   "type": "object",
                   "properties": {
                     "status": {
@@ -1052,9 +1057,8 @@
                     "componentId": {
                       "type": "string"
                     },
-                    "message": {
-                      "type": "string",
-                      "nullable": true
+                    "componentType": {
+                      "type": "string"
                     },
                     "observedUnit": {
                       "type": "string"
@@ -1069,7 +1073,11 @@
                       "type": "string",
                       "format": "datetime"
                     },
-                    "endPoints": {
+                    "message": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "AffectedEndPoints": {
                       "type": "array",
                       "nullable": true,
                       "items": {
@@ -1078,7 +1086,7 @@
                     }
                   }
                 },
-                "getActorById": {
+                "getActorById:responseTime": {
                   "type": "object",
                   "properties": {
                     "status": {
@@ -1087,9 +1095,8 @@
                     "componentId": {
                       "type": "string"
                     },
-                    "message": {
-                      "type": "string",
-                      "nullable": true
+                    "componentType": {
+                      "type": "string"
                     },
                     "observedUnit": {
                       "type": "string"
@@ -1104,7 +1111,11 @@
                       "type": "string",
                       "format": "datetime"
                     },
-                    "endPoints": {
+                    "message": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "affectedEndPoints": {
                       "type": "array",
                       "nullable": true,
                       "items": {
@@ -1113,7 +1124,7 @@
                     }
                   }
                 },
-                "getMovieById": {
+                "getMovieById:responseTime": {
                   "type": "object",
                   "properties": {
                     "status": {
@@ -1122,9 +1133,8 @@
                     "componentId": {
                       "type": "string"
                     },
-                    "message": {
-                      "type": "string",
-                      "nullable": true
+                    "componentType": {
+                      "type": "string"
                     },
                     "observedUnit": {
                       "type": "string"
@@ -1139,7 +1149,11 @@
                       "type": "string",
                       "format": "datetime"
                     },
-                    "endPoints": {
+                    "message": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "affectedEndPoints": {
                       "type": "array",
                       "nullable": true,
                       "items": {
@@ -1148,7 +1162,7 @@
                     }
                   }
                 },
-                "searchMovies": {
+                "searchMovies:responseTime": {
                   "type": "object",
                   "properties": {
                     "status": {
@@ -1157,9 +1171,8 @@
                     "componentId": {
                       "type": "string"
                     },
-                    "message": {
-                      "type": "string",
-                      "nullable": true
+                    "componentType": {
+                      "type": "string"
                     },
                     "observedUnit": {
                       "type": "string"
@@ -1174,7 +1187,11 @@
                       "type": "string",
                       "format": "datetime"
                     },
-                    "endPoints": {
+                    "message": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "affectedEndPoints": {
                       "type": "array",
                       "nullable": true,
                       "items": {
@@ -1183,7 +1200,7 @@
                     }
                   }
                 },
-                "searchActors": {
+                "searchActors:responseTime": {
                   "type": "object",
                   "properties": {
                     "status": {
@@ -1192,9 +1209,8 @@
                     "componentId": {
                       "type": "string"
                     },
-                    "message": {
-                      "type": "string",
-                      "nullable": true
+                    "componentType": {
+                      "type": "string"
                     },
                     "observedUnit": {
                       "type": "string"
@@ -1209,7 +1225,11 @@
                       "type": "string",
                       "format": "datetime"
                     },
-                    "endPoints": {
+                    "message": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "affectedEndPoints": {
                       "type": "array",
                       "nullable": true,
                       "items": {
