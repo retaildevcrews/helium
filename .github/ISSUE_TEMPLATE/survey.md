@@ -79,3 +79,26 @@ assignees: ''
 - [ ] We had scripts for both creating and deploying some services to an environment.
 - [ ] We had scripts for both creating and deploying all services to an environment.
 - [ ] There were multiple environments and deployments into them were automated and well understood.
+
+### How was observability achieved?
+- [ ] We didn’t add any logging, metrics, tracing, or monitoring. 
+- [ ] We added some logging, metrics, tracing, and/or monitoring but it was not done consistently across all system components. 
+- [ ] We added logging, metrics, tracing, and/or monitoring across most components. However, the implementation was not complete; ex) we did not use correlation ids or business context was missing or alerts were not defined for monitored components, etc. 
+- [ ] We added extensive logging, metrics, tracing, and monitoring alerts to facilitate debugging, viewing of historical trends, understanding control flow, and the current state of the system. 
+- [ ] We designed and implemented instrumentation to help run the solution with the goal of adding value to the customer.
+
+### How was security evaluated in this engagement?
+- [ ] We did not evaluate security as a part of this engagement.
+- [ ] Security was evaluated only at the end of the engagement; little to no time was available to remediate issues.
+- [ ] Security was evaluated only at the end of the engagement; there was time remaining prior to hand-off to fix issues (if needed).
+- [ ] Secure design was considered during the design and implementation phases but with no ongoing support.
+- [ ] Secure design was considered during the design and implementation phases, and ongoing automated testing was introduced to the DevSecOps process prior to hand off.
+
+### How was impactful Product Group engineering feedback provided?
+- [ ] Microsoft products/services worked flawlessly without any issues, therefore, there was no engineering feedback to share.
+- [ ] We encountered some friction with Microsoft products/services but didn’t submit any engineering feedback for the Product Group.
+- [ ] We shared our feedback directly with the Product Group but only in an ad-hoc manner (i.e. via email, teams, etc).
+- [ ] Mostly at the end of the engagement, we submitted some engineering feedback via CSE Feedback tool.
+- [ ] On an ongoing basis, we submitted all of the relevant high-quality feedback via CSE Feedback tool, including priority, scenario-based description, repro steps with screenshots, and attached relevant email threads with the Product Group.
+
+
