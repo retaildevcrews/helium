@@ -144,7 +144,7 @@
 | **Linting** | | | |
 | Linter being used | fxcop | eslint | |
 | **No** lint errors | Yes | Yes | |
-| Linter running in Dockerfile, fails to build if errors | **No** | | |
+| Linter running in Dockerfile, fails to build if errors | **No** | **No** | |
 | |
 | **Documentation** | | | |
 | Readme specific to language | Yes | Yes | |
