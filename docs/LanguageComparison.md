@@ -97,53 +97,56 @@
 | Swagger Docs | Yes | Yes | Yes |
 | Publish and use shared Swagger | Yes | Yes | Yes |
 | |
-| ***Managed Identity + Key Vault (MIKV)*** |
-|   Repo    | [csharp](https://github.com/Azure-Samples/app-service-managed-identity-key-vault-csharp) |         |  |
+
+## Managed Identity + Key Vault (MIKV)
+
+|   Repo    | [csharp](https://github.com/Azure-Samples/app-service-managed-identity-key-vault-csharp) |  [typescript](https://github.com/retaildevcrews/mikv-typescript) |  |
+| ------------- | ------------- | ------------- | ------------- |
 | **Key Vault Secrets** |
-| Secret Name: MySecret | Yes | | |
-| Retrieved and used from Key Vault | Yes | | |
-| Secret Name: AcrPassword | Yes |  | |
-| Retrieved and used from Key Vault | Yes | | |
-| Secret Name: AcrUserId | Yes | | |
-| Retrieved and used from Key Vault | Yes | | |
-| Secret Name: AppInsightsKey | Yes | | |
-| Retrieved and used from Key Vault | Yes | | |
-| Runs successfully without App Insights Key secret set  | Yes | | |
+| Secret Name: MySecret | Yes | Yes | |
+| Retrieved and used from Key Vault | Yes | Yes | |
+| Secret Name: AcrPassword | Yes | Yes | |
+| Retrieved and used from Key Vault | Yes | Yes | |
+| Secret Name: AcrUserId | Yes | Yes | |
+| Retrieved and used from Key Vault | Yes | Yes | |
 | |
-| **Container Settings** | | | |
-| KeyVaultName (env var) | Yes | | |
-| KeyVaultName (cmd line) | Yes | | |
-| APPINSIGHTS_INSTRUMENTATIONKEY | | | |
+| **Command Line and Environment Variables** | | | |
+| KEYVAULT_NAME (env var) | ? | Yes | |
+| --keyvault-name (cmd line) | ? | Yes | |
+| AUTH_TYPE (env var) | ? | Yes | |
+| --auth-type (cmd line) | ? | Yes | |
+| LOG_LEVEL (env var) | ? | Yes | |
+| --log-level (cmd line) | ? | Yes | |
+| --help (cmd line) | ? | Yes | |
+| --dry-run (cmd line) | ? | Yes | |
 | |
 | **MSI to access Key Vault** | | | |
-| App Services | Yes | | |
-| Local | Yes | | |
+| App Services | Yes | Yes | |
+| Local | Yes | Yes | |
 | |
 | **Logging Behavior** | | | |
-| Logging only Exceptions/Failures | Yes | | |
+| Logging only Exceptions/Failures | Yes | Yes | |
 | |
 | **Observability/Testing** | | | |
-| Metrics reporting to App Insights  | Yes | | |
-| Unit Tests  | Yes | | |
+| No App Insights (out of scope) | No | Yes | |
+| No Unit Tests (out of scope) | No | Yes | |
 | |
 | **Versioning** | | | |
-| Version is set to 0.[Milestone].MmDd.Hhmm (UTC) | Yes | | |
+| Version is set to [0,1].0.[Milestone].MmDd.Hhmm (UTC) | ? | Yes | |
 | |
 | **API Spec** | | | |
-| Endpoint /api/secret returns value of MySecret in KV | Yes | | |
-| Endpoint /healthz returns "Healthy" | Yes | | |
+| Endpoint /api/secret returns value of MySecret in KV | Yes | Yes | |
 | |
 | **CI-CD/Build/Deployment** | | | |
-| Includes Dockerfile | Yes | | |
-| Includes Dockerfile-Dev that runs locally with MSI | Yes | | |
-| Can be deployed with App Services | Yes | | |
+| Includes Dockerfile | Yes | Yes | |
+| Can be deployed with App Services | Yes | Yes | |
 | |
 | **Linting** | | | |
-| Linter being used | fxcop | | |
-| **No** lint errors | Yes | | |
-| Linter running in Dockerfile, fails to build if errors | **No** | | |
+| Linter being used | fxcop | eslint | |
+| **No** lint errors | Yes | Yes | |
+| Linter running in Dockerfile, fails to build if errors | **No** | **No** | |
 | |
 | **Documentation** | | | |
-| Readme specific to language | Yes | | |
-| Swagger Docs | Yes | | |
-| Publish and use shared Swagger | **No** |  |  |
+| Readme specific to language | Yes | Yes | |
+| Swagger Docs | Yes | Yes | |
+| Use comment-generated Swagger | Yes | Yes |  |
