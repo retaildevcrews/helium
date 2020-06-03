@@ -255,7 +255,7 @@ Replace the values in the `Helium_Dashboard.json` file surrounded by `%%` with t
 
 ```bash
 
-cd $REPO_ROOT
+cd $REPO_ROOT/docs/dashboard
 sed -i "s/%%SUBSCRIPTION_GUID%%/${He_Sub}/g" Helium_Dashboard.json && \
 sed -i "s/%%DASHBOARD_RESOURCE_GROUP%%/${He_App_RG}/g" Helium_Dashboard.json && \
 sed -i "s/%%He_Language%%/${He_Language}/g" Helium_Dashboard.json && \
