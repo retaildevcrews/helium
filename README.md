@@ -249,6 +249,22 @@ Run the Integration Test
 docker run -it --rm retaildevcrew/webvalidate --host https://${He_Name}.azurewebsites.net --files baseline.json
 
 ```
+## Dashboard setup
+
+Replace the values in the `Helium_Dashboard.json` file surrounded by `%%` with the proper environment variables
+
+```bash
+
+cd $REPO_ROOT
+sed -i "s/%%SUBSCRIPTION_GUID%%/${He_Sub}/g" Helium_Dashboard.json && \
+sed -i "s/%%DASHBOARD_RESOURCE_GROUP%%/${He_App_RG}/g" Helium_Dashboard.json && \
+sed -i "s/%%COSMOS_RESOURCE_GROUP%%/${Imdb_RG}/g" Helium_Dashboard.json
+
+```
+
+Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file with your correct subscription GUID, resource group names, and app name.
+
+For more documentation on creating and sharing Dashboards, see ([here](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards)).
 
 ## Contributing
 
