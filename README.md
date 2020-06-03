@@ -42,6 +42,8 @@ az account list -o table
 # select the Azure account
 az account set -s {subscription name or Id}
 
+export He_Sub=$(az account show --subscription {subscription name or Id} --output tsv |awk '{print $3}')
+
 ```
 
 Choose a unique DNS name
@@ -252,6 +254,7 @@ docker run -it --rm retaildevcrew/webvalidate --host https://${He_Name}.azureweb
 ## Dashboard setup
 
 Replace the values in the `Helium_Dashboard.json` file surrounded by `%%` with the proper environment variables
+after making sure the proper environment variables are set
 
 ```bash
 
