@@ -263,7 +263,7 @@ sed -i "s/%%SUBSCRIPTION_GUID%%/${He_Sub}/g" Helium_Dashboard.json && \
 sed -i "s/%%DASHBOARD_RESOURCE_GROUP%%/${He_App_RG}/g" Helium_Dashboard.json && \
 sed -i "s/%%He_Language%%/${He_Language}/g" Helium_Dashboard.json && \
 sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json && \
-sed -i "s/%%IMDB_NAME/${Imdb_Name}/g" Helium_Dashboard.json
+sed -i "s/%%Imdb_NAME/${Imdb_Name}/g" Helium_Dashboard.json
 
 ```
 
