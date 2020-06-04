@@ -28,3 +28,4 @@ else
   cat ~/${He_Name}.env
 fi
 
+export KEYVAULT_NAME="devshop-gelatodev-kv"

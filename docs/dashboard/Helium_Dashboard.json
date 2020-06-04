@@ -1,0 +1,725 @@
+{
+  "properties": {
+    "lenses": {
+      "0": {
+        "order": 0,
+        "parts": {
+          "0": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 12,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "settings": {
+                    "content": "<h1 style=\"text-align: center;\">Helium Readme Dashboard</h1>\n",
+                    "title": "",
+                    "subtitle": "",
+                    "markdownSource": 1
+                  }
+                }
+              }
+            }
+          },
+          "1": {
+            "position": {
+              "x": 0,
+              "y": 1,
+              "colSpan": 4,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "value": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-app-rg/providers/microsoft.insights/components/bluebell"
+                }
+              ],
+              "type": "Extension/AppInsightsExtension/PartType/AllWebTestsResponseTimeFullGalleryAdapterPart",
+              "isAdapter": true,
+              "asset": {
+                "idInputName": "ComponentId",
+                "type": "ApplicationInsights"
+              }
+            }
+          },
+          "2": {
+            "position": {
+              "x": 4,
+              "y": 1,
+              "colSpan": 4,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrdash2-rg-acr/providers/microsoft.insights/components/bluebell"
+                          },
+                          "name": "availabilityResults/duration",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.insights/components",
+                          "metricVisualization": {
+                            "displayName": "Availability test duration",
+                            "resourceDisplayName": "bluebell"
+                          }
+                        }
+                      ],
+                      "title": "Availability by Location (bluebell)",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      },
+                      "grouping": {
+                        "dimension": "availabilityResult/location",
+                        "sort": 1,
+                        "top": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "3": {
+            "position": {
+              "x": 8,
+              "y": 1,
+              "colSpan": 4,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/imdbcosmoswsrdash2-cosmos-rg/providers/Microsoft.DocumentDb/databaseAccounts/%%Imdb_Name%%"
+                          },
+                          "name": "TotalRequests",
+                          "aggregationType": 7,
+                          "namespace": "microsoft.documentdb/databaseaccounts",
+                          "metricVisualization": {
+                            "displayName": "Total Requests",
+                            "resourceDisplayName": "bluebell"
+                          }
+                        }
+                      ],
+                      "title": "Cosmos Throttled Requests (bluebell)",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "StatusCode": {
+                  "model": {
+                    "operator": "equals",
+                    "values": [
+                      "429"
+                    ]
+                  }
+                },
+                "DatabaseName": {
+                  "model": {
+                    "operator": "equals",
+                    "values": [
+                      "IMDB"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "4": {
+            "position": {
+              "x": 0,
+              "y": 3,
+              "colSpan": 4,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrdash2-rg-acr/providers/microsoft.insights/components/bluebell"
+                          },
+                          "name": "requests/failed",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.insights/components/kusto",
+                          "metricVisualization": {
+                            "displayName": "Failed requests"
+                          }
+                        }
+                      ],
+                      "title": "Failed Requests (bluebell)",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      },
+                      "grouping": {
+                        "dimension": "request/resultCode",
+                        "sort": 2,
+                        "top": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "5": {
+            "position": {
+              "x": 4,
+              "y": 3,
+              "colSpan": 4,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrdash2-rg-acr/providers/microsoft.insights/components/bluebell"
+                          },
+                          "name": "requests/count",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.insights/components/kusto",
+                          "metricVisualization": {
+                            "displayName": "Server requests"
+                          }
+                        }
+                      ],
+                      "title": "Server Requests (bluebell)",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "6": {
+            "position": {
+              "x": 8,
+              "y": 3,
+              "colSpan": 4,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrdash2-rg-acr/providers/microsoft.insights/components/bluebell"
+                          },
+                          "name": "requests/duration",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.insights/components/kusto",
+                          "metricVisualization": {
+                            "displayName": "Server response time"
+                          }
+                        }
+                      ],
+                      "title": "Avg Response Time (bluebell)",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "7": {
+            "position": {
+              "x": 0,
+              "y": 5,
+              "colSpan": 4,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/imdbcosmoswsrdash2-cosmos-rg/providers/Microsoft.DocumentDb/databaseAccounts/%%Imdb_Name%%"
+                          },
+                          "name": "TotalRequestUnits",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.documentdb/databaseaccounts",
+                          "metricVisualization": {
+                            "displayName": "Total Request Units",
+                            "resourceDisplayName": "bluebell"
+                          }
+                        },
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/imdbcosmoswsrdash2-cosmos-rg/providers/Microsoft.DocumentDb/databaseAccounts/%%Imdb_Name%%"
+                          },
+                          "name": "TotalRequests",
+                          "aggregationType": 7,
+                          "namespace": "microsoft.documentdb/databaseaccounts",
+                          "metricVisualization": {
+                            "displayName": "Total Requests",
+                            "resourceDisplayName": "bluebell"
+                          }
+                        }
+                      ],
+                      "title": "Cosmos Requests and RUs (bluebell)",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "DatabaseName": {
+                  "model": {
+                    "operator": "equals",
+                    "values": [
+                      "IMDB"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "8": {
+            "position": {
+              "x": 4,
+              "y": 5,
+              "colSpan": 4,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/imdbcosmoswsrdash2-cosmos-rg/providers/Microsoft.DocumentDb/databaseAccounts/%%Imdb_Name%%"
+                          },
+                          "name": "ProvisionedThroughput",
+                          "aggregationType": 3,
+                          "namespace": "microsoft.documentdb/databaseaccounts",
+                          "metricVisualization": {
+                            "displayName": "Provisioned Throughput",
+                            "resourceDisplayName": "bluebell"
+                          }
+                        }
+                      ],
+                      "title": "Cosmos Provisioned Throughput (bluebell)",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "DatabaseName": {
+                  "model": {
+                    "operator": "equals",
+                    "values": [
+                      "IMDB"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "9": {
+            "position": {
+              "x": 8,
+              "y": 5,
+              "colSpan": 4,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrdash2-rg-acr/providers/microsoft.insights/components/bluebell"
+                          },
+                          "name": "requests/failed",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.insights/components/kusto",
+                          "metricVisualization": {
+                            "displayName": "Failed requests"
+                          }
+                        }
+                      ],
+                      "title": "Failed Requests (bluebell)",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 5,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "grouping": {
+                        "dimension": "request/name",
+                        "sort": 2,
+                        "top": 10
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 259200000
+                        },
+                        "showUTCTime": false,
+                        "grain": 9
+                      }
+                    }
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrdash2-rg-acr/providers/microsoft.insights/components/bluebell"
+                          },
+                          "name": "requests/failed",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.insights/components/kusto",
+                          "metricVisualization": {
+                            "displayName": "Failed requests"
+                          }
+                        }
+                      ],
+                      "title": "Failed Requests (bluebell)",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 5,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      },
+                      "grouping": {
+                        "dimension": "request/name",
+                        "sort": 2,
+                        "top": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        },
+        "filterLocale": {
+          "value": "en-us"
+        },
+        "filters": {
+          "value": {
+            "MsPortalFx_TimeRange": {
+              "model": {
+                "format": "local",
+                "granularity": "1m",
+                "relative": "30m"
+              },
+              "displayCache": {
+                "name": "Local Time",
+                "value": "Past 30 minutes"
+              },
+              "filteredPartIds": [
+                "StartboardPart-MonitorChartPart-52e983a5-971b-4ba1-8796-5046bdd4325a",
+                "StartboardPart-MonitorChartPart-52e983a5-971b-4ba1-8796-5046bdd43272",
+                "StartboardPart-MonitorChartPart-52e983a5-971b-4ba1-8796-5046bdd4324e",
+                "StartboardPart-MonitorChartPart-52e983a5-971b-4ba1-8796-5046bdd4326c",
+                "StartboardPart-MonitorChartPart-52e983a5-971b-4ba1-8796-5046bdd43254",
+                "StartboardPart-MonitorChartPart-52e983a5-971b-4ba1-8796-5046bdd43260",
+                "StartboardPart-MonitorChartPart-52e983a5-971b-4ba1-8796-5046bdd43266",
+                "StartboardPart-MonitorChartPart-52e983a5-971b-4ba1-8796-5046bdd43278"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "Helium-Dashboard-Test",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "Helium-Dashboard-Test"
+  },
+  "apiVersion": "2015-08-01-preview"
+}
