@@ -42,6 +42,8 @@ az account list -o table
 # select the Azure account
 az account set -s {subscription name or Id}
 
+export He_Sub=$(az account show --subscription {subscription name or Id} --output tsv |awk '{print $3}')
+
 ```
 
 Choose a unique DNS name
@@ -252,15 +254,17 @@ docker run -it --rm retaildevcrew/webvalidate --host https://${He_Name}.azureweb
 ## Dashboard setup
 
 Replace the values in the `Helium_Dashboard.json` file surrounded by `%%` with the proper environment variables
+after making sure the proper environment variables are set
 
 ```bash
 
-cd $REPO_ROOT
+cd $REPO_ROOT/docs/dashboard
 sed -i "s/%%SUBSCRIPTION_GUID%%/${He_Sub}/g" Helium_Dashboard.json && \
-sed -i "s/%%DASHBOARD_RESOURCE_GROUP%%/${He_App_RG}/g" Helium_Dashboard.json && \
-sed -i "s/%%He_Language%%/${He_Language}/g" Helium_Dashboard.json && \
-sed -i "s/%%IMDB_RG%%/${Imdb_RG}/g" Helium_Dashboard.json && \
-sed -i "s/%%IMDB_NAME/${Imdb_Name}/g" Helium_Dashboard.json
+sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json && \
+sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json && \
+sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json
+
+if [ "$He_Language" == "java" ]; then sed -i "s/%%He_Language%%/gelato/g" Helium_Dashboard.json; elif [ "$He_Language" == "csharp" ]; then sed -i "s/%%He_Language%%/bluebell/g" Helium_Dashboard.json;  elif [ "$He_Language" == "typescript" ]; then sed -i "s/%%He_Language%%/sherbert/g" Helium_Dashboard.json; fi
 
 ```
 
