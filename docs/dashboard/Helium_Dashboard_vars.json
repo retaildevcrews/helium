@@ -17,7 +17,7 @@
               "settings": {
                 "content": {
                   "settings": {
-                    "content": "<h1 style=\"text-align: center;\">Helium Readme Dashboard</h1>\n",
+                    "content": "<h1 style=\"text-align: center;\">Helium %%He_Language%% Dashboard</h1>\n",
                     "title": "",
                     "subtitle": "",
                     "markdownSource": 1
@@ -37,7 +37,7 @@
               "inputs": [
                 {
                   "name": "ComponentId",
-                  "value": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%DASHBOARD_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%He_Language%%"
+                  "value": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
                 }
               ],
               "type": "Extension/AppInsightsExtension/PartType/AllWebTestsResponseTimeFullGalleryAdapterPart",
@@ -74,7 +74,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%DASHBOARD_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
                           },
                           "name": "availabilityResults/duration",
                           "aggregationType": 4,
@@ -225,7 +225,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%DASHBOARD_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
                           },
                           "name": "requests/failed",
                           "aggregationType": 1,
@@ -293,7 +293,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%DASHBOARD_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
                           },
                           "name": "requests/count",
                           "aggregationType": 1,
@@ -356,7 +356,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%DASHBOARD_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
                           },
                           "name": "requests/duration",
                           "aggregationType": 4,
@@ -573,7 +573,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%DASHBOARD_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
                           },
                           "name": "requests/failed",
                           "aggregationType": 1,
@@ -628,7 +628,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%DASHBOARD_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
                           },
                           "name": "requests/failed",
                           "aggregationType": 1,
@@ -715,11 +715,11 @@
       }
     }
   },
-  "name": "Helium-Readme",
+  "name": "Helium-Readme-%%He_Language%%",
   "type": "Microsoft.Portal/dashboards",
   "location": "INSERT LOCATION",
   "tags": {
-    "hidden-title": "Helium-Readme"
+    "hidden-title": "Helium-Readme-%%He_Language%%"
   },
   "apiVersion": "2015-08-01-preview"
 }
