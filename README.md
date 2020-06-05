@@ -260,10 +260,10 @@ after making sure the proper environment variables are set
 
 cd $REPO_ROOT/docs/dashboard
 sed -i "s/%%SUBSCRIPTION_GUID%%/${He_Sub}/g" Helium_Dashboard.json && \
-sed -i "s/%%DASHBOARD_RESOURCE_GROUP%%/${He_App_RG}/g" Helium_Dashboard.json && \
-sed -i "s/%%He_Language%%/${He_Language}/g" Helium_Dashboard.json && \
+sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json && \
 sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json && \
-sed -i "s/%%Imdb_NAME/${Imdb_Name}/g" Helium_Dashboard.json
+sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json \
+if [ "$He_Language" == "java" ]; then sed -i "s/%%He_Language%%/gelato/g" Helium_Dashboard.json; elif [ "$He_Language" == "csharp" ]; then sed -i "s/%%He_Language%%/bluebell/g" Helium_Dashboard.json;  elif [ "$He_Language" == "typescript" ]; then sed -i "s/%%He_Language%%/sherbert/g" Helium_Dashboard.json; fi
 
 ```
 
