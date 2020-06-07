@@ -1,20 +1,18 @@
-# C#/ASP.NET Developer Documentation
+# C# dotnet core Developer Documentation
 
 ## Index
 
-1. [Managed Identity and Key Vault](#managed-identity-and-key-vault)
-2. [Key Rotation](#key-rotation)
-3. [Cosmos DB](#cosmos-db)
-    - [Reconnect](#reconnect)
-    - [Partition Key Function](#partition-key-function)
-4. [AKS Pod Identity Support](#aks-pod-identity-support)
-5. [Versioning](#versioning)
-6. [Dependency Injection (DI)](#dependency-injection-(di))
-    - [Key Vault](#key-vault)
-    - [Data Access Layer (DAL)](#data-access-layer-(DAL))
-    - [Application Insights](#application-insights)
-7. [Robots Middleware](#robots-middleware)
-8. [Logging](#logging)
+- [Managed Identity and Key Vault](#managed-identity-and-key-vault)
+- [Cosmos DB](#cosmos-db)
+  - [Partition Key Function](#partition-key-function)
+- [AKS Pod Identity Support](#aks-pod-identity-support)
+- [Versioning](#versioning)
+- [Dependency Injection (DI)](#dependency-injection-(di))
+  - [Key Vault](#key-vault)
+  - [Data Access Layer (DAL)](#data-access-layer-(DAL))
+  - [Application Insights](#application-insights)
+- [Middleware](#middleware)
+- [Logging](#logging)
 
 ## Managed Identity and Key Vault
 
@@ -35,87 +33,7 @@ return keyVaultClient;
 
 ```
 
-## Key Rotation
-
-ASP.NET IConfiguration does not currently track changes to Key Vault secrets. Helium implements a loop in Program.cs that continuously checks Key Vault for changes to the CosmosDB paramaters and calls IDal::Reconnect so that Key Rotation and other scenarios can be supported.
-
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L262)
-
-```c#
-
-// reload the config from Key Vault
-config.Reload();
-
-// get the DAL from ASP.NET DI
-var dal = _host.Services.GetService<IDAL>();
-
-// this will only reconnect if one or more of the variables changed, so no need to track values here
-await dal.Reconnect(config[Constants.CosmosUrl], config[Constants.CosmosKey], config[Constants.CosmosDatabase], config[Constants.CosmosCollection]);
-
-// log Cosmos Key changes to std out and App Insights
-if (key != config[Constants.CosmosKey])
-{
-    key = config[Constants.CosmosKey];
-    Console.WriteLine($"Cosmos Key Rotated: {key.Substring(0, 5)} ...");
-
-...
-
-```
-
 ## Cosmos DB
-
-### Reconnect
-
-The Reconnect method on IDal allows you to programmatically change your CosmosDB client configuration. If one or more of the connection paramaters changed, Reconnect will attempt to connect to CosmosDB using the new Url, key, database and collection. If it fails, the data access layer will continue using the existing credentials. The force parameter allows you to force the reconnect even if the other parameters don't change.
-
-[dalMain.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L53)
-
-```c#
-
-public async Task Reconnect(Uri cosmosUrl, string cosmosKey, string cosmosDatabase, string cosmosCollection, bool force = false)
-{
-    if (cosmosUrl == null)
-    {
-        throw new ArgumentNullException(nameof(cosmosUrl));
-    }
-
-    if (force ||
-        cosmosDetails.CosmosCollection != cosmosCollection ||
-        cosmosDetails.CosmosDatabase != cosmosDatabase ||
-        cosmosDetails.CosmosKey != cosmosKey ||
-        cosmosDetails.CosmosUrl != cosmosUrl.AbsoluteUri)
-    {
-        CosmosConfig d = new CosmosConfig
-        {
-            CosmosCollection = cosmosCollection,
-            CosmosDatabase = cosmosDatabase,
-            CosmosKey = cosmosKey,
-            CosmosUrl = cosmosUrl.AbsoluteUri
-        };
-
-        // open and test a new client / container
-        d.Client = await OpenAndTestCosmosClient(cosmosUrl, cosmosKey, cosmosDatabase, cosmosCollection).ConfigureAwait(false);
-        d.Container = d.Client.GetContainer(cosmosDatabase, cosmosCollection);
-
-        // set the current CosmosDetail
-        cosmosDetails = d;
-    }
-}
-
-```
-
-Open and test the CosmosDB connection / database / collection. The call to ReadItemAsync retrieves the Action Genre document and verifies that the new parameters can read the collection.
-
-[dalMain.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L99)
-
-```c#
-
-// open and test a new client / container
-var c = new CosmosClient(cosmosUrl, cosmosKey, _cosmosDetails.CosmosClientOptions);
-var con = c.GetContainer(cosmosDatabase, cosmosCollection);
-await con.ReadItemAsync<dynamic>("action", new PartitionKey("0"));
-
-```
 
 ### Partition Key Function
 
@@ -228,7 +146,7 @@ Helium builds a version string in version attribute in the assembly version foll
 
 ```c#
 
-<Version>1.0.7+$([System.DateTime]::UtcNow.ToString(`MMdd-HHmm`))</Version>
+<Version>1.0.8+$([System.DateTime]::UtcNow.ToString(`MMdd-HHmm`))</Version>
 
 ```
 
@@ -298,7 +216,7 @@ services.AddKeyVaultConnection(kvClient, new Uri(kvUrl));
 
 ### Data Access Layer (DAL)
 
-The controllers need access to Helium's implementation of IDal in order to retrieve results from CosmosDB, so we add the data access layer via DI as a singleton.
+The controllers need access to Helium's implementation of IDal in order to retrieve results from Cosmos DB, so we add the data access layer via DI as a singleton.
 
 #### Adding IDal via ASP.NET DI
 
@@ -341,7 +259,7 @@ var dal = host.Services.GetService<IDAL>();
 
 ### Application Insights
 
-Optionally store the application insights instrumentation key in Key Vault to configure Helium to use Application Insights. When configured, the DI creates a singleton instance of TelemetryClient that can be used to track custom events and metrics.
+We store the application insights instrumentation key in Key Vault to configure Helium to use Application Insights. When configured, the DI creates a singleton instance of TelemetryClient that can be used to track custom events and metrics.
 
 #### Adding Application Insights from ASP.NET DI
 
@@ -378,12 +296,12 @@ if (!string.IsNullOrEmpty(config[Constants.AppInsightsKey]))
 
 ```
 
-## Robots Middleware
+## Middleware
 
 There is a robotsText middleware extension method added to Helium to handle a default warmup request of /robots43245.txt (43245 is random) when deploying to Azure App Service. Because Helium does not expect this request as part of its normal app logic, it would cause a 404 error, or in this case a false (expected) error, to appear in Azure Monitor reporting. This extension helps keep reporting clean and only contain true errors warranting investigation. Code: [robotsText.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Middleware/robotsText.cs)
 
 ## Logging
 
-A custom Request Logger extension is added to handle logging Http request information. This can be configured with LoggerOptions to control which requests to log based on status code.  By default, only 4xx and 5xx responses are logged.  This helps make logs easy to search through when debugging errors, rather than having to navigate through several successful requests.  In addition to the request logger, helium logs primarily errors to console to keep output clean.
+A custom Request Logger extension is added to handle logging Http request information. This can be configured with LoggerOptions to control which requests to log based on status code.  By default, only 4xx and 5xx responses are logged.  This helps make logs easy to search through when debugging errors, rather than having to navigate through several successful requests.  In addition to the request logger, helium logs to console the console. Log level can be controlled with the --log-level command line parameter. The default is `warn`
 
 Code: [requestLogger.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Middleware/requestLogger.cs)
