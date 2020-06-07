@@ -38,7 +38,8 @@ az webapp log config --docker-container-logging filesystem -g $He_App_RG -n $He_
 export He_AcrUserId=$(az keyvault secret show --vault-name $He_Name --name "AcrUserId" --query id -o tsv)
 export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "AcrPassword" --query id -o tsv)
 
-# Optional: Run ./saveenv.sh to save latest variables
+# save environment variables
+./saveenv.sh
 
 ### App Service cannot currently use Managed Identity to access ACR
 ### We pull the Service Principal ID and Key from Key Vault via
