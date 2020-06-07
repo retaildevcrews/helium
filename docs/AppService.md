@@ -27,7 +27,7 @@ export He_CICD_URL=$(az webapp deployment container config -n $He_Name -g $He_Ap
 az acr webhook create -r $He_Name -n ${He_Name} --actions push --uri $He_CICD_URL --scope helium-${He_Language}:latest
 
 # set the Key Vault name app setting (environment variable)
-az webapp config appsettings set --settings KeyVaultName=$He_Name -g $He_App_RG -n $He_Name
+az webapp config appsettings set --settings KEYVAULT_NAME=$He_Name -g $He_App_RG -n $He_Name
 
 # turn on container logging
 # this will send stdout and stderr to the logs
