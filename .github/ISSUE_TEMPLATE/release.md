@@ -28,9 +28,12 @@ This checklist is for verifing the release is ready to publish and published cor
 - [ ] Smoke test deployed for 48 hours
 
 ### Release
+- [ ] Reviewed & updated readme for Developer Experience
 - [ ] Resolve to-do from code
 - [ ] Verify all new libraries and dependencies are customer approved
 - [ ] Tag repo with version tag
 - [ ] Ensure CI-CD runs correctly
+- [ ] Ran cred scan
+- [ ] Removed workflow for issue triage and PR submission
 - [ ] Validate e2e testing
 - [ ] Close Release Task
