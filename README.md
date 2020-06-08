@@ -254,7 +254,7 @@ docker run -it --rm retaildevcrew/webvalidate --host https://${He_Name}.azureweb
 ## Dashboard setup
 
 Replace the values in the `Helium_Dashboard.json` file surrounded by `%%` with the proper environment variables
-after making sure the proper environment variables are set
+after making sure the proper environment variables are set (He_Sub, He_App_RG, Imdb_RB and Imdb_Name)
 
 ```bash
 
