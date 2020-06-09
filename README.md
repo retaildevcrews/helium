@@ -1,6 +1,4 @@
-# Web API using Managed Identity, Key Vault, and Cosmos DB
-
-> Build a Web API reference application using Managed Identity, Key Vault, and Cosmos DB that is designed to be deployed to Azure App Service or Azure Kubernetes Service (AKS)
+# Build a Web API reference application using Managed Identity, Key Vault, and Cosmos DB that is designed to be deployed to Azure App Service or Azure Kubernetes Service (AKS)
 
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
@@ -20,24 +18,19 @@ This is a Web API reference application designed to "fork and code" with the fol
 
 - Azure subscription with permissions to create:
   - Resource Groups, Service Principals, Key Vault, Cosmos DB, Azure Container Registry, Azure Monitor, App Service or AKS
-- Bash shell (tested on Codespaces, Mac, Ubuntu, Windows with WSL2)
-  - Will not work in Cloud Shell or WSL1
-- Azure CLI ([download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest))
+- Bash shell (tested on Mac, Ubuntu, Windows with WSL2)
+  - Will not work in Cloud Shell unless you have a remote dockerd
+- Azure CLI 2.0.72+ ([download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest))
 - Docker CLI ([download](https://docs.docker.com/install/))
 - Visual Studio Code (optional) ([download](https://code.visualstudio.com/download))
 
 ## Setup
 
-- TODO - the only "code" we need from this repo is saveenv.sh
-- We could add saveenv.sh to the language repos and change the instructions
-- to fork and clone one of the language repos instead
-- I think that's a better approach
-
 - Fork this repo and clone to your local machine
   - cd to the base directory of the repo
   - all instructions assume starting from the base directory of this repo
 
-Login to Azure
+Login to Azure and select subscription
 
 ```bash
 
@@ -46,8 +39,10 @@ az login
 # show your Azure accounts
 az account list -o table
 
-# select your Azure subscription if necessary
+# select the Azure account
 az account set -s {subscription name or Id}
+
+export He_Sub=$(az account show --subscription {subscription name or Id} --output tsv |awk '{print $3}')
 
 ```
 
@@ -61,10 +56,10 @@ Choose a unique DNS name
 # must start with a-z (only lowercase)
 export He_Name="youruniquename"
 
-### if true, change He_Name and test again
+### if true, change He_Name
 az cosmosdb check-name-exists -n ${He_Name}
 
-### if nslookup doesn't fail to resolve, change He_Name and test again
+### if nslookup doesn't fail to resolve, change He_Name
 nslookup ${He_Name}.azurewebsites.net
 nslookup ${He_Name}.vault.azure.net
 nslookup ${He_Name}.azurecr.io
@@ -73,18 +68,18 @@ nslookup ${He_Name}.azurecr.io
 
 Create Resource Groups
 
-> When experimenting with this app, you should create new resource groups to avoid accidentally deleting resources
->
-> If you use an existing resource group, please make sure to apply resource locks to avoid accidentally deleting resources
+- When experimenting with this app, you should create new resource groups to avoid accidentally deleting resources
+
+  - If you use an existing resource group, please make sure to apply resource locks to avoid accidentally deleting resources
 
 - You will create 3 resource groups
   - One for ACR
   - One for App Service or AKS, Key Vault and Azure Monitor
-  - One for Cosmos DB (see create and load sample data in Cosmos DB step)
+  - One for Cosmos DB (see create and load sample data to Cosmos DB step)
 
 ```bash
 
-# set location (change as necessary)
+# set location
 export He_Location=centralus
 
 # resource group names
@@ -97,14 +92,9 @@ az group create -n $He_ACR_RG -l $He_Location
 
 ```
 
-- Save your environment variables for ease of reuse and picking up where you left off
-  - You will need these environment variables if you want to setup CI-CD
+Save your environment variables for ease of reuse and picking up where you left off.
 
 ```bash
-
-# TODO - since we are saving secrets to this file, I suggest we change the location to .azure
-#        name the file .helium.env
-#        chmod appropriately (440?)
 
 # run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/${He_Name}.env
 # make sure you are in the root of the repo
@@ -128,6 +118,8 @@ Create and load sample data into Cosmos DB
 # Run saveenv.sh to save the Imdb variables
 ./saveenv.sh
 
+# Verify the output of the script shows the newly created Imdb_* variables
+
 ```
 
 Get the Cosmos DB read only key used by App Service
@@ -142,7 +134,6 @@ Create Azure Key Vault
 
 - All secrets are stored in Azure Key Vault for security
   - This app uses Managed Identity to access Key Vault
-  - In developer mode, the app uses the Azure CLI credentials
 
 ```bash
 
@@ -163,13 +154,13 @@ Use the following command to grant permissions to each developer that will need 
 
 ```bash
 
-# get the object ID by email address for each developer
-az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id \
-$(az ad user show --id {developer email address} --query objectId -o tsv)
+# get the object id for each developer (optional)
+export dev_Object_Id=$(az ad user show --id {developer email address} --query objectId -o tsv)
+
+# grant Key Vault access to each developer (optional)
+az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id $dev_Object_Id
 
 ```
-
-## TODO - per earlier suggestion, we could use the language repo instead of helium and skip this step
 
 Choose your app language
 
@@ -185,9 +176,9 @@ export He_Language=csharp
 
 Setup Container Registry
 
-- Create the Container Registry with admin access `disabled`
+- Create the Container Registry with admin access _disabled_
 
-> Currently, App Service cannot access ACR via the Managed Identity, so we have to setup a separate Service Principal and grant access to that SP
+> Currently, App Service cannot access ACR via the Managed Identity, so we have to setup a separate Service Principal and grant access to that SP.
 
 ```bash
 
@@ -198,8 +189,6 @@ az acr create --sku Standard --admin-enabled false -g $He_ACR_RG -n $He_Name
 az acr login -n $He_Name
 
 # if you get an error that the login server isn't available, it's a DNS issue that will resolve in a minute or two, just retry
-
-# TODO - a pull and a push would be a lot faster than building from scratch - should we change
 
 # Build the container with az acr build
 az acr build -r $He_Name -t $He_Name.azurecr.io/helium-${He_Language} https://github.com/retaildevcrews/helium-${He_Language}.git
@@ -226,20 +215,17 @@ az role assignment create --assignee $He_SP_ID --scope $He_ACR_Id --role acrpull
 az keyvault secret set -o table --vault-name $He_Name --name "AcrUserId" --value $He_SP_ID
 az keyvault secret set -o table --vault-name $He_Name --name "AcrPassword" --value $He_SP_PWD
 
-# Run saveenv.sh to save the environment variables
-./saveenv.sh
+# Optional: Run ./saveenv.sh to save latest variables
 
 ```
 
 Create Azure Monitor
 
-- TODO - is this still in preview? Is this step still necessary?
 - The Application Insights extension is in preview and needs to be added to the CLI
 
 ```bash
 
 # Add App Insights extension
-# you can ignore any message that the extension is already installed
 az extension add -n application-insights
 
 # Create App Insights
@@ -248,28 +234,43 @@ export He_AppInsights_Key=$(az monitor app-insights component create -g $He_App_
 # add App Insights Key to Key Vault
 az keyvault secret set -o table --vault-name $He_Name --name "AppInsightsKey" --value $He_AppInsights_Key
 
-# Run saveenv.sh to save the environment variables
-./saveenv.sh
+# Optional: Run ./saveenv.sh to save latest variables
 
 ```
 
 Deploy the container to App Service or AKS
 
 - Instructions for [App Service](docs/AppService.md)
-- Instructions for [AKS](docs/aks/README.md#L233)
+- Instructions for [AKS](docs/aks/README.md#L233) (currently requires csharp)
 
-### TODO - this will only work if you run via App Services - we should move this to the other docs
-
-Run the Validation Test
-
-> For more information on the validation test tool, see [Web Validate](https://github.com/retaildevcrews/webvalidate)
+Run the Integration Test
 
 ```bash
 
 # run the tests in the container
-docker run -it --rm retaildevcrew/webvalidate --host https://${He_Name}.azurewebsites.net --files helium.json
+docker run -it --rm retaildevcrew/webvalidate --host https://${He_Name}.azurewebsites.net --files baseline.json
 
 ```
+## Dashboard setup
+
+Replace the values in the `Helium_Dashboard.json` file surrounded by `%%` with the proper environment variables
+after making sure the proper environment variables are set (He_Sub, He_App_RG, Imdb_RB and Imdb_Name)
+
+```bash
+
+cd $REPO_ROOT/docs/dashboard
+sed -i "s/%%SUBSCRIPTION_GUID%%/${He_Sub}/g" Helium_Dashboard.json && \
+sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json && \
+sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json && \
+sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json
+
+if [ "$He_Language" == "java" ]; then sed -i "s/%%He_Language%%/gelato/g" Helium_Dashboard.json; elif [ "$He_Language" == "csharp" ]; then sed -i "s/%%He_Language%%/bluebell/g" Helium_Dashboard.json;  elif [ "$He_Language" == "typescript" ]; then sed -i "s/%%He_Language%%/sherbert/g" Helium_Dashboard.json; fi
+
+```
+
+Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file with your correct subscription GUID, resource group names, and app name.
+
+For more documentation on creating and sharing Dashboards, see ([here](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards)).
 
 ## Contributing
 
