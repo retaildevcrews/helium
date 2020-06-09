@@ -30,7 +30,7 @@ This is a Web API reference application designed to "fork and code" with the fol
 
 ## Language Specific Documentation
 
-### [dotnet Implementation](CSharp-ASPDotNet-Developer.md)
+### [dotnet Implementation](DotNet-Core-Developer.md)
 
 ### [Java Implementation](Java-SpringBoot-Developer.md)
 

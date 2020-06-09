@@ -24,7 +24,7 @@ Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally
   - Resource Groups, Service Principals, Keyvault, Cosmos DB, App Service, Azure Container Registry, Azure Monitor
 - Bash shell (tested on Mac, Ubuntu, Windows with WSL2)
   - Will not work in Cloud Shell unless you have a remote dockerd
-- Azure CLI 2.0.72+ ([download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest))
+- Azure CLI ([download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest))
 - Docker CLI ([download](https://docs.docker.com/install/))
 - Visual Studio Code (optional) ([download](https://code.visualstudio.com/download))
 - kubectl (install by using `sudo az aks install-cli`)
@@ -218,8 +218,8 @@ export He_AppInsights_Key=$(az monitor app-insights component create -g $He_App_
 # add App Insights Key to Key Vault
 az keyvault secret set -o table --vault-name $He_Name --name "AppInsightsKey" --value $He_AppInsights_Key
 
-# Optional: Run ./saveenv.sh to save latest variables
-
+# Run saveenv.sh to save the Imdb variables
+./saveenv.sh
 ```
 
 Create your AKS Cluster
@@ -448,7 +448,7 @@ ingress:
     - host: %%INGRESS_PIP%%.nip.io # Replace the IP address with the IP of the nginx external IP (value of $INGRESS_PIP or run kubectl get svc -n ingress-nginx to see the correct IP)
       paths: /
 
-keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets (value of $He_Name)
+KEYVAULT_NAME: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets (value of $He_Name)
 ```
 
 Replace the values in the file surrounded by `%%` with the proper environment variables
