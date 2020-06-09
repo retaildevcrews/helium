@@ -105,6 +105,7 @@ az group create -n $He_ACR_RG -l $He_Location
 # TODO - since we are saving secrets to this file, I suggest we change the location to .azure
 #        name the file .helium.env
 #        chmod appropriately (440?)
+# An alternative approach is to save the values to Key Vault and eval the environment variables
 
 # run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/${He_Name}.env
 # make sure you are in the root of the repo
@@ -134,7 +135,13 @@ Get the Cosmos DB read only key used by App Service
 
 ```bash
 
-export Imdb_Cosmos_RO_Key=$(az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query primaryMasterKey -o tsv)
+# TODO - this is a potential new way to save secrets
+
+# save the key to Key Vault
+az keyvault secret set --vault-name $He_Name --name "Imdb-Key" --value $(eval az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query primaryMasterKey -o tsv) --query name -o tsv
+
+# TODO should we expand $He_Name on save so that it still works if $He_Name is not set / changed
+export Imdb_Key="az keyvault secret show --vault-name $He_Name --name Imdb-Key --query value -o tsv"
 
 ```
 
@@ -169,7 +176,7 @@ $(az ad user show --id {developer email address} --query objectId -o tsv)
 
 ```
 
-## TODO - per earlier suggestion, we could use the language repo instead of helium and skip this step
+> TODO - per earlier suggestion, we could use the language repo instead of helium and skip this step
 
 Choose your app language
 
@@ -233,7 +240,6 @@ az keyvault secret set -o table --vault-name $He_Name --name "AcrPassword" --val
 
 Create Azure Monitor
 
-- TODO - is this still in preview? Is this step still necessary?
 - The Application Insights extension is in preview and needs to be added to the CLI
 
 ```bash
@@ -241,12 +247,19 @@ Create Azure Monitor
 # Add App Insights extension
 # you can ignore any message that the extension is already installed
 az extension add -n application-insights
+az feature register --name AIWorkspacePreview --namespace microsoft.insights
+az provider register -n microsoft.insights
+
+## TODO - this is potentially a new way to save the values
 
 # Create App Insights
-export He_AppInsights_Key=$(az monitor app-insights component create -g $He_App_RG -l $He_Location -a $He_Name --query instrumentationKey -o tsv)
+az monitor app-insights component create -g $He_App_RG -l $He_Location -a $He_Name --query instrumentationKey -o table
+
+# save the env variable - use via $(eval $He_AppInsights_Key)
+export He_AppInsight_Key='az monitor app-insights component show -g $He_App_RG -a $He_Name --query instrumentationKey -o tsv'
 
 # add App Insights Key to Key Vault
-az keyvault secret set -o table --vault-name $He_Name --name "AppInsightsKey" --value $He_AppInsights_Key
+az keyvault secret set -o tsv --query name --vault-name $He_Name --name "AppInsightsKey" --value $(eval $He_AppInsight_Key)
 
 # Run saveenv.sh to save the environment variables
 ./saveenv.sh
