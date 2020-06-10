@@ -32,6 +32,10 @@ This is a Web API reference application designed to "fork and code" with the fol
 - We could add saveenv.sh to the language repos and change the instructions
 - to fork and clone one of the language repos instead
 - I think that's a better approach
+- Meeting notes:
+-
+- Do we clone the repo or not?  Yes and include Codespaces instructions. And add Helium.env to all 3 language repos and tweak He_Language to be the lang of the repo
+- Make saveenv.sh required - yes rename to Helium.env (still enter location, He_Name)
 
 - Fork this repo and clone to your local machine
   - cd to the base directory of the repo
@@ -106,6 +110,8 @@ az group create -n $He_ACR_RG -l $He_Location
 #        name the file .helium.env
 #        chmod appropriately (440?)
 # An alternative approach is to save the values to Key Vault and eval the environment variables
+# move SP IDs and Tenant name to keyvault and add README instructions to do so
+# This put all IDs and Tenants in KV
 
 # run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/${He_Name}.env
 # make sure you are in the root of the repo
@@ -135,12 +141,11 @@ Get the Cosmos DB read only key used by App Service
 
 ```bash
 
-# TODO - this is a potential new way to save secrets
+# TODO - this is a potential new way to save secrets - resolved
 
 # save the key to Key Vault
 az keyvault secret set --vault-name $He_Name --name "Imdb-Key" --value $(eval az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query primaryMasterKey -o tsv) --query name -o tsv
 
-# TODO should we expand $He_Name on save so that it still works if $He_Name is not set / changed
 export Imdb_Key="az keyvault secret show --vault-name $He_Name --name Imdb-Key --query value -o tsv"
 
 ```
@@ -176,7 +181,7 @@ $(az ad user show --id {developer email address} --query objectId -o tsv)
 
 ```
 
-> TODO - per earlier suggestion, we could use the language repo instead of helium and skip this step
+> TODO - per earlier suggestion, we could use the language repo instead of helium and skip this step - resolved
 
 Choose your app language
 
@@ -206,9 +211,10 @@ az acr login -n $He_Name
 
 # if you get an error that the login server isn't available, it's a DNS issue that will resolve in a minute or two, just retry
 
-# TODO - a pull and a push would be a lot faster than building from scratch - should we change
+# TODO - a pull and a push would be a lot faster than building from scratch - should we change and remove the build? Yes
+# Modify language repo instructions to not point back to Helium repo for ACR build instructions.
 
-# Build the container with az acr build
+# Build the container with az acr build - Remove below command
 az acr build -r $He_Name -t $He_Name.azurecr.io/helium-${He_Language} https://github.com/retaildevcrews/helium-${He_Language}.git
 
 ```
@@ -250,7 +256,7 @@ az extension add -n application-insights
 az feature register --name AIWorkspacePreview --namespace microsoft.insights
 az provider register -n microsoft.insights
 
-## TODO - this is potentially a new way to save the values
+## TODO - this is potentially a new way to save the values - Resolved - add to KV
 
 # Create App Insights
 az monitor app-insights component create -g $He_App_RG -l $He_Location -a $He_Name --query instrumentationKey -o table
@@ -271,7 +277,7 @@ Deploy the container to App Service or AKS
 - Instructions for [App Service](docs/AppService.md)
 - Instructions for [AKS](docs/aks/README.md#L233)
 
-### TODO - this will only work if you run via App Services - we should move this to the other docs
+### TODO - this will only work if you run via App Services - we should move this to the App service and AKS README's.
 
 Run the Validation Test
 
