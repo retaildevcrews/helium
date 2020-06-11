@@ -24,7 +24,7 @@ az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissio
 export He_CICD_URL=$(az webapp deployment container config -n $He_Name -g $He_App_RG --enable-cd true --query CI_CD_URL -o tsv)
 
 # add the webhook
-az acr webhook create -r $He_Name -n ${He_Name} --actions push --uri $He_CICD_URL --scope helium-${He_Language}:latest
+az acr webhook create -r $He_Name -n ${He_Name} --actions push --uri $He_CICD_URL --scope ${He_Repo}:latest
 
 # set the Key Vault name app setting (environment variable)
 az webapp config appsettings set --settings KEYVAULT_NAME=$He_Name -g $He_App_RG -n $He_Name
@@ -32,11 +32,6 @@ az webapp config appsettings set --settings KEYVAULT_NAME=$He_Name -g $He_App_RG
 # turn on container logging
 # this will send stdout and stderr to the logs
 az webapp log config --docker-container-logging filesystem -g $He_App_RG -n $He_Name
-
-# get the Service Principal Id and Key from Key Vault
-# note these are full URLs
-export He_AcrUserId=$(az keyvault secret show --vault-name $He_Name --name "AcrUserId" --query id -o tsv)
-export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "AcrPassword" --query id -o tsv)
 
 # save environment variables
 ./saveenv.sh
@@ -47,10 +42,10 @@ export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "Ac
 
 # configure the Web App to use Container Registry
 az webapp config container set -n $He_Name -g $He_App_RG \
--i ${He_Name}.azurecr.io/helium-${He_Language} \
+-i ${He_Name}.azurecr.io/${He_Repo} \
 -r https://${He_Name}.azurecr.io \
--u "@Microsoft.KeyVault(SecretUri=${He_AcrUserId})" \
--p "@Microsoft.KeyVault(SecretUri=${He_AcrPassword})"
+-u "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name "AcrUserId" --query id -o tsv))" \
+-p "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name "AcrPassword" --query id -o tsv))"
 
 # restart the Web App
 az webapp restart -g $He_App_RG -n $He_Name
@@ -58,6 +53,17 @@ az webapp restart -g $He_App_RG -n $He_Name
 # curl the health check endpoint
 # this will eventually work, but may take a minute or two
 # you may get a 403 error, if so, just run again
-curl https://${He_Name}.azurewebsites.net/healthz
+curl https://${He_Name}.azurewebsites.net/version
+
+```
+
+Run the Validation Test
+
+> For more information on the validation test tool, see [Web Validate](https://github.com/retaildevcrews/webvalidate)
+
+```bash
+
+# run the tests in the container
+docker run -it --rm retaildevcrew/webvalidate --server https://${He_Name}.azurewebsites.net --files helium.json
 
 ```
