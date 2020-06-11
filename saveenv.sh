@@ -22,9 +22,11 @@ else
   echo '#!/bin/bash' > ~/.helium.env
   echo '' >> ~/.helium.env
 
-  for var in $(env | grep -E 'He_|MSI_|AKS_|Imdb_' | sort)
+  IFS=$'\n'
+
+  for var in $(env | grep -E 'He_|MSI_|AKS_|Imdb_' | sort | sed "s/=/='/g")
   do
-    echo "export ${var}" >> ~/.helium.env
+    echo "export ${var}'" >> ~/.helium.env
   done
 
   cat ~/.helium.env
