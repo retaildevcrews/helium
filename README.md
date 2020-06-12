@@ -35,6 +35,9 @@ This is a Web API reference application designed to "fork and code" with the fol
 ### TODO - include Codespaces instructions
 ### TODO - add export He_Repo=helium-csharp to ./saveenv.sh in each language repo
 
+# TODO - change this in each language repo
+export He_Repo=helium-csharp
+
 ```
 
 ### bash
@@ -172,7 +175,7 @@ Get the Cosmos DB read only key used by App Service
 ```bash
 
 export Imdb_RO_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name CosmosKey'
-export Imdb_RW_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name CosmosKey'
+export Imdb_RW_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name CosmosRWKey'
 
 # Run saveenv.sh to save the Imdb variables
 ./saveenv.sh
