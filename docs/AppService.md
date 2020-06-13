@@ -42,7 +42,7 @@ az webapp log config --docker-container-logging filesystem -g $He_App_RG -n $He_
 
 # configure the Web App to use Container Registry
 az webapp config container set -n $He_Name -g $He_App_RG \
--i ${He_Name}.azurecr.io/${He_Repo} \
+-i ${He_Name}.azurecr.io/${He_Repo}:latest \
 -r https://${He_Name}.azurecr.io \
 -u "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name "AcrUserId" --query id -o tsv))" \
 -p "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name "AcrPassword" --query id -o tsv))"
