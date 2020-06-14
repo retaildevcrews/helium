@@ -1,4 +1,6 @@
-# Build a Web API reference application using Managed Identity, Key Vault, and Cosmos DB that is designed to be deployed to Azure App Service or Azure Kubernetes Service (AKS)
+# Managed Identity and Key Vault with App Services
+
+> Build a Web API reference application using Managed Identity, Key Vault, and Cosmos DB that is designed to be deployed to Azure App Service or Azure Kubernetes Service (AKS)
 
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
