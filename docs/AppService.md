@@ -10,7 +10,10 @@ Create and configure App Service (Web App for Containers)
 az appservice plan create --sku B1 --is-linux -g $He_App_RG -n ${He_Name}-plan
 
 # create Web App for Containers
-az webapp create --deployment-container-image-name hello-world -g $He_App_RG -n $He_Name -p ${He_Name}-plan
+az webapp create -g $He_App_RG -n $He_Name -p ${He_Name}-plan \
+--deployment-container-image-name hello-world \
+--docker-registry-server-user "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrUserId --query id -o tsv))" \
+--docker-registry-server-password "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrPassword --query id -o tsv)"
 
 # stop the Web App
 az webapp stop -g $He_App_RG -n $He_Name
@@ -20,8 +23,6 @@ export He_MSI_ID=$(az webapp identity assign -g $He_App_RG -n $He_Name --query p
 
 # grant Key Vault access to Managed Identity
 az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id $He_MSI_ID
-
-### Configure Web App
 
 # turn on CI
 export He_CICD_URL=$(az webapp deployment container config -n $He_Name -g $He_App_RG --enable-cd true --query CI_CD_URL -o tsv)
@@ -50,14 +51,19 @@ az webapp config container set -n $He_Name -g $He_App_RG \
 -u "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrUserId --query id -o tsv))" \
 -p "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrPassword --query id -o tsv))"
 
-# stop / start the Web App
+# assign acrpull access to Service Principal
+az role assignment create --assignee $(eval $He_SP_ID) --scope $He_ACR_Id --role acrpull
+
+# start the Web App
 az webapp stop -g $He_App_RG -n $He_Name
 az webapp start -g $He_App_RG -n $He_Name
 
-# curl the health check endpoint
-# this will eventually work, but may take a minute or two
-# you may get a 403 error, if so, just run again
-curl https://${He_Name}.azurewebsites.net/version
+# check the version endpoint
+# this will eventually work, but may take a minute
+# you may get a 403 or timeout error, if so, just run again
+
+sleep 30
+http https://${He_Name}.azurewebsites.net/version
 
 ```
 
