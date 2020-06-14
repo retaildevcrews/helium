@@ -9,9 +9,13 @@ Create and configure App Service (Web App for Containers)
 # create App Service plan
 az appservice plan create --sku B1 --is-linux -g $He_App_RG -n ${He_Name}-plan
 
+### App Service cannot currently use Managed Identity to access ACR
+### We pull the Service Principal ID and Key from Key Vault via
+### the @Microsoft.KeyVault() format used in -u and -p below
+
 # create Web App for Containers
 az webapp create -g $He_App_RG -n $He_Name -p ${He_Name}-plan \
---deployment-container-image-name hello-world \
+--deployment-container-image-name https://${He_Name}.azurecr.io \
 --docker-registry-server-user "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrUserId --query id -o tsv))" \
 --docker-registry-server-password "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrPassword --query id -o tsv)"
 
@@ -39,17 +43,6 @@ az webapp log config --docker-container-logging filesystem -g $He_App_RG -n $He_
 
 # save environment variables
 ./saveenv.sh -y
-
-### App Service cannot currently use Managed Identity to access ACR
-### We pull the Service Principal ID and Key from Key Vault via
-### the @Microsoft.KeyVault() format used in -u and -p below
-
-# configure the Web App to use Container Registry
-az webapp config container set -n $He_Name -g $He_App_RG \
--i ${He_Name}.azurecr.io/${He_Repo}:latest \
--r https://${He_Name}.azurecr.io \
--u "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrUserId --query id -o tsv))" \
--p "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrPassword --query id -o tsv))"
 
 # assign acrpull access to Service Principal
 az role assignment create --assignee $(eval $He_SP_ID) --scope $He_ACR_Id --role acrpull
