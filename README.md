@@ -80,6 +80,9 @@ Choose a unique DNS name
 
 ```bash
 
+### TODO - need to install nslookup in each .devcontainer setup script
+# sudo apt-get install ... dnsutils
+
 # this will be the prefix for all resources
 # only use a-z and 0-9 - do not include punctuation or uppercase characters
 # must be at least 5 characters long
