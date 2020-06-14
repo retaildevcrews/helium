@@ -50,8 +50,9 @@ az webapp config container set -n $He_Name -g $He_App_RG \
 -u "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrUserId --query id -o tsv))" \
 -p "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrPassword --query id -o tsv))"
 
-# restart the Web App
-az webapp restart -g $He_App_RG -n $He_Name
+# stop / start the Web App
+az webapp stop -g $He_App_RG -n $He_Name
+az webapp start -g $He_App_RG -n $He_Name
 
 # curl the health check endpoint
 # this will eventually work, but may take a minute or two
