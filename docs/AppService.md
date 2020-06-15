@@ -13,14 +13,52 @@ az appservice plan create --sku B1 --is-linux -g $He_App_RG -n ${He_Name}-plan
 ### We pull the Service Principal ID and Key from Key Vault via
 ### the @Microsoft.KeyVault() format used in -u and -p below
 
-# create Web App for Containers
-az webapp create -g $He_App_RG -n $He_Name -p ${He_Name}-plan \
---deployment-container-image-name https://${He_Name}.azurecr.io \
---docker-registry-server-user "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrUserId --query id -o tsv))" \
---docker-registry-server-password "@Microsoft.KeyVault(SecretUri=$(az keyvault secret show --vault-name $He_Name --name AcrPassword --query id -o tsv)"
-
 # stop the Web App
 az webapp stop -g $He_App_RG -n $He_Name
+
+
+
+# create Web App for Containers
+az webapp create --deployment-container-image-name hello-world -g $He_App_RG -p ${He_Name}-plan -n $He_Name
+
+
+
+
+
+### TODO - delete this
+### this works consistently once the acrpull role is successfully granted
+### it appears that doesn't happen consistently
+### I'm testing that now
+
+### You can iterate creating multiple web apps without having to go through everything
+### by using these temp steps
+
+export t_name=bartr9d
+
+# create Web App for Containers
+az webapp create --deployment-container-image-name hello-world -g $He_App_RG -p ${He_Name}-plan \
+-n $t_name
+
+az webapp stop -g $He_App_RG -n $t_name
+
+
+# configure the Web App to use Container Registry
+az webapp config container set -g $He_App_RG \
+-n $t_name \
+-i ${He_Name}.azurecr.io/${He_Repo} \
+-r https://${He_Name}.azurecr.io \
+-u "@Microsoft.KeyVault(SecretUri=${He_AcrUserId})" \
+-p "@Microsoft.KeyVault(SecretUri=${He_AcrPassword})"
+
+
+az webapp start -g $He_App_RG -n $t_name
+
+http https://${t_name}.azurewebsites.net/version
+
+
+
+
+
 
 # assign Managed Identity
 export He_MSI_ID=$(az webapp identity assign -g $He_App_RG -n $He_Name --query principalId -o tsv)
@@ -46,6 +84,14 @@ az webapp log config --docker-container-logging filesystem -g $He_App_RG -n $He_
 
 # assign acrpull access to Service Principal
 az role assignment create --assignee $(eval $He_SP_ID) --scope $He_ACR_Id --role acrpull
+
+# configure the Web App to use Container Registry
+az webapp config container set -n $He_Name -g $He_App_RG \
+-i ${He_Name}.azurecr.io/${He_Repo} \
+-r https://${He_Name}.azurecr.io \
+-u "@Microsoft.KeyVault(SecretUri=${He_AcrUserId})" \
+-p "@Microsoft.KeyVault(SecretUri=${He_AcrPassword})"
+
 
 # start the Web App
 az webapp stop -g $He_App_RG -n $He_Name
