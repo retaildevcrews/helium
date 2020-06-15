@@ -72,6 +72,9 @@ az account list -o table
 # select the Azure account
 az account set -s {subscription name or Id}
 
+## TODO - need to move this as you only run the az account set if you have multiple subs
+## TODO - we try not to have to edit a command - you should be able to get the sub from az account show
+## TODO - He_Sub needs to be an "eval" as we don't store IDs in env vars / disk
 export He_Sub=$(az account show --subscription {subscription name or Id} --output tsv |awk '{print $3}')
 
 ```
@@ -160,6 +163,8 @@ az keyvault create -g $He_App_RG -n $He_Name
 
 ```
 
+> TODO - should we move this to the end? It has caused some confusion as we were running through it
+
 In order to run the application locally, each developer will need access to the Key Vault. Since you created the Key Vault during setup, you will automatically have permission, so this step is only required for additional developers.
 
 Use the following command to grant permissions to each developer that will need access.
@@ -243,15 +248,19 @@ az keyvault secret set -o table --vault-name $He_Name --name "AcrPassword" --val
 # add Service Principal ID to Key Vault
 az keyvault secret set -o table --vault-name $He_Name --name "AcrUserId" --value $(az ad sp show --id http://${He_Name}-acr-sp --query appId -o tsv)
 
-# retrive the values using eval $He_SP_PWD
+# retrieve the values using eval $He_SP_PWD
 export He_SP_PWD='az keyvault secret show -o tsv --query value --vault-name $He_Name --name AcrPassword'
 export He_SP_ID='az keyvault secret show -o tsv --query value --vault-name $He_Name --name AcrUserId'
+
+# get the URLs for the secrets
+export He_AcrUserId=$(az keyvault secret show --vault-name $He_Name --name "AcrUserId" --query id -o tsv)
+export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "AcrPassword" --query id -o tsv)
 
 # get the Container Registry Id
 export He_ACR_Id=$(az acr show -n $He_Name -g $He_ACR_RG --query "id" -o tsv)
 
 # assign acrpull access to Service Principal
-az role assignment create --assignee $(eval $He_SP_ID) --scope $He_ACR_Id --role acrpull
+az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $He_SP_ID)
 
 # save the environment variables
 ./saveenv.sh -y
