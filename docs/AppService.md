@@ -13,15 +13,17 @@ az appservice plan create --sku B1 --is-linux -g $He_App_RG -n ${He_Name}-plan
 ### We pull the Service Principal ID and Key from Key Vault via
 ### the @Microsoft.KeyVault() format used in -u and -p below
 
-# stop the Web App
-az webapp stop -g $He_App_RG -n $He_Name
-
-
-
 # create Web App for Containers
 az webapp create --deployment-container-image-name hello-world -g $He_App_RG -p ${He_Name}-plan -n $He_Name
 
+# stop the Web App
+az webapp stop -g $He_App_RG -n $He_Name
 
+# assign Managed Identity
+export He_MSI_ID=$(az webapp identity assign -g $He_App_RG -n $He_Name --query principalId -o tsv)
+
+# grant Key Vault access to Managed Identity
+az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id $He_MSI_ID
 
 
 
@@ -33,7 +35,14 @@ az webapp create --deployment-container-image-name hello-world -g $He_App_RG -p 
 ### You can iterate creating multiple web apps without having to go through everything
 ### by using these temp steps
 
-export t_name=bartr9d
+
+az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $He_SP_ID)
+az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(az ad sp show --id http://${He_Name}-acr-sp --query objectId -o tsv)
+
+az keyvault secret set -o table --vault-name $He_Name --name "AcrUserId" --value $(az ad sp show --id http://${He_Name}-acr-sp --query objectId -o tsv)
+
+
+export t_name=bartr11
 
 # create Web App for Containers
 az webapp create --deployment-container-image-name hello-world -g $He_App_RG -p ${He_Name}-plan \
@@ -51,20 +60,16 @@ az webapp config container set -g $He_App_RG \
 -p "@Microsoft.KeyVault(SecretUri=${He_AcrPassword})"
 
 
+az webapp stop -g $He_App_RG -n $t_name
 az webapp start -g $He_App_RG -n $t_name
 
 http https://${t_name}.azurewebsites.net/version
 
+az webapp log tail -g $He_App_RG -n $t_name
 
 
 
 
-
-# assign Managed Identity
-export He_MSI_ID=$(az webapp identity assign -g $He_App_RG -n $He_Name --query principalId -o tsv)
-
-# grant Key Vault access to Managed Identity
-az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id $He_MSI_ID
 
 # turn on CI
 export He_CICD_URL=$(az webapp deployment container config -n $He_Name -g $He_App_RG --enable-cd true --query CI_CD_URL -o tsv)
