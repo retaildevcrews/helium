@@ -72,11 +72,6 @@ az account list -o table
 # select the Azure account
 az account set -s {subscription name or Id}
 
-## TODO - need to move this as you only run the az account set if you have multiple subs
-## TODO - we try not to have to edit a command - you should be able to get the sub from az account show
-## TODO - He_Sub needs to be an "eval" as we don't store IDs in env vars / disk
-export He_Sub=$(az account show --subscription {subscription name or Id} --output tsv |awk '{print $3}')
-
 ```
 
 Choose a unique DNS name
@@ -293,15 +288,22 @@ Deploy the container to App Service or AKS
 ## Dashboard setup
 
 Replace the values in the `Helium_Dashboard.json` file surrounded by `%%` with the proper environment variables
-after making sure the proper environment variables are set (He_Sub, He_App_RG, Imdb_RB and Imdb_Name)
+after making sure the proper environment variables are set (He_Sub, He_App_RG, Imdb_RG and Imdb_Name)
 
 ```bash
 
+export He_Sub='az account show -o tsv --query id'
+
 cd $REPO_ROOT/docs/dashboard
-sed -i "s/%%SUBSCRIPTION_GUID%%/${He_Sub}/g" Helium_Dashboard.json && \
+sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json && \
 sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json && \
 sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json && \
 sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json
+
+### TODO - since there is only one app deployed, do we need the language?
+### TODO - shouldn't use internal code names - bluebell, gelato, sherbert
+### TODO - He_Language was changed to He_Repo for simplicity - if the language is still needed
+###          can be computed from He_Repo (helium-language)
 
 if [ "$He_Language" == "java" ];
 then
