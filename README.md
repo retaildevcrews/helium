@@ -289,27 +289,17 @@ cd $REPO_ROOT/docs/dashboard
 sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json && \
 sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json && \
 sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json && \
-sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json
+sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json && \
+sed -i "s/%%He_Repo%%/${He_Name}/g" Helium_Dashboard.json
 
-### TODO - since there is only one app deployed, do we need the language?
-### TODO - shouldn't use internal code names - bluebell, gelato, sherbert
+### TODO - since there is only one app deployed, do we need the language? - no just the app insights name which is He_Name
+### TODO - shouldn't use internal code names - bluebell, gelato, sherbert - repaired
 ### TODO - He_Language was changed to He_Repo for simplicity - if the language is still needed
-###          can be computed from He_Repo (helium-language)
-
-if [ "$He_Language" == "java" ];
-then
-  sed -i "s/%%He_Language%%/gelato/g" Helium_Dashboard.json
-elif [ "$He_Language" == "csharp" ];
-then
-  sed -i "s/%%He_Language%%/bluebell/g" Helium_Dashboard.json
-elif [ "$He_Language" == "typescript" ];
-then
-  sed -i "s/%%He_Language%%/sherbert/g" Helium_Dashboard.json
-fi
+###          can be computed from He_Repo (helium-language) - repaired
 
 ```
 
-Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file with your correct subscription GUID, resource group names, and app name.
+Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file with your correct subscription GUID, resource group names, and app insights name.
 
 For more documentation on creating and sharing Dashboards, see ([here](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards)).
 
