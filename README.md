@@ -35,9 +35,6 @@ This is a Web API reference application designed to "fork and code" with the fol
 ### TODO - include Codespaces instructions
 # this is on hold pending a design review
 
-# TODO - change this in each language repo
-export He_Repo=helium-csharp
-
 ```
 
 ### bash
@@ -80,10 +77,6 @@ az account set -s {subscription name or Id}
 Choose a unique DNS name
 
 ```bash
-
-### TODO - need to install nslookup in each .devcontainer setup script
-# this is in the java PR
-# sudo apt-get install ... dnsutils
 
 # this will be the prefix for all resources
 # only use a-z and 0-9 - do not include punctuation or uppercase characters
