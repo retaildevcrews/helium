@@ -17,7 +17,7 @@
               "settings": {
                 "content": {
                   "settings": {
-                    "content": "<h1 style=\"text-align: center;\">Helium %%He_Language%% Dashboard</h1>\n",
+                    "content": "<h1 style=\"text-align: center;\">Helium %%He_Repo%% Dashboard</h1>\n",
                     "title": "",
                     "subtitle": "",
                     "markdownSource": 1
@@ -37,7 +37,7 @@
               "inputs": [
                 {
                   "name": "ComponentId",
-                  "value": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
+                  "value": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                 }
               ],
               "type": "Extension/AppInsightsExtension/PartType/AllWebTestsResponseTimeFullGalleryAdapterPart",
@@ -74,18 +74,18 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "availabilityResults/duration",
                           "aggregationType": 4,
                           "namespace": "microsoft.insights/components",
                           "metricVisualization": {
                             "displayName": "Availability test duration",
-                            "resourceDisplayName": "%%He_Language%%"
+                            "resourceDisplayName": "%%He_Repo%%"
                           }
                         }
                       ],
-                      "title": "Availability by Location (%%He_Language%%)",
+                      "title": "Availability by Location (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -150,11 +150,11 @@
                           "namespace": "microsoft.documentdb/databaseaccounts",
                           "metricVisualization": {
                             "displayName": "Total Requests",
-                            "resourceDisplayName": "%%He_Language%%"
+                            "resourceDisplayName": "%%He_Repo%%"
                           }
                         }
                       ],
-                      "title": "Cosmos Throttled Requests (%%He_Language%%)",
+                      "title": "Cosmos Throttled Requests (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -225,7 +225,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "requests/failed",
                           "aggregationType": 1,
@@ -235,7 +235,7 @@
                           }
                         }
                       ],
-                      "title": "Failed Requests (%%He_Language%%)",
+                      "title": "Failed Requests (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -293,7 +293,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "requests/count",
                           "aggregationType": 1,
@@ -303,7 +303,7 @@
                           }
                         }
                       ],
-                      "title": "Server Requests (%%He_Language%%)",
+                      "title": "Server Requests (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -356,7 +356,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "requests/duration",
                           "aggregationType": 4,
@@ -366,7 +366,7 @@
                           }
                         }
                       ],
-                      "title": "Avg Response Time (%%He_Language%%)",
+                      "title": "Avg Response Time (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -426,7 +426,7 @@
                           "namespace": "microsoft.documentdb/databaseaccounts",
                           "metricVisualization": {
                             "displayName": "Total Request Units",
-                            "resourceDisplayName": "%%He_Language%%"
+                            "resourceDisplayName": "%%He_Repo%%"
                           }
                         },
                         {
@@ -438,11 +438,11 @@
                           "namespace": "microsoft.documentdb/databaseaccounts",
                           "metricVisualization": {
                             "displayName": "Total Requests",
-                            "resourceDisplayName": "%%He_Language%%"
+                            "resourceDisplayName": "%%He_Repo%%"
                           }
                         }
                       ],
-                      "title": "Cosmos Requests and RUs (%%He_Language%%)",
+                      "title": "Cosmos Requests and RUs (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -512,11 +512,11 @@
                           "namespace": "microsoft.documentdb/databaseaccounts",
                           "metricVisualization": {
                             "displayName": "Provisioned Throughput",
-                            "resourceDisplayName": "%%He_Language%%"
+                            "resourceDisplayName": "%%He_Repo%%"
                           }
                         }
                       ],
-                      "title": "Cosmos Provisioned Throughput (%%He_Language%%)",
+                      "title": "Cosmos Provisioned Throughput (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -573,7 +573,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "requests/failed",
                           "aggregationType": 1,
@@ -583,7 +583,7 @@
                           }
                         }
                       ],
-                      "title": "Failed Requests (%%He_Language%%)",
+                      "title": "Failed Requests (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 5,
@@ -628,7 +628,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Language%%"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "requests/failed",
                           "aggregationType": 1,
@@ -638,7 +638,7 @@
                           }
                         }
                       ],
-                      "title": "Failed Requests (%%He_Language%%)",
+                      "title": "Failed Requests (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 5,
@@ -715,11 +715,11 @@
       }
     }
   },
-  "name": "Helium-Readme-%%He_Language%%",
+  "name": "Helium-Readme-%%He_Repo%%",
   "type": "Microsoft.Portal/dashboards",
   "location": "INSERT LOCATION",
   "tags": {
-    "hidden-title": "Helium-Readme-%%He_Language%%"
+    "hidden-title": "Helium-Readme-%%He_Repo%%"
   },
   "apiVersion": "2015-08-01-preview"
 }
