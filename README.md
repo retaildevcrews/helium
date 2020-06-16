@@ -20,7 +20,7 @@ This is a Web API reference application designed to "fork and code" with the fol
 
 - Azure subscription with permissions to create:
   - Resource Groups, Service Principals, Key Vault, Cosmos DB, Azure Container Registry, Azure Monitor, App Service or AKS
-- Bash shell (tested on Cloudspaces Mac, Ubuntu, Windows with WSL2)
+- Bash shell (tested on Visual Studio Codespaces, Mac, Ubuntu, Windows with WSL2)
   - Will not work in Cloud Shell or WSL1
 - Azure CLI ([download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest))
 - Docker CLI ([download](https://docs.docker.com/install/))
@@ -33,6 +33,7 @@ This is a Web API reference application designed to "fork and code" with the fol
 ```bash
 
 ### TODO - include Codespaces instructions
+# this is on hold pending a design review
 
 # TODO - change this in each language repo
 export He_Repo=helium-csharp
@@ -44,6 +45,8 @@ export He_Repo=helium-csharp
 Choose which Helium language implementation you want to use and clone the repo
 
 ```bash
+
+### TODO - should we have them fork the repo or is cloning it OK for a test drive?
 
 # run one of these commands
 
@@ -69,7 +72,7 @@ az login
 # show your Azure accounts
 az account list -o table
 
-# select the Azure account
+# select the Azure subscription if necessary
 az account set -s {subscription name or Id}
 
 ```
@@ -79,6 +82,7 @@ Choose a unique DNS name
 ```bash
 
 ### TODO - need to install nslookup in each .devcontainer setup script
+# this is in the java PR
 # sudo apt-get install ... dnsutils
 
 # this will be the prefix for all resources
@@ -99,39 +103,33 @@ nslookup ${He_Name}.azurecr.io
 
 Create Resource Groups
 
-- When experimenting with this app, you should create new resource groups to avoid accidentally deleting resources
-
-  - If you use an existing resource group, please make sure to apply resource locks to avoid accidentally deleting resources
+> When experimenting with this app, you should create new resource groups to avoid accidentally deleting resources
+>
+> If you use an existing resource group, please make sure to apply resource locks to avoid accidentally deleting resources
 
 - You will create 3 resource groups
   - One for ACR
   - One for App Service or AKS, Key Vault and Azure Monitor
-  - One for Cosmos DB (see create and load sample data to Cosmos DB step)
+  - One for Cosmos DB
 
 ```bash
 
 # set location
 export He_Location=centralus
 
-# resource group names
+# set resource group names
 export He_ACR_RG=${He_Name}-rg-acr
 export He_App_RG=${He_Name}-rg-app
 
 # create the resource groups
+# the Cosmos DB resource group is created later
 az group create -n $He_App_RG -l $He_Location
 az group create -n $He_ACR_RG -l $He_Location
 
-```
-
-Save your environment variables for ease of reuse and picking up where you left off.
-
-```bash
-
-# run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/${He_Name}.env
-# make sure you are in the root of the repo
+# run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/.helium.env
 ./saveenv.sh
 
-# at any point if your terminal environment gets cleared, you can source the file to reload the environment variables
+# at any point if your terminal environment gets cleared, you can source the file to reload the environment variables and pickup where you left off
 source ~/.helium.env
 
 ```
@@ -139,15 +137,13 @@ source ~/.helium.env
 Create Azure Key Vault
 
 - All secrets are stored in Azure Key Vault for security
-  - This app uses Managed Identity to access Key Vault
+  - The app uses Managed Identity to access Key Vault in production
+  - and Azure CLI credentials in development
 
 ```bash
 
-## create the Key Vault and add secrets
+## create the Key Vault
 az keyvault create -g $He_App_RG -n $He_Name
-
-# Run saveenv.sh to save the Imdb variables
-./saveenv.sh -y
 
 ```
 
@@ -174,10 +170,12 @@ Create and load sample data into Cosmos DB
 
 - This takes several minutes to run
 - This reference app is designed to use a simple dataset from IMDb of 1300 movies and their associated actors and genres
-- Follow the guidance in the [IMDb Repo](https://github.com/retaildevcrews/imdb) to create a Cosmos DB server (SQL API), a database, and a collection and then load the IMDb data. The repo readme also provides an explanation of the data model design decisions.
-- Recommendation is to set $Imdb_Name the same value as $He_Name
+- Follow the steps in the [IMDb Repo](https://github.com/retaildevcrews/imdb) to create a Cosmos DB server, database, and collection and load the sampleIMDb data.
+  - The repo readme also provides an explanation of the data model design decisions.
+  - Recommendation is to set $Imdb_Name to the same value as $He_Name
+  - `export Imdb_Name=$He_Name`
 
-Save the Cosmos DB keys to Key Vault
+Save the Cosmos DB config to Key Vault
 
 ```bash
 
@@ -192,16 +190,16 @@ az keyvault secret set -o table --vault-name $He_Name --name "CosmosCollection" 
 export Imdb_RO_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name CosmosKey'
 export Imdb_RW_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name CosmosRWKey'
 
-# Run saveenv.sh to save the Imdb variables
+# save the Imdb variables
 ./saveenv.sh -y
 
 ```
 
 Setup Container Registry
 
-- Create the Container Registry with admin access _disabled_
+- Create the Container Registry with admin access `disabled`
 
-> Currently, App Service cannot access ACR via the Managed Identity, so we have to setup a separate Service Principal and grant access to that SP.
+> Currently, App Service cannot access ACR via the Managed Identity, so we have to setup a separate Service Principal and grant access to that SP
 
 ```bash
 
@@ -236,7 +234,7 @@ az keyvault secret set -o table --vault-name $He_Name --name "AcrPassword" --val
 # add Service Principal ID to Key Vault
 az keyvault secret set -o table --vault-name $He_Name --name "AcrUserId" --value $(az ad sp show --id http://${He_Name}-acr-sp --query appId -o tsv)
 
-# retrieve the values using eval $He_SP_PWD
+# retrieve the values using eval $He_SP_*
 export He_SP_PWD='az keyvault secret show -o tsv --query value --vault-name $He_Name --name AcrPassword'
 export He_SP_ID='az keyvault secret show -o tsv --query value --vault-name $He_Name --name AcrUserId'
 
@@ -247,7 +245,7 @@ export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "Ac
 # get the Container Registry Id
 export He_ACR_Id=$(az acr show -n $He_Name -g $He_ACR_RG --query "id" -o tsv)
 
-# assign acrpull access to Service Principal
+# assign acrpull access to the Service Principal
 az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $He_SP_ID)
 
 # save the environment variables
@@ -267,12 +265,12 @@ az feature register --name AIWorkspacePreview --namespace microsoft.insights
 az provider register -n microsoft.insights
 
 # Create App Insights
-az monitor app-insights component create -g $He_App_RG -l $He_Location -a $He_Name --query instrumentationKey -o table
+az monitor app-insights component create -g $He_App_RG -l $He_Location -a $He_Name -o table
 
 # add App Insights Key to Key Vault
 az keyvault secret set -o tsv --query name --vault-name $He_Name --name "AppInsightsKey" --value $(az monitor app-insights component show -g $He_App_RG -a $He_Name --query instrumentationKey -o tsv)
 
-# save the env variable - use via $(eval $He_AppInsights_Key)
+# save the env variable - use eval $He_AppInsights_Key
 export He_AppInsights_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name AppInsightsKey'
 
 # save the environment variables
@@ -283,7 +281,7 @@ export He_AppInsights_Key='az keyvault secret show -o tsv --query value --vault-
 Deploy the container to App Service or AKS
 
 - Instructions for [App Service](docs/AppService.md)
-- Instructions for [AKS](docs/aks/README.md#L233) (currently requires csharp)
+- Instructions for [AKS](docs/aks/README.md#L233)
 
 ## Dashboard setup
 
@@ -333,5 +331,6 @@ a CLA and decorate the PR appropriately (e.g., status check, comment). Simply fo
 provided by the bot. You will only need to do this once across all repos using our CLA.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments
