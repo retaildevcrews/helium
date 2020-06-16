@@ -17,7 +17,7 @@
               "settings": {
                 "content": {
                   "settings": {
-                    "content": "<h1 style=\"text-align: center;\">Helium wsrtf Dashboard</h1>\n",
+                    "content": "<h1 style=\"text-align: center;\">Helium %%He_Repo%% Dashboard</h1>\n",
                     "title": "",
                     "subtitle": "",
                     "markdownSource": 1
@@ -37,7 +37,7 @@
               "inputs": [
                 {
                   "name": "ComponentId",
-                  "value": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-app-rg/providers/microsoft.insights/components/wsrtf"
+                  "value": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                 }
               ],
               "type": "Extension/AppInsightsExtension/PartType/AllWebTestsResponseTimeFullGalleryAdapterPart",
@@ -74,18 +74,18 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-app-rg/providers/microsoft.insights/components/wsrtf"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "availabilityResults/duration",
                           "aggregationType": 4,
                           "namespace": "microsoft.insights/components",
                           "metricVisualization": {
                             "displayName": "Availability test duration",
-                            "resourceDisplayName": "wsrtf"
+                            "resourceDisplayName": "%%He_Repo%%"
                           }
                         }
                       ],
-                      "title": "Availability by Location (wsrtf)",
+                      "title": "Availability by Location (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -143,18 +143,18 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-cosmos-rg/providers/Microsoft.DocumentDb/databaseAccounts/wsrtf"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%Imdb_RG%%/providers/Microsoft.DocumentDb/databaseAccounts/%%Imdb_Name%%"
                           },
                           "name": "TotalRequests",
                           "aggregationType": 7,
                           "namespace": "microsoft.documentdb/databaseaccounts",
                           "metricVisualization": {
                             "displayName": "Total Requests",
-                            "resourceDisplayName": "wsrtf"
+                            "resourceDisplayName": "%%He_Repo%%"
                           }
                         }
                       ],
-                      "title": "Cosmos Throttled Requests (wsrtf)",
+                      "title": "Cosmos Throttled Requests (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -225,7 +225,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-app-rg/providers/microsoft.insights/components/wsrtf"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "requests/failed",
                           "aggregationType": 1,
@@ -235,7 +235,7 @@
                           }
                         }
                       ],
-                      "title": "Failed Requests (wsrtf)",
+                      "title": "Failed Requests (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -293,7 +293,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-app-rg/providers/microsoft.insights/components/wsrtf"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "requests/count",
                           "aggregationType": 1,
@@ -303,7 +303,7 @@
                           }
                         }
                       ],
-                      "title": "Server Requests (wsrtf)",
+                      "title": "Server Requests (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -356,7 +356,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-app-rg/providers/microsoft.insights/components/wsrtf"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "requests/duration",
                           "aggregationType": 4,
@@ -366,7 +366,7 @@
                           }
                         }
                       ],
-                      "title": "Avg Response Time (wsrtf)",
+                      "title": "Avg Response Time (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -419,30 +419,30 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-cosmos-rg/providers/Microsoft.DocumentDb/databaseAccounts/wsrtf"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%Imdb_RG%%/providers/Microsoft.DocumentDb/databaseAccounts/%%Imdb_Name%%"
                           },
                           "name": "TotalRequestUnits",
                           "aggregationType": 1,
                           "namespace": "microsoft.documentdb/databaseaccounts",
                           "metricVisualization": {
                             "displayName": "Total Request Units",
-                            "resourceDisplayName": "wsrtf"
+                            "resourceDisplayName": "%%He_Repo%%"
                           }
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-cosmos-rg/providers/Microsoft.DocumentDb/databaseAccounts/wsrtf"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%Imdb_RG%%/providers/Microsoft.DocumentDb/databaseAccounts/%%Imdb_Name%%"
                           },
                           "name": "TotalRequests",
                           "aggregationType": 7,
                           "namespace": "microsoft.documentdb/databaseaccounts",
                           "metricVisualization": {
                             "displayName": "Total Requests",
-                            "resourceDisplayName": "wsrtf"
+                            "resourceDisplayName": "%%He_Repo%%"
                           }
                         }
                       ],
-                      "title": "Cosmos Requests and RUs (wsrtf)",
+                      "title": "Cosmos Requests and RUs (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -505,18 +505,18 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-cosmos-rg/providers/Microsoft.DocumentDb/databaseAccounts/wsrtf"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%Imdb_RG%%/providers/Microsoft.DocumentDb/databaseAccounts/%%Imdb_Name%%"
                           },
                           "name": "ProvisionedThroughput",
                           "aggregationType": 3,
                           "namespace": "microsoft.documentdb/databaseaccounts",
                           "metricVisualization": {
                             "displayName": "Provisioned Throughput",
-                            "resourceDisplayName": "wsrtf"
+                            "resourceDisplayName": "%%He_Repo%%"
                           }
                         }
                       ],
-                      "title": "Cosmos Provisioned Throughput (wsrtf)",
+                      "title": "Cosmos Provisioned Throughput (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -573,7 +573,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-app-rg/providers/microsoft.insights/components/wsrtf"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "requests/failed",
                           "aggregationType": 1,
@@ -583,7 +583,7 @@
                           }
                         }
                       ],
-                      "title": "Failed Requests (wsrtf)",
+                      "title": "Failed Requests (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 5,
@@ -628,7 +628,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d6059683-f948-42af-a4de-dcb43e306d49/resourceGroups/wsrtf-app-rg/providers/microsoft.insights/components/wsrtf"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%He_App_RG%%/providers/microsoft.insights/components/%%He_Repo%%"
                           },
                           "name": "requests/failed",
                           "aggregationType": 1,
@@ -638,7 +638,7 @@
                           }
                         }
                       ],
-                      "title": "Failed Requests (wsrtf)",
+                      "title": "Failed Requests (%%He_Repo%%)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 5,
@@ -715,11 +715,11 @@
       }
     }
   },
-  "name": "Helium-Readme-wsrtf",
+  "name": "Helium-Readme-%%He_Repo%%",
   "type": "Microsoft.Portal/dashboards",
   "location": "INSERT LOCATION",
   "tags": {
-    "hidden-title": "Helium-Readme-wsrtf"
+    "hidden-title": "Helium-Readme-%%He_Repo%%"
   },
   "apiVersion": "2015-08-01-preview"
 }
