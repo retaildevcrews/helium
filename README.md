@@ -37,6 +37,22 @@ This is a Web API reference application designed to "fork and code" with the fol
 
 ```
 
+> WIP
+
+The application requires Key Vault and Cosmos DB to be setup per the Helium [readme](https://github.com/retaildevcrews/helium)
+
+- Fork this repo and clone to your local machine
+  - cd to the base directory of the repo
+  - All instructions assume starting from the root of the repo
+  
+- Setup using [Visual Studio Codespaces](https://visualstudio.microsoft.com/services/visual-studio-codespaces/)
+  - Fork this repo
+  - Create a new Codespace from the forked repo
+  - TODO - include instructions / screenshots
+    - can we share this across repos?
+
+> WIP
+
 ### bash
 
 Choose which Helium language implementation you want to use and clone the repo
