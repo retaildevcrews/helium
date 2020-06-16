@@ -43,8 +43,6 @@ Choose which Helium language implementation you want to use and clone the repo
 
 ```bash
 
-### TODO - should we have them fork the repo or is cloning it OK for a test drive?
-
 # run one of these commands
 
 # dotnet (C#)
@@ -137,25 +135,6 @@ Create Azure Key Vault
 
 ## create the Key Vault
 az keyvault create -g $He_App_RG -n $He_Name
-
-```
-
-> TODO - should we move this to the end? It has caused some confusion as we were running through it
-
-In order to run the application locally, each developer will need access to the Key Vault. Since you created the Key Vault during setup, you will automatically have permission, so this step is only required for additional developers.
-
-Use the following command to grant permissions to each developer that will need access.
-
-> This step is optional
-
-```bash
-
-# get the object ID by email address for each developer
-az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id \
-$(az ad user show --query objectId -o tsv --id {developer email address})
-
-# grant Key Vault access to each developer (optional)
-az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id $dev_Object_Id
 
 ```
 
@@ -289,19 +268,33 @@ cd $REPO_ROOT/docs/dashboard
 sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json && \
 sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json && \
 sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json && \
-sed -i "s/%%Imdb_Name%%/${Imdb_Name}/g" Helium_Dashboard.json && \
+sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json && \
 sed -i "s/%%He_Repo%%/${He_Name}/g" Helium_Dashboard.json
-
-### TODO - since there is only one app deployed, do we need the language? - no just the app insights name which is He_Name
-### TODO - shouldn't use internal code names - bluebell, gelato, sherbert - repaired
-### TODO - He_Language was changed to He_Repo for simplicity - if the language is still needed
-###          can be computed from He_Repo (helium-language) - repaired
 
 ```
 
 Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file with your correct subscription GUID, resource group names, and app insights name.
 
 For more documentation on creating and sharing Dashboards, see ([here](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards)).
+
+Option Step below:
+
+In order to run the application locally, each developer will need access to the Key Vault. Since you created the Key Vault during setup, you will automatically have permission, so this step is only required for additional developers.
+
+Use the following command to grant permissions to each developer that will need access.
+
+> This step is optional
+
+```bash
+
+# get the object ID by email address for each developer
+az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id \
+$(az ad user show --query objectId -o tsv --id {developer email address})
+
+# grant Key Vault access to each developer (optional)
+az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id $dev_Object_Id
+
+```
 
 ## Contributing
 
