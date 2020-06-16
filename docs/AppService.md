@@ -25,52 +25,6 @@ export He_MSI_ID=$(az webapp identity assign -g $He_App_RG -n $He_Name --query p
 # grant Key Vault access to Managed Identity
 az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id $He_MSI_ID
 
-
-
-### TODO - delete this
-### this works consistently once the acrpull role is successfully granted
-### it appears that doesn't happen consistently
-### I'm testing that now
-
-### You can iterate creating multiple web apps without having to go through everything
-### by using these temp steps
-
-
-az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $He_SP_ID)
-az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(az ad sp show --id http://${He_Name}-acr-sp --query objectId -o tsv)
-
-az keyvault secret set -o table --vault-name $He_Name --name "AcrUserId" --value $(az ad sp show --id http://${He_Name}-acr-sp --query objectId -o tsv)
-
-
-export t_name=bartr11
-
-# create Web App for Containers
-az webapp create --deployment-container-image-name hello-world -g $He_App_RG -p ${He_Name}-plan \
--n $t_name
-
-az webapp stop -g $He_App_RG -n $t_name
-
-
-# configure the Web App to use Container Registry
-az webapp config container set -g $He_App_RG \
--n $t_name \
--i ${He_Name}.azurecr.io/${He_Repo} \
--r https://${He_Name}.azurecr.io \
--u "@Microsoft.KeyVault(SecretUri=${He_AcrUserId})" \
--p "@Microsoft.KeyVault(SecretUri=${He_AcrPassword})"
-
-
-az webapp stop -g $He_App_RG -n $t_name
-az webapp start -g $He_App_RG -n $t_name
-
-http https://${t_name}.azurewebsites.net/version
-
-az webapp log tail -g $He_App_RG -n $t_name
-
-
-
-
-
 # turn on CI
 export He_CICD_URL=$(az webapp deployment container config -n $He_Name -g $He_App_RG --enable-cd true --query CI_CD_URL -o tsv)
 
@@ -97,16 +51,13 @@ az webapp config container set -n $He_Name -g $He_App_RG \
 -u "@Microsoft.KeyVault(SecretUri=${He_AcrUserId})" \
 -p "@Microsoft.KeyVault(SecretUri=${He_AcrPassword})"
 
-
 # start the Web App
-az webapp stop -g $He_App_RG -n $He_Name
 az webapp start -g $He_App_RG -n $He_Name
 
 # check the version endpoint
 # this will eventually work, but may take a minute
 # you may get a 403 or timeout error, if so, just run again
 
-sleep 30
 http https://${He_Name}.azurewebsites.net/version
 
 ```
