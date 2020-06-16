@@ -277,6 +277,8 @@ Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure
 
 For more documentation on creating and sharing Dashboards, see ([here](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards)).
 
+Option Step below:
+
 In order to run the application locally, each developer will need access to the Key Vault. Since you created the Key Vault during setup, you will automatically have permission, so this step is only required for additional developers.
 
 Use the following command to grant permissions to each developer that will need access.
