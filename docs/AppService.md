@@ -1,19 +1,14 @@
-# Deploy Helium container to Azure App Service
+# Deploy Helium to Azure App Service
 
 Create and configure App Service (Web App for Containers)
-
-- App Service will fail to start until configured properly
 
 ```bash
 
 # create App Service plan
 az appservice plan create --sku B1 --is-linux -g $He_App_RG -n ${He_Name}-plan
 
-### App Service cannot currently use Managed Identity to access ACR
-### We pull the Service Principal ID and Key from Key Vault via
-### the @Microsoft.KeyVault() format used in -u and -p below
-
 # create Web App for Containers
+# temporarily use the hello-world image - App Service will fail to start - error can be ignored
 az webapp create --deployment-container-image-name hello-world -g $He_App_RG -p ${He_Name}-plan -n $He_Name
 
 # stop the Web App
@@ -31,7 +26,7 @@ export He_CICD_URL=$(az webapp deployment container config -n $He_Name -g $He_Ap
 # add the webhook
 az acr webhook create -r $He_Name -n ${He_Name} --actions push --uri $He_CICD_URL --scope ${He_Repo}:latest
 
-# set the Key Vault name app setting (environment variable)
+# set the Key Vault config setting
 az webapp config appsettings set --settings KEYVAULT_NAME=$He_Name -g $He_App_RG -n $He_Name
 
 # turn on container logging
@@ -40,6 +35,10 @@ az webapp log config --docker-container-logging filesystem -g $He_App_RG -n $He_
 
 # save environment variables
 ./saveenv.sh -y
+
+### App Service cannot currently use Managed Identity to access ACR
+### We pull the Service Principal ID and Key from Key Vault via
+### the @Microsoft.KeyVault() format used in -u and -p below
 
 # assign acrpull access to Service Principal
 az role assignment create --assignee $(eval $He_SP_ID) --scope $He_ACR_Id --role acrpull
@@ -55,8 +54,7 @@ az webapp config container set -n $He_Name -g $He_App_RG \
 az webapp start -g $He_App_RG -n $He_Name
 
 # check the version endpoint
-# this will eventually work, but may take a minute
-# you may get a 403 or timeout error, if so, just run again
+# you may get a 403 or timeout error, if so, just retry
 
 http https://${He_Name}.azurewebsites.net/version
 
