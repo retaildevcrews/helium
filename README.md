@@ -30,28 +30,17 @@ This is a Web API reference application designed to "fork and code" with the fol
 
 ### Codespaces
 
-```bash
-
-### TODO - include Codespaces instructions
-# this is on hold pending a design review
-
-```
-
 > WIP
 
-The application requires Key Vault and Cosmos DB to be setup per the Helium [readme](https://github.com/retaildevcrews/helium)
-
-- Fork this repo and clone to your local machine
-  - cd to the base directory of the repo
-  - All instructions assume starting from the root of the repo
-  
 - Setup using [Visual Studio Codespaces](https://visualstudio.microsoft.com/services/visual-studio-codespaces/)
-  - Fork this repo
-  - Create a new Codespace from the forked repo
-  - TODO - include instructions / screenshots
-    - can we share this across repos?
+  - Choose which Helium language implementation you want to use and create a new Codespaces from the repo
+    - retaildevcrews/helium-csharp
+    - retaildevcrews/helium-java
+    - retaildevcrews/helium-typescript
+  - Open a terminal in Codespaces
+    - use the command palette or press ctl + `
 
-> WIP
+> End WIP
 
 ### bash
 
@@ -122,7 +111,8 @@ Create Resource Groups
 ```bash
 
 # set location
-export He_Location=centralus
+export He_Location=
+
 
 # set resource group names
 export He_ACR_RG=${He_Name}-rg-acr
@@ -183,7 +173,7 @@ export Imdb_RW_Key='az keyvault secret show -o tsv --query value --vault-name $H
 
 ```
 
-Setup Container Registry
+Setup Azure Container Registry
 
 - Create the Container Registry with admin access `disabled`
 
@@ -266,6 +256,14 @@ export He_AppInsights_Key='az keyvault secret show -o tsv --query value --vault-
 
 ```
 
+> WIP
+
+Run the app locally
+
+Should we move this before setup ACR?
+
+> End WIP
+
 Deploy the container to App Service or AKS
 
 - Instructions for [App Service](docs/AppService.md)
@@ -280,7 +278,12 @@ after making sure the proper environment variables are set (He_Sub, He_App_RG, I
 
 export He_Sub='az account show -o tsv --query id'
 
-cd $REPO_ROOT/docs/dashboard
+### TODO - this won't work since the instructions clone the language repo, not the helium repo
+### One option is to make dashboard setup a separate md file and include instructions for cloning
+###   the helium repo
+### Another option is to add the dashboard files to each of the language repos
+
+cd docs/dashboard
 sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json && \
 sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json && \
 sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json && \
@@ -293,7 +296,7 @@ Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure
 
 For more documentation on creating and sharing Dashboards, see ([here](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards)).
 
-Optional Step below to grant permissions to each developer that will need access:
+## Team Development
 
 In order to run the application locally, each developer will need access to the Key Vault. Since you created the Key Vault during setup, you will automatically have permission, so this step is only required for additional developers.
 
@@ -301,12 +304,9 @@ Use the following command to grant permissions to each developer that will need 
 
 ```bash
 
-# get the object ID by email address for each developer
+# grant Key Vault access to each developer
 az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id \
 $(az ad user show --query objectId -o tsv --id {developer email address})
-
-# grant Key Vault access to each developer (optional)
-az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id $dev_Object_Id
 
 ```
 
