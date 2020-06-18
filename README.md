@@ -111,8 +111,7 @@ Create Resource Groups
 ```bash
 
 # set location
-export He_Location=
-
+export He_Location=centralus
 
 # set resource group names
 export He_ACR_RG=${He_Name}-rg-acr
@@ -124,6 +123,7 @@ az group create -n $He_App_RG -l $He_Location
 az group create -n $He_ACR_RG -l $He_Location
 
 # run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/.helium.env
+# the saveenv.sh script sets He_Repo correctly based on the helium language version you are using
 ./saveenv.sh
 
 # at any point if your terminal environment gets cleared, you can source the file to reload the environment variables and pickup where you left off
@@ -160,13 +160,11 @@ Save the Cosmos DB config to Key Vault
 # add Cosmos DB config to Key Vault
 az keyvault secret set -o table --vault-name $He_Name --name "CosmosUrl" --value https://${Imdb_Name}.documents.azure.com:443/
 az keyvault secret set -o table --vault-name $He_Name --name "CosmosKey" --value $(az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query primaryReadonlyMasterKey -o tsv)
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosRWKey" --value $(az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query primaryMasterKey -o tsv)
 az keyvault secret set -o table --vault-name $He_Name --name "CosmosDatabase" --value $Imdb_DB
 az keyvault secret set -o table --vault-name $He_Name --name "CosmosCollection" --value $Imdb_Col
 
-# retrieve the keys using eval $Imdb_RO_Key
+# retrieve the Cosmos DB key using eval $Imdb_RO_Key
 export Imdb_RO_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name CosmosKey'
-export Imdb_RW_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name CosmosRWKey'
 
 # save the Imdb variables
 ./saveenv.sh -y
