@@ -148,7 +148,7 @@ Create and load sample data into Cosmos DB
 
 - This takes several minutes to run
 - This reference app is designed to use a simple dataset from IMDb of 1300 movies and their associated actors and genres
-- Follow the steps in the [IMDb Repo](https://github.com/retaildevcrews/imdb) to create a Cosmos DB server, database, and collection and load the sampleIMDb data.
+- Follow the steps in the [IMDb Repo](https://github.com/retaildevcrews/imdb) to create a Cosmos DB server, database, and collection and load the sample IMDb data.
   - The repo readme also provides an explanation of the data model design decisions.
   - Recommendation is to set $Imdb_Name to the same value as $He_Name
   - `export Imdb_Name=$He_Name`
