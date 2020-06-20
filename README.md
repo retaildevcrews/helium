@@ -28,25 +28,63 @@ This is a Web API reference application designed to "fork and code" with the fol
 
 ## Setup
 
+> [Visual Studio Codespaces](https://visualstudio.microsoft.com/services/visual-studio-codespaces/) is the easiest way to evaluate helium as all of the prerequisites are automatically installed
+
 ### Codespaces
 
-> WIP
+Setup using Visual Studio Codespaces
 
-- Setup using [Visual Studio Codespaces](https://visualstudio.microsoft.com/services/visual-studio-codespaces/)
+- Open your [Codespaces](https://online.visualstudio.com/environments)
+- Sign in if prompted
+- If you haven't used Codespaces, you will be prompted to create a new Codespace
+- Click on Create Codespace
+
+![alt text](./docs/images/codespaces1.jpg "Create Codespaces")
+
+- If you haven't setup a billing plan, you will be prompted to set one up
+  - Expand the Advanced Options or accept the defaults
+
+![alt text](./docs/images/codespaces2.jpg "Create a billing plan if necessary")
+
+- Create your Codespace
+  - Name your Codespace
   - Choose which Helium language implementation you want to use and create a new Codespaces from the repo
     - retaildevcrews/helium-csharp
     - retaildevcrews/helium-java
     - retaildevcrews/helium-typescript
-  - Open a terminal in Codespaces
-    - use the command palette or press ctl + `
+  - Choose your Linux instance type
+  - Click Create
 
-> End WIP
+![alt text](./docs/images/codespaces3.jpg "Create a Codespace")
+
+> dotfiles allow you to customize your Codespace to your individual preferences
+>
+> Using dotfiles is optional
+>
+> A sample dotfiles repo is available [here](https://github.com/retaildevcrews/dotfiles)
+
+- Codespaces will display a `Creation Log` window
+  - You may close this window once all the steps have completed
+
+> Codespaces is now ready to use!
+
+- Open a terminal in Codespaces
+  - use the command palette or press ctl + `
+  - you can also click on the Menu button in the upper left corner
+    - choose view
+    - choose terminal
+
+![alt text](./docs/images/codespaces4.jpg "Codespaces Menu Button")
+
+> If using Codespaces, skip to the Azure login step
 
 ### bash
 
 Choose which Helium language implementation you want to use and clone the repo
 
 ```bash
+
+### skip this step if using Codespaces
 
 # run one of these commands
 
@@ -63,7 +101,7 @@ cd helium
 
 ```
 
-Login to Azure and select subscription
+#### Login to Azure and select subscription
 
 ```bash
 
@@ -77,7 +115,7 @@ az account set -s {subscription name or Id}
 
 ```
 
-Choose a unique DNS name
+#### Choose a unique DNS name
 
 ```bash
 
@@ -85,7 +123,7 @@ Choose a unique DNS name
 # only use a-z and 0-9 - do not include punctuation or uppercase characters
 # must be at least 5 characters long
 # must start with a-z (only lowercase)
-export He_Name="youruniquename"
+export He_Name=[your unique name]
 
 ### if true, change He_Name
 az cosmosdb check-name-exists -n ${He_Name}
@@ -97,9 +135,9 @@ nslookup ${He_Name}.azurecr.io
 
 ```
 
-Create Resource Groups
+#### Create Resource Groups
 
-> When experimenting with this app, you should create new resource groups to avoid accidentally deleting resources
+> When experimenting with `helium`, you should create new resource groups to avoid accidentally deleting resources
 >
 > If you use an existing resource group, please make sure to apply resource locks to avoid accidentally deleting resources
 
@@ -113,29 +151,40 @@ Create Resource Groups
 # set location
 export He_Location=centralus
 
+# set the subscription
+export He_Sub='az account show -o tsv --query id'
+
 # set resource group names
+export Imdb_Name=$He_Name
 export He_ACR_RG=${He_Name}-rg-acr
 export He_App_RG=${He_Name}-rg-app
 
+# export Cosmos DB env vars
+# these will be explained in the Cosmos DB setup step
+export Imdb_Location=$He_Location
+export Imdb_DB=imdb
+export Imdb_Col=movies
+export Imdb_RW_Key='az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query primaryMasterKey -o tsv'
+
 # create the resource groups
-# the Cosmos DB resource group is created later
 az group create -n $He_App_RG -l $He_Location
 az group create -n $He_ACR_RG -l $He_Location
+az group create -n $Imdb_RG -l $Imdb_Location
 
 # run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/.helium.env
 # the saveenv.sh script sets He_Repo correctly based on the helium language version you are using
 ./saveenv.sh
 
-# at any point if your terminal environment gets cleared, you can source the file to reload the environment variables and pickup where you left off
+# if your terminal environment gets cleared, you can source the file to reload the environment variables
 source ~/.helium.env
 
 ```
 
-Create Azure Key Vault
+#### Create Azure Key Vault
 
 - All secrets are stored in Azure Key Vault for security
-  - The app uses Managed Identity to access Key Vault in production
-  - and Azure CLI credentials in development
+  - Helium uses Managed Identity to access Key Vault in production
+    - Helium uses Azure CLI credentials in development
 
 ```bash
 
@@ -144,14 +193,16 @@ az keyvault create -g $He_App_RG -n $He_Name
 
 ```
 
-Create and load sample data into Cosmos DB
+#### Create and load sample data into Cosmos DB
 
 - This takes several minutes to run
 - This reference app is designed to use a simple dataset from IMDb of 1300 movies and their associated actors and genres
-- Follow the steps in the [IMDb Repo](https://github.com/retaildevcrews/imdb) to create a Cosmos DB server, database, and collection and load the sample IMDb data.
-  - The repo readme also provides an explanation of the data model design decisions.
-  - Recommendation is to set $Imdb_Name to the same value as $He_Name
-  - `export Imdb_Name=$He_Name`
+- Follow the steps in the [IMDb Repo](https://github.com/retaildevcrews/imdb) to create a Cosmos DB server, database, and collection and load the sample IMDb data
+  - The repo readme also provides an explanation of the data model design decisions
+
+  > You can safely start with the Create Cosmos DB step
+  >
+  > The initial steps were completed above
 
 Save the Cosmos DB config to Key Vault
 
@@ -171,11 +222,39 @@ export Imdb_RO_Key='az keyvault secret show -o tsv --query value --vault-name $H
 
 ```
 
-Setup Azure Container Registry
+#### Create Azure Monitor
+
+> The Application Insights extension is in preview and needs to be added to the CLI
+
+```bash
+
+# Add App Insights extension
+az extension add -n application-insights
+az feature register --name AIWorkspacePreview --namespace microsoft.insights
+az provider register -n microsoft.insights
+
+# Create App Insights
+az monitor app-insights component create -g $He_App_RG -l $He_Location -a $He_Name -o table
+
+# add App Insights Key to Key Vault
+az keyvault secret set -o tsv --query name --vault-name $He_Name --name "AppInsightsKey" --value $(az monitor app-insights component show -g $He_App_RG -a $He_Name --query instrumentationKey -o tsv)
+
+# save the env variable - use eval $He_AppInsights_Key
+export He_AppInsights_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name AppInsightsKey'
+
+# save the environment variables
+./saveenv.sh -y
+
+```
+
+#### Run helium locally
+
+- You can now follow the language specific readme to run helium locally
+  - this step is optional
+
+#### Setup Azure Container Registry
 
 - Create the Container Registry with admin access `disabled`
-
-> Currently, App Service cannot access ACR via the Managed Identity, so we have to setup a separate Service Principal and grant access to that SP
 
 ```bash
 
@@ -198,9 +277,9 @@ docker push $He_Name.azurecr.io/${He_Repo}:latest
 
 ```
 
-Create a Service Principal for Container Registry
+#### Create a Service Principal for Container Registry
 
-- App Service will use this Service Principal to access Container Registry
+> Currently, App Service cannot access ACR via Managed Identity, so we have to create a Service Principal and grant access to that SP
 
 ```bash
 
@@ -229,40 +308,7 @@ az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $H
 
 ```
 
-Create Azure Monitor
-
-- The Application Insights extension is in preview and needs to be added to the CLI
-
-```bash
-
-# Add App Insights extension
-az extension add -n application-insights
-az feature register --name AIWorkspacePreview --namespace microsoft.insights
-az provider register -n microsoft.insights
-
-# Create App Insights
-az monitor app-insights component create -g $He_App_RG -l $He_Location -a $He_Name -o table
-
-# add App Insights Key to Key Vault
-az keyvault secret set -o tsv --query name --vault-name $He_Name --name "AppInsightsKey" --value $(az monitor app-insights component show -g $He_App_RG -a $He_Name --query instrumentationKey -o tsv)
-
-# save the env variable - use eval $He_AppInsights_Key
-export He_AppInsights_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name AppInsightsKey'
-
-# save the environment variables
-./saveenv.sh -y
-
-```
-
-> WIP
-
-Run the app locally
-
-Should we move this before setup ACR?
-
-> End WIP
-
-Deploy the container to App Service or AKS
+#### Deploy the container to App Service or AKS
 
 - Instructions for [App Service](docs/AppService.md)
 - Instructions for [AKS](docs/aks/README.md#L233)
@@ -273,8 +319,6 @@ Replace the values in the `Helium_Dashboard.json` file surrounded by `%%` with t
 after making sure the proper environment variables are set (He_Sub, He_App_RG, Imdb_RG and Imdb_Name)
 
 ```bash
-
-export He_Sub='az account show -o tsv --query id'
 
 ### TODO - this won't work since the instructions clone the language repo, not the helium repo
 ### One option is to make dashboard setup a separate md file and include instructions for cloning
@@ -296,7 +340,7 @@ For more documentation on creating and sharing Dashboards, see ([here](https://d
 
 ## Team Development
 
-In order to run the application locally, each developer will need access to the Key Vault. Since you created the Key Vault during setup, you will automatically have permission, so this step is only required for additional developers.
+In order to run helium locally, each developer will need access to the Key Vault. Since you created the Key Vault during setup, you will automatically have permission, so this step is only required for additional developers.
 
 Use the following command to grant permissions to each developer that will need access.
 
