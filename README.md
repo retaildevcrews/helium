@@ -158,6 +158,7 @@ export He_Sub='az account show -o tsv --query id'
 export Imdb_Name=$He_Name
 export He_ACR_RG=${He_Name}-rg-acr
 export He_App_RG=${He_Name}-rg-app
+export Imdb_RG=${Imdb_Name}-rg-cosmos
 
 # export Cosmos DB env vars
 # these will be explained in the Cosmos DB setup step
