@@ -1,9 +1,12 @@
-# Java/Spring Boot Developer Documentation
+<!-- markdownlint-disable MD033 -->
+# Java Spring WebFlux Developer Documentation
 
 ## Index
 
-1. [Managed Identity and Key Vault](#managed-identity-and-key-vault)
+1. [Frameworks and SDKs](#Frameworks-and-SDKs)
+    - [Identity](#Identity)
     - [Key Vault](#key-vault)
+    - [CosmosDB](#CosmosDB)
 2. [Key Rotation](#key-rotation)
     - Work in progress
 3. [Cosmos DB](#cosmos-db)
@@ -14,13 +17,43 @@
 5. [Versioning](#versioning)
 6. [Application Insights](#application-insights)
 
-## Managed Identity and Key Vault
+## Frameworks and SDKs
 
-After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to the Service Principal, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in application code.
+For the Java version of this project we chose to use Spring WebFlux.  This gives us an asynchronous framework on which to build and aligns with the latest version of the CosmosDB SDK for Java which also uses WebFlux.  
+
+<img src="./images/CosmosDB-Flux.png" />
+
+`Figure 01: CosmosDB & WebFlux`
+
+As illustrated above it provides a natural flow within the code sinze the frameworks match.  Additionally, we used beta framewoks to provide the best security options available on the platform presently.  Those are covered in the subsequent sections.  
+
+> **Important**
+> At the time of release the version of the CosmosDB SDK relied on a version of Netty that had a bug which would cause closed connections to be used from the connection.  We observed this was a factor after 10 - 12 hours of running.  There is an upcoming change that will incorporate the Netty remediation.  We will update the dependency and remove this note once available.
+
+### Identity
+
+- intro
+- version
+- examples
 
 ### Key Vault
 
+- intro
+- version
+- examples
+- config cache
+- 
 If you need access to Key Vault in your application, you can retrieve the Key Vault Client from Spring framework's DI rather than have to track credentials and create a new connection.
+
+### CosmosDB
+
+```xml
+<dependency>
+    <groupId>com.microsoft.azure</groupId>
+    <artifactId>spring-data-cosmosdb</artifactId>
+    <version>2.2.2</version>
+</dependency>
+```
 
 #### Adding Key Vault via Spring Configuration
 
