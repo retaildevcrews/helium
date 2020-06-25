@@ -28,13 +28,49 @@ For the Java version of this project we chose to use Spring WebFlux.  This gives
 As illustrated above it provides a natural flow within the code sinze the frameworks match.  Additionally, we used beta framewoks to provide the best security options available on the platform presently.  Those are covered in the subsequent sections.  
 
 > **Important**
-> At the time of release the version of the CosmosDB SDK relied on a version of Netty that had a bug which would cause closed connections to be used from the connection.  We observed this was a factor after 10 - 12 hours of running.  There is an upcoming change that will incorporate the Netty remediation.  We will update the dependency and remove this note once available.
+> At the time of release the version of the CosmosDB SDK relied on a version of Netty that had a bug which would cause closed connections to be used from the connection pool.  We observed this was a factor after 10 - 12 hours of running.  There is an upcoming change that will incorporate the Netty remediation.  We will update the dependency and remove this note once available.
 
 ### Identity
 
-- intro
-- version
-- examples
+The identity SDK is a core component of this project.  It is via the credentials created using the SDK that the application accesses Key Vault to resolve runtime configuration and secrets.
+
+```xml
+<dependency>
+    <groupId>com.azure</groupId>
+    <artifactId>azure-identity</artifactId>
+    <version>1.1.0-beta.5</version>
+</dependency>
+```
+
+As can be seen in the dependency configuration, this is one of the framewoks that we are using which is in a pre-release ([beta-5](https://azuresdkdocs.blob.core.windows.net/$web/java/azure-identity/1.1.0-beta.5/index.html)) state. This version of the Azure Identity SDK came with the ability for us to create discrete credentials so that we could target Managed Service Identity (MSI) and Azure CLI (CLI).  Additionally, this version would allow for the creation of other identity types such as `IntelliJCredential` and `VSCodeCredential` should you want to support them.
+
+The identiy SDK is used only in the `KeyVaultService` `@Service` class as that is the only place the code actively authenticates presently.
+
+```java
+public KeyVaultService(IEnvironmentReader environmentReader)
+    throws HeliumException {
+
+    if (this.authType.equals(Constants.USE_MSI)) {
+
+        credential = new ManagedIdentityCredentialBuilder().build();
+
+    } else if (this.authType.equals(Constants.USE_CLI)) {
+        credential = new AzureCliCredentialBuilder().build();
+    } else if (this.authType.equals(Constants.USE_MSI_APPSVC)) {
+        try {
+        credential = new ManagedIdentityCredentialBuilder().build();
+        } catch (final Exception ex) {
+        logger.error(ex.getMessage());
+        throw new HeliumException(ex.getMessage());
+        }
+    } else {
+        this.authType = Constants.USE_MSI;
+        credential = new ManagedIdentityCredentialBuilder().build();
+    }
+```
+
+The above code has been abridged, but shows the creation of the credential type in the `KeyVaultService` constructor based on either a command line flag or an environment variable.
+
 
 ### Key Vault
 
