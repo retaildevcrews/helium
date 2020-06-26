@@ -55,7 +55,9 @@ public KeyVaultService(IEnvironmentReader environmentReader)
         credential = new ManagedIdentityCredentialBuilder().build();
 
     } else if (this.authType.equals(Constants.USE_CLI)) {
+
         credential = new AzureCliCredentialBuilder().build();
+
     } else if (this.authType.equals(Constants.USE_MSI_APPSVC)) {
         try {
         credential = new ManagedIdentityCredentialBuilder().build();
@@ -71,15 +73,48 @@ public KeyVaultService(IEnvironmentReader environmentReader)
 
 The above code has been abridged, but shows the creation of the credential type in the `KeyVaultService` constructor based on either a command line flag or an environment variable.
 
-
 ### Key Vault
 
-- intro
-- version
-- examples
-- config cache
-- 
-If you need access to Key Vault in your application, you can retrieve the Key Vault Client from Spring framework's DI rather than have to track credentials and create a new connection.
+The April 2020 version [4.1.2](https://azuresdkdocs.blob.core.windows.net/$web/java/azure-security-keyvault-keys/4.1.2/index.html) of the Azure Key Vault Java SDK is used.  Key Vault + Managed Service Identity are the core enabling technologies in the secure by design pattern that we are advocating.  The only setting that is passed to the application is the name of the Key Vault.  All other endpoints and access secrets are stored as secrets in Key Vault.
+
+The `KeyVaultService` class contains all of the Key Vault access code.  It is marked with an `@Service` attribute so that it may be construced and injected by Spring.  During construction the class creates a credential as illustrated in the Identity section.  After that it creates clients for Secrets, Certificates, and Keys.
+
+```java
+secretAsyncClient = new SecretClientBuilder()
+    .vaultUrl(getKeyVaultUri())
+    .credential(credential)
+    .addPolicy(getKvLogPolicy())
+    .buildAsyncClient();
+
+//build key client
+keyAsyncClient = new KeyClientBuilder()
+    .vaultUrl(getKeyVaultUri())
+    .credential(credential)
+    .buildAsyncClient();
+
+//build certificate client
+certificateAsyncClient = new CertificateClientBuilder()
+    .vaultUrl(getKeyVaultUri())
+    .credential(credential)
+    .buildAsyncClient();
+```
+
+While Certificates and Keys are not used in this implementation the class was built with them completed so that its use could be expanded with little to no modification.
+
+> **Important Note**
+> This version of the KeyVault SDK will log return values in plain text if the log level is set to **BODY_AND_HEADERS**.  For that reason, a custom loggin policy is used. That implementation may be found in the `KeyVaultSecretsLogPolicy` class. That class is responsible for redacting any values that come through the log so that they will not show up in log files or in the terminal window.  Additionally, the mapping of general log setting to the custom policy setting is shown in the following table.
+>
+KV Log Level | Description | App Log Level | Reason
+-- | -- | -- | --
+BASIC | Logs only URLs, HTTP methods, and time to finish the request. | WARN, ERROR, FATAL | Matching decreased information
+BODY | Logs everything in BASIC, plus all the request and response body. Note that only payloads in plain text or plain text encoded in GZIP will be logged. | N/A | Unused as it will show plain text secrets
+BODY_AND_HEADERS | Logs everything in HEADERS and BODY. | TRACE, DEBUG | A custom log policy redacts plain text secrets.
+HEADERS | Logs everything in BASIC, plus all the request and response headers. | INFO | Matching increased amount of information
+NONE | Logging is turned off. | OFF | This level is not currently used
+
+### Configuration Cache
+
+TODO: you are here
 
 ### CosmosDB
 
