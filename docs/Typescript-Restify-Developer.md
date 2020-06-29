@@ -2,20 +2,22 @@
 
 ## Index
 
-1. [Async/Await](#async-await)
-2. [Restify vs. Express](#restify-vs.-express)
-3. [Dependency Injection (DI)](#dependency-injection-(di))
+1. [Async/Await](#asyncawait)
+2. [Restify vs. Express](#restify-vs-express)
+3. [Dependency Injection (DI)](#dependency-injection-di)
 4. [Managed Identity and Key Vault](#managed-identity-and-key-vault)
+    - [Dev Flag](#dev-flag)
 5. [Key Rotation](#key-rotation)
 6. [Cosmos DB](#cosmos-db)
     - [SQL Parameterization](#sql-parameterization)
     - [Partition Key Function](#partition-key-function)
-7. [AKS Pod Identity Support](#aks-pod-identity-support)
-8. [Versioning](#versioning)
-9. [Middleware](#middleware)
+7. [Healthz Response Cache](#healthz-response-cache)
+8. [AKS Pod Identity Support](#aks-pod-identity-support)
+9. [Versioning](#versioning)
+10. [Middleware](#middleware)
     - [Robots](#robots)
     - [Endpoint Logger](#endpoint-logger)
-10. [Logging](#logging)
+11. [Logging](#logging)
 
 ## Async/Await
 
@@ -27,7 +29,7 @@ Restify is written specifically for maintainable and observable REST API's, wher
 
 ## Dependency Injection (DI)
 
-Helium uses inversify to implement DI. To do this, we create an inversify Container and map, or bind, interfaces with concrete classes. Note that some classes are bound in Singleton Scope, this allows for the same instance of the class to be injected, which we want for our LogService, DataService, and TelemetryService.
+Helium uses inversify to implement DI. To do this, we create an inversify Container and map, or bind, interfaces with concrete classes. Note that some classes are bound in Singleton Scope, this allows for the same instance of the class to be injected, which we want for our LogService, NodeCache, DataService, and TelemetryService.
 
 [server.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/server.ts)
 
@@ -39,11 +41,13 @@ Helium uses inversify to implement DI. To do this, we create an inversify Contai
     container.bind<LogService>("LogService").to(BunyanLogService).inSingletonScope();
     const logService = container.get<LogService>("LogService");
 
-    // parse command line arguments to get the key vault url and auth type
+    // parse command line arguments to get the Key Vault url and auth type
     const consoleController = new ConsoleController(logService);
     const config = await consoleController.run();
+    const healthzCache = new NodeCache();
 
     // setup ioc container
+    container.bind<NodeCache>("NodeCache").toConstantValue(healthzCache);
     container.bind<ConfigValues>("ConfigValues").toConstantValue(config);
     container.bind<interfaces.Controller>(TYPE.Controller).to(ActorController).whenTargetNamed("ActorController");
     container.bind<interfaces.Controller>(TYPE.Controller).to(FeaturedController).whenTargetNamed("FeaturedController");
@@ -66,7 +70,7 @@ export class CosmosDBService implements DataService {
 
 To use the injected object, use the get method. Continuing the Cosmos DB example, below shows the container resolving the DataService dependency when attempting to set up the Cosmos DB connection.
 
-[server.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/server.ts)
+[server.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/server.ts#L42)
 
 ```typescript
 
@@ -83,7 +87,7 @@ To use the injected object, use the get method. Continuing the Cosmos DB example
 
 After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code.  For the local development scenario, we use a different credential specifically for Azure CLI credentials.  This works as long as the developer has access to the Key Vault and is logged in to the Azure CLI with az login. The authentication type can be specified as an environment variable or command line argument, defaulting to MSI.
 
-Currently, we use a different package for MSI credentials and CLI credentials, this will be consolidated with the upcoming May 2020 release of @azure/identity when they plan to add CLI credentials as an option *without* the built in default to fall back on environment variable credentials.
+Currently, we use a different package for MSI credentials and CLI credentials, this will be consolidated with the next release of @azure/identity when they plan to add CLI credentials as an option *without* the built in default to fall back on environment variable credentials.
 
 [KeyVaultService.ts](https://github.com/RetailDevCrews/helium-typescript/blob/master/src/services/KeyVaultService.ts#L36)
 
@@ -98,6 +102,16 @@ this.client = new SecretClient(this.url, creds);
 
 // test getSecret to validate successful Key Vault connection
 await this.getSecret(cosmosUrl);
+
+```
+
+### Dev Flag
+
+To enforce MSI in production, the --dev flag is required as a command line argument in order to use CLI credentials to authenticate. There is no environment variable option for this arg, as there is with --keyvault-name (KEYVAULT_NAME), for instance. Ideally, conditionaly compilation would have been used as with the C# version. However, typescript does not currently support this feature.
+
+```bash
+
+npm start -- --keyvault-name $He_Name --auth-type CLI --dev
 
 ```
 
@@ -153,9 +167,9 @@ In order to directly read a document using 1 RU (assuming the document is 1K or 
 
 ```typescript
 
-/* Compute the partition key based on the movieId or actorId
-    * For this sample, the partition key is mod 10 of the numeric portion of the id
-    * Returns "0" by default */
+// compute the partition key based on the movieId or actorId
+// for this sample, the partition key is mod 10 of the numeric portion of the id
+// returns "0" by default
 public static getPartitionKey(id: string): string {
     let idInt = 0;
 
@@ -165,6 +179,24 @@ public static getPartitionKey(id: string): string {
     }
 
     return idInt.toString();
+}
+
+```
+
+## Healthz Response Cache
+
+Helium's health check generates 5 separate queries and is an expensive request. To help prevent a DoS attack on the /healthz and /healthz/ietf endpoints which run the health check, the response is cached for 60 seconds using node-cache. See [Dependency Injection (DI)](#dependency-injection-di) for the creation of the cache. See the code below for its usage in the /healthz/ietf endpoint.
+
+[HealthzController](https://github.com/retaildevcrews/helium-typescript/blob/master/src/controllers/HealthzController.ts#L54)
+
+```typescript
+
+const cachedValue = this.cache.get("healthz");
+if (cachedValue != undefined) {
+    healthCheckResult = cachedValue;
+} else {
+    healthCheckResult = await this.runHealthChecks();
+    this.cache.set("healthz", healthCheckResult, 60);
 }
 
 ```
@@ -204,7 +236,7 @@ public async connect() {
         } catch (e) {
             retries++;
             if (this.authType === "MSI" && retries < MAX_RETRIES) {
-                this.logger.trace("KeyVault: Retry");
+                this.logger.info("Key Vault: Retry");
                 // wait 1 second and retry (continue while loop)
                 await new Promise(resolve => setTimeout(resolve, 1000));
             } else {
@@ -253,6 +285,6 @@ Code: [EndpointLogger.ts](https://github.com/retaildevcrews/helium-typescript/bl
 
 ## Logging
 
-Helium uses the Bunyan log service. Bunyan supports 6 logging levels, Helium currently implements 4: trace (10), info (30), warn (40), and error (50). The stream logging level definition determines which logs are output to the stream. For instance, if the stream logging level is set to warn, only warn logs and higher (error) will be logged. The default stream logging level is info (30), this can be changed via command line (-l argument) or environment variable (LOG_LEVEL).
+Helium uses the Bunyan log service. Bunyan supports 6 logging levels, Helium currently implements 4: trace (10), info (30), warn (40), and error (50). The stream logging level definition determines which logs are output to the stream. For instance, if the stream logging level is set to warn, only warn logs and higher (error) will be logged. The default stream logging level is info (30), this can be changed via command line (--log-level argument) or environment variable (LOG_LEVEL).
 
 Code: [BunyanLogService.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/services/BunyanLogService.ts)
