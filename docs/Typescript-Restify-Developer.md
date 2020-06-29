@@ -7,17 +7,16 @@
 3. [Dependency Injection (DI)](#dependency-injection-di)
 4. [Managed Identity and Key Vault](#managed-identity-and-key-vault)
     - [Dev Flag](#dev-flag)
-5. [Key Rotation](#key-rotation)
-6. [Cosmos DB](#cosmos-db)
+5. [Cosmos DB](#cosmos-db)
     - [SQL Parameterization](#sql-parameterization)
     - [Partition Key Function](#partition-key-function)
-7. [Healthz Response Cache](#healthz-response-cache)
-8. [AKS Pod Identity Support](#aks-pod-identity-support)
-9. [Versioning](#versioning)
-10. [Middleware](#middleware)
+6. [Healthz Response Cache](#healthz-response-cache)
+7. [AKS Pod Identity Support](#aks-pod-identity-support)
+8. [Versioning](#versioning)
+9. [Middleware](#middleware)
     - [Robots](#robots)
     - [Endpoint Logger](#endpoint-logger)
-11. [Logging](#logging)
+10. [Logging](#logging)
 
 ## Async/Await
 
@@ -114,10 +113,6 @@ To enforce MSI in production, the --dev flag is required as a command line argum
 npm start -- --keyvault-name $He_Name --auth-type CLI --dev
 
 ```
-
-## Key Rotation
-
-Not yet implemented: <https://github.com/retaildevcrews/helium-typescript/issues/5>
 
 ## Cosmos DB
 
