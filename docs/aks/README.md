@@ -474,6 +474,11 @@ helm install helium-aks helium --set image.repository=<acr_name>.azurecr.io -f h
 # curl the health check endpoint
 curl ${INGRESS_PIP}.nip.io/healthz
 
+# NOTE: Currently there is an issue where the app does not start as expected
+# Logs from the linkerd-proxy container show the following error (repeatedly):
+# ERR! [    34.403788s] linkerd2_proxy::app::errors unexpected error: error trying to connect: Connection refused (os error 111) (address: 127.0.0.1:4120)
+# Additional investigation is needed to fix this bug
+
 ```
 
 ## Dashboard setup
