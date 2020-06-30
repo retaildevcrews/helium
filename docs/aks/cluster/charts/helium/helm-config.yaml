@@ -7,6 +7,7 @@ labels:
 image:
   repository: retaildevcrew #The specific acr created for this environment
   name: helium-csharp # The name of the image for the helium-csharp repo
+  tag: stable
 
 annotations:
   linkerd.io/inject: enabled # Allows for the application to be injected into the Service Mesh
