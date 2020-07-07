@@ -155,9 +155,6 @@ export He_Location=centralus
 # set the subscription
 export He_Sub='az account show -o tsv --query id'
 
-### TODO - should we create a separate RG for webv or use the app RG?
-### bartr - I vote for using the app-rg for simplicity
-
 # set resource group names
 export Imdb_Name=$He_Name
 export He_ACR_RG=${He_Name}-rg-acr
@@ -247,8 +244,6 @@ az keyvault secret set -o tsv --query name --vault-name $He_Name --name "AppInsi
 # save the env variable - use eval $He_AppInsights_Key
 export He_AppInsights_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name AppInsightsKey'
 
-### TODO - create webv app insights here or as part of webv setup?
-
 # save the environment variables
 ./saveenv.sh -y
 
@@ -316,12 +311,33 @@ az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $H
 
 ## Smoke test setup
 
-- TODO
-  - not sure what we want to call this
-  - do we create the RG / App Insights here or earlier?
-    - I vote for earlier as I think it's easier to understand
-  - create ACI webv instance
-    - should we create in 4 regions?
+```bash
+
+# Create App Insights
+az monitor app-insights component create -g $He_App_RG -l $He_Location -a ${He_Name}-webv -o table
+
+# save the env variable - use eval $He_WebV_AppInsights_Key
+export He_WebV_AppInsights_Key='az monitor app-insights component show -g $He_App_RG -a ${He_Name}-webv --query instrumentationKey -o tsv'
+
+# Create ACI
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:beta -o tsv --query name \
+-n ${He_Name}-webv-${He_Location} -l $He_Location \
+ --command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --summary-minutes 5"
+
+# Optionally create in three different regions
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:beta -o tsv --query name \
+-n ${He_Name}-webv-eastus2 -l eastus2 \
+ --command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --summary-minutes 5"
+
+ az container create -g $He_App_RG --image retaildevcrew/webvalidate:beta -o tsv --query name \
+-n ${He_Name}-webv-westeurope -l westeurope \
+ --command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --summary-minutes 5"
+
+ az container create -g $He_App_RG --image retaildevcrew/webvalidate:beta -o tsv --query name \
+-n ${He_Name}-webv-southeastasia -l southeastasia \
+ --command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --summary-minutes 5"
+
+```
 
 ## Dashboard setup
 
@@ -376,3 +392,4 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments
+
