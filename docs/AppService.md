@@ -37,11 +37,8 @@ az webapp log config --docker-container-logging filesystem -g $He_App_RG -n $He_
 ./saveenv.sh -y
 
 ### App Service cannot currently use Managed Identity to access ACR
-### We pull the Service Principal ID and Key from Key Vault via
+### We pull the previously created Service Principal ID and Key from Key Vault via
 ### the @Microsoft.KeyVault() format used in -u and -p below
-
-# assign acrpull access to Service Principal
-az role assignment create --assignee $(eval $He_SP_ID) --scope $He_ACR_Id --role acrpull
 
 # configure the Web App to use Container Registry
 az webapp config container set -n $He_Name -g $He_App_RG \
