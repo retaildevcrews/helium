@@ -12,10 +12,10 @@
 3. [Cosmos DB](#cosmos-db)
     - [Spring Repository Pattern](#spring-repository-pattern)
     - [Partition Key Function](#partition-key-usage-in-spring)
-4. [AKS Pod Identity Support](#aks-pod-identity-support)
+3. [AKS Pod Identity Support](#aks-pod-identity-support)
     - Work in progress
-5. [Versioning](#versioning)
-6. [Application Insights](#application-insights)
+4. [Versioning](#versioning)
+5. [Application Insights](#application-insights)
 
 ## Frameworks and SDKs
 
@@ -214,10 +214,6 @@ public class Application implements CommandLineRunner {
 }
 
 ```
-
-## Key Rotation
-
-- Work in progress
 
 ## Cosmos DB
 

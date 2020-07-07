@@ -267,14 +267,8 @@ az acr login -n $He_Name
 
 # if you get an error that the login server isn't available, it's a DNS issue that will resolve in a minute or two, just retry
 
-# Pull the image from the repo
-docker pull retaildevcrew/$He_Repo:stable
-
-# tag the image
-docker tag retaildevcrew/$He_Repo:stable $He_Name.azurecr.io/${He_Repo}:latest
-
-# push the image to ACR
-docker push $He_Name.azurecr.io/${He_Repo}:latest
+# import the helium image
+az acr import -n $He_Name --source docker.io/retaildevcrew/$He_Repo:stable --image $He_Repo:latest
 
 ```
 
