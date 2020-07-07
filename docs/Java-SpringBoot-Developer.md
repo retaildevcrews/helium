@@ -114,7 +114,12 @@ NONE | Logging is turned off. | OFF | This level is not currently used
 
 ### Configuration Cache
 
-TODO: you are here
+A `ConfigurationService` class has been defined within the project.  This class uses the `KeyVaultService` to retrieve all of the values from Key Vault needed to access data.  This information is fetched and cached at start-up.  Additionally, the `ConfigurationService` is injected into the `CosmosDbConfig` so that location and credentials for the CosmosDB configuration may be accessed.
+
+> **NOTE on Key Rotation**
+> Key rotation will need to be implemented in this class to ensure that it repopulates the cache.  Additionally, it will need to trigger clearing any constructed versions of the Data Access Classes as they will need to use the update configuration values.
+
+
 
 ### CosmosDB
 
