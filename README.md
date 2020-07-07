@@ -13,6 +13,7 @@ This is a Web API reference application designed to "fork and code" with the fol
 - Securely build and deploy the Docker container from Azure Container Registry (ACR) or Azure DevOps
 - Connect to and query Cosmos DB
 - Automatically send telemetry and logs to Azure Monitor
+- TODO - should we put a bullet about smoker?
 
 ![alt text](./docs/images/architecture.jpg "Architecture Diagram")
 
@@ -154,6 +155,9 @@ export He_Location=centralus
 # set the subscription
 export He_Sub='az account show -o tsv --query id'
 
+### TODO - should we create a separate RG for webv or use the app RG?
+### bartr - I vote for using the app-rg for simplicity
+
 # set resource group names
 export Imdb_Name=$He_Name
 export He_ACR_RG=${He_Name}-rg-acr
@@ -243,6 +247,8 @@ az keyvault secret set -o tsv --query name --vault-name $He_Name --name "AppInsi
 # save the env variable - use eval $He_AppInsights_Key
 export He_AppInsights_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name AppInsightsKey'
 
+### TODO - create webv app insights here or as part of webv setup?
+
 # save the environment variables
 ./saveenv.sh -y
 
@@ -307,6 +313,15 @@ az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $H
 
 - Instructions for [App Service](docs/AppService.md)
 - Instructions for [AKS](docs/aks/README.md#L233)
+
+## Smoke test setup
+
+- TODO
+  - not sure what we want to call this
+  - do we create the RG / App Insights here or earlier?
+    - I vote for earlier as I think it's easier to understand
+  - create ACI webv instance
+    - should we create in 4 regions?
 
 ## Dashboard setup
 
