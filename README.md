@@ -13,7 +13,7 @@ This is a Web API reference application designed to "fork and code" with the fol
 - Securely build and deploy the Docker container from Azure Container Registry (ACR) or Azure DevOps
 - Connect to and query Cosmos DB
 - Automatically send telemetry and logs to Azure Monitor
-- TODO - should we put a bullet about smoker?
+- Deliver observability best practices via dashboards, alerting and availability tests
 
 ![alt text](./docs/images/architecture.jpg "Architecture Diagram")
 
@@ -311,20 +311,25 @@ az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $H
 
 ## Smoke test setup
 
+Deploy [web validate](https://github.com/retaildevcrews/webvalidate) to drive consistent traffic to the App Service for monitoring and alerting.
+
+> For production deployments, you likely want to set --summary-minutes to 30 or 60
+
 ```bash
 
-# Create App Insights
+# create App Insights for the webv clients
 az monitor app-insights component create -g $He_App_RG -l $He_Location -a ${He_Name}-webv -o table
 
-# save the env variable - use eval $He_WebV_AppInsights_Key
+# get the key
 export He_WebV_AppInsights_Key='az monitor app-insights component show -g $He_App_RG -a ${He_Name}-webv --query instrumentationKey -o tsv'
+./saveenv.sh -y
 
-# Create ACI
+# create Azure Container Instance running webv
 az container create -g $He_App_RG --image retaildevcrew/webvalidate:beta -o tsv --query name \
 -n ${He_Name}-webv-${He_Location} -l $He_Location \
  --command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --summary-minutes 5"
 
-# Optionally create in three different regions
+# create in additional regions (optional)
 az container create -g $He_App_RG --image retaildevcrew/webvalidate:beta -o tsv --query name \
 -n ${He_Name}-webv-eastus2 -l eastus2 \
  --command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --summary-minutes 5"
@@ -347,9 +352,9 @@ after making sure the proper environment variables are set (He_Sub, He_App_RG, I
 ```bash
 
 ### TODO - this won't work since the instructions clone the language repo, not the helium repo
-### One option is to make dashboard setup a separate md file and include instructions for cloning
-###   the helium repo
+### One option is to make dashboard setup a separate md file and include instructions for cloning the helium repo
 ### Another option is to add the dashboard files to each of the language repos
+### Another option is to curl the files from helium <- I like this option best
 
 cd docs/dashboard
 sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json && \
@@ -392,4 +397,3 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments
-
