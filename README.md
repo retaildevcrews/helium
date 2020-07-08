@@ -317,13 +317,6 @@ Deploy [web validate](https://github.com/retaildevcrews/webvalidate) to drive co
 
 ```bash
 
-# create App Insights for the webv clients
-az monitor app-insights component create -g $He_App_RG -l $He_Location -a ${He_Name}-webv -o table
-
-# get the key
-export He_WebV_AppInsights_Key='az monitor app-insights component show -g $He_App_RG -a ${He_Name}-webv --query instrumentationKey -o tsv'
-./saveenv.sh -y
-
 # create Azure Container Instance running webv
 az container create -g $He_App_RG --image retaildevcrew/webvalidate:beta -o tsv --query name \
 -n ${He_Name}-webv-${He_Location} -l $He_Location \
