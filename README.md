@@ -278,8 +278,8 @@ az acr import -n $He_Name --source docker.io/retaildevcrew/$He_Repo:stable --ima
 
 ```bash
 
-# create a Service Principal and add password to Key Vault
-az keyvault secret set -o table --vault-name $He_Name --name "AcrPassword" --value $(az ad sp create-for-rbac -n http://${He_Name}-acr-sp --query password -o tsv)
+# create a Service Principal scoped to the ACR with the acrpull role and add password to Key Vault
+az keyvault secret set -o table --vault-name $He_Name --name "AcrPassword" --value $(az ad sp create-for-rbac -n http://${He_Name}-acr-sp --scope $He_ACR_Id --role acrpull --query password -o tsv)
 
 # add Service Principal ID to Key Vault
 az keyvault secret set -o table --vault-name $He_Name --name "AcrUserId" --value $(az ad sp show --id http://${He_Name}-acr-sp --query appId -o tsv)
@@ -294,9 +294,6 @@ export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "Ac
 
 # get the Container Registry Id
 export He_ACR_Id=$(az acr show -n $He_Name -g $He_ACR_RG --query "id" -o tsv)
-
-# assign acrpull access to the Service Principal
-az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $He_SP_ID)
 
 # save the environment variables
 ./saveenv.sh -y
