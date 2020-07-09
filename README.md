@@ -321,16 +321,9 @@ az extension add -n log-analytics
 # create Log Analytics for the webv clients
 az monitor log-analytics workspace create -g $He_App_RG -l $He_Location -n $He_Name -o table
 
-# retrieve the Log Analytics ID
-export He_LogAnalyticsId=$(az monitor log-analytics workspace show -g $He_App_RG -n $He_Name --query customerId -o tsv)
-
-# add Log Analytics Keys to Key Vault (TODO: should secondary keys be added?)
-az keyvault secret set -o tsv --query name --vault-name $He_Name --name "LogAnalyticsPrimaryKey" --value $(az monitor log-analytics workspace get-shared-keys -g $He_App_RG -n $He_Name --query primarySharedKey -o tsv)
-az keyvault secret set -o tsv --query name --vault-name $He_Name --name "LogAnalyticsSecondaryKey" --value $(az monitor log-analytics workspace get-shared-keys -g $He_App_RG -n $He_Name --query secondarySharedKey -o tsv)
-
-# get the values
-export He_LogAnalytics_Primary_Key=$(az keyvault secret show -o tsv --query value --vault-name $He_Name --name LogAnalyticsPrimaryKey)
-export He_LogAnalytics_Secondary_Key=$(az keyvault secret show -o tsv --query value --vault-name $He_Name --name LogAnalyticsSecondaryKey)
+# retrieve the Log Analytics values using eval $He_LogAnalytics_*
+export He_LogAnalytics_Id='az monitor log-analytics workspace show -g $He_App_RG -n $He_Name --query customerId -o tsv'
+export He_LogAnalytics_Key='az monitor log-analytics workspace get-shared-keys -g $He_App_RG -n $He_Name --query primarySharedKey -o tsv'
 
 # save the environment variables
 ./saveenv.sh -y
@@ -338,28 +331,28 @@ export He_LogAnalytics_Secondary_Key=$(az keyvault secret show -o tsv --query va
 # create Azure Container Instance running webv
 az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-${He_Location} -l $He_Location \
---log-analytics-workspace $He_LogAnalyticsId --log-analytics-workspace-key $He_LogAnalytics_Primary_Key \
+--log-analytics-workspace $He_LogAnalytics_Id --log-analytics-workspace-key $He_LogAnalytics_Key \
  --command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
 # create in additional regions (optional)
 az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-eastus2 -l eastus2 \
---log-analytics-workspace $He_LogAnalyticsId --log-analytics-workspace-key $He_LogAnalytics_Primary_Key \
+--log-analytics-workspace $He_LogAnalytics_Id --log-analytics-workspace-key $He_LogAnalytics_Key \
  --command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
  az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-westeurope -l westeurope \
---log-analytics-workspace $He_LogAnalyticsId --log-analytics-workspace-key $He_LogAnalytics_Primary_Key \
+--log-analytics-workspace $He_LogAnalytics_Id --log-analytics-workspace-key $He_LogAnalytics_Key \
  --command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
  az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-southeastasia -l southeastasia \
---log-analytics-workspace $He_LogAnalyticsId --log-analytics-workspace-key $He_LogAnalytics_Primary_Key \
+--log-analytics-workspace $He_LogAnalytics_Id --log-analytics-workspace-key $He_LogAnalytics_Key \
  --command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
 # Query logs in Log Analytics (takes several minutes after ACI creation to see logs)
 # TODO: add more query examples?
-az monitor log-analytics query -w $He_LogAnalyticsId \
+az monitor log-analytics query -w $He_LogAnalytics_Id \
 --analytics-query "ContainerInstanceLog_CL | sort by TimeGenerated asc "
 
 ```
