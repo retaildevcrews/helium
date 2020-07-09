@@ -13,6 +13,7 @@ This is a Web API reference application designed to "fork and code" with the fol
 - Securely build and deploy the Docker container from Azure Container Registry (ACR) or Azure DevOps
 - Connect to and query Cosmos DB
 - Automatically send telemetry and logs to Azure Monitor
+- Deliver observability best practices via dashboards, alerting and availability tests
 
 ![alt text](./docs/images/architecture.jpg "Architecture Diagram")
 
@@ -305,6 +306,54 @@ export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "Ac
 - Instructions for [App Service](docs/AppService.md)
 - Instructions for [AKS](docs/aks/README.md#L233)
 
+## Smoke test setup
+
+Deploy [web validate](https://github.com/retaildevcrews/webvalidate) to drive consistent traffic to the App Service for monitoring and alerting.
+
+```bash
+
+# Add Log Analytics extension
+az extension add -n log-analytics
+
+# create Log Analytics for the webv clients
+az monitor log-analytics workspace create -g $He_App_RG -l $He_Location -n $He_Name -o table
+
+# retrieve the Log Analytics values using eval $He_LogAnalytics_*
+export He_LogAnalytics_Id='az monitor log-analytics workspace show -g $He_App_RG -n $He_Name --query customerId -o tsv'
+export He_LogAnalytics_Key='az monitor log-analytics workspace get-shared-keys -g $He_App_RG -n $He_Name --query primarySharedKey -o tsv'
+
+# save the environment variables
+./saveenv.sh -y
+
+# create Azure Container Instance running webv
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+-n ${He_Name}-webv-${He_Location} -l $He_Location \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
+ --command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+
+# create in additional regions (optional)
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+-n ${He_Name}-webv-eastus2 -l eastus2 \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
+ --command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+
+ az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+-n ${He_Name}-webv-westeurope -l westeurope \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
+ --command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+
+ az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+-n ${He_Name}-webv-southeastasia -l southeastasia \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
+ --command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+
+# Query logs in Log Analytics (takes several minutes after ACI creation to see logs)
+# TODO: add more query examples?
+az monitor log-analytics query -w $He_LogAnalytics_Id \
+--analytics-query "ContainerInstanceLog_CL | sort by TimeGenerated asc "
+
+```
+
 ## Dashboard setup
 
 Replace the values in the `Helium_Dashboard.json` file surrounded by `%%` with the proper environment variables
@@ -313,9 +362,9 @@ after making sure the proper environment variables are set (He_Sub, He_App_RG, I
 ```bash
 
 ### TODO - this won't work since the instructions clone the language repo, not the helium repo
-### One option is to make dashboard setup a separate md file and include instructions for cloning
-###   the helium repo
+### One option is to make dashboard setup a separate md file and include instructions for cloning the helium repo
 ### Another option is to add the dashboard files to each of the language repos
+### Another option is to curl the files from helium <- I like this option best
 
 cd docs/dashboard
 sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json && \
