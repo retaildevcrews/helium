@@ -313,8 +313,6 @@ az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $H
 
 Deploy [web validate](https://github.com/retaildevcrews/webvalidate) to drive consistent traffic to the App Service for monitoring and alerting.
 
-> For production deployments, you likely want to set --summary-minutes to 30 or 60
-
 ```bash
 
 # Add Log Analytics extension
@@ -337,28 +335,27 @@ export He_LogAnalytics_Secondary_Key=$(az keyvault secret show -o tsv --query va
 # save the environment variables
 ./saveenv.sh -y
 
-
 # create Azure Container Instance running webv
-az container create -g $He_App_RG --image retaildevcrew/webvalidate:beta -o tsv --query name \
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-${He_Location} -l $He_Location \
 --log-analytics-workspace $He_LogAnalyticsId --log-analytics-workspace-key $He_LogAnalytics_Primary_Key \
- --command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --summary-minutes 5"
+ --command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
 # create in additional regions (optional)
-az container create -g $He_App_RG --image retaildevcrew/webvalidate:beta -o tsv --query name \
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-eastus2 -l eastus2 \
 --log-analytics-workspace $He_LogAnalyticsId --log-analytics-workspace-key $He_LogAnalytics_Primary_Key \
- --command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --summary-minutes 5"
+ --command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
- az container create -g $He_App_RG --image retaildevcrew/webvalidate:beta -o tsv --query name \
+ az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-westeurope -l westeurope \
 --log-analytics-workspace $He_LogAnalyticsId --log-analytics-workspace-key $He_LogAnalytics_Primary_Key \
- --command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --summary-minutes 5"
+ --command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
- az container create -g $He_App_RG --image retaildevcrew/webvalidate:beta -o tsv --query name \
+ az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-southeastasia -l southeastasia \
 --log-analytics-workspace $He_LogAnalyticsId --log-analytics-workspace-key $He_LogAnalytics_Primary_Key \
- --command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --summary-minutes 5"
+ --command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
 # Query logs in Log Analytics (takes several minutes after ACI creation to see logs)
 # TODO: add more query examples?
