@@ -331,23 +331,23 @@ export He_LogAnalytics_Key='az monitor log-analytics workspace get-shared-keys -
 # create Azure Container Instance running webv
 az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-${He_Location} -l $He_Location \
---log-analytics-workspace $He_LogAnalytics_Id --log-analytics-workspace-key $He_LogAnalytics_Key \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
  --command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
 # create in additional regions (optional)
 az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-eastus2 -l eastus2 \
---log-analytics-workspace $He_LogAnalytics_Id --log-analytics-workspace-key $He_LogAnalytics_Key \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
  --command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
  az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-westeurope -l westeurope \
---log-analytics-workspace $He_LogAnalytics_Id --log-analytics-workspace-key $He_LogAnalytics_Key \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
  --command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
  az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-southeastasia -l southeastasia \
---log-analytics-workspace $He_LogAnalytics_Id --log-analytics-workspace-key $He_LogAnalytics_Key \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
  --command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
 # Query logs in Log Analytics (takes several minutes after ACI creation to see logs)
