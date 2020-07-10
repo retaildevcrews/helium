@@ -329,23 +329,23 @@ export He_LogAnalytics_Key='az monitor log-analytics workspace get-shared-keys -
 az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-${He_Location} -l $He_Location \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
- --command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
 # create in additional regions (optional)
 az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-eastus2 -l eastus2 \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
- --command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
- az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-westeurope -l westeurope \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
- --command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
- az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-southeastasia -l southeastasia \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
- --command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
 # Query logs in Log Analytics (takes several minutes after ACI creation to see logs)
 # TODO: add more query examples?
@@ -361,23 +361,18 @@ after making sure the proper environment variables are set (He_Sub, He_App_RG, I
 
 ```bash
 
-### TODO - this won't work since the instructions clone the language repo, not the helium repo
-### One option is to make dashboard setup a separate md file and include instructions for cloning the helium repo
-### Another option is to add the dashboard files to each of the language repos
-### Another option is to curl the files from helium <- I like this option best
-
-cd docs/dashboard
-sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json && \
-sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json && \
-sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json && \
-sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json && \
+curl -s https://raw.githubusercontent.com/retaildevcrews/helium/master/docs/dashboard/Helium_Dashboard.json > Helium_Dashboard.json
+sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json
+sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json
+sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json
+sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json
 sed -i "s/%%He_Repo%%/${He_Name}/g" Helium_Dashboard.json
 
 ```
 
-Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file with your correct subscription GUID, resource group names, and app insights name.
+Navigate to the ([dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file that you have created.
 
-For more documentation on creating and sharing Dashboards, see ([here](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards)).
+Refer to the [documentation](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards) for more information on creating and sharing dashboards.
 
 ## Team Development
 
