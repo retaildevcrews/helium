@@ -370,9 +370,9 @@ sed -i "s/%%He_Repo%%/${He_Name}/g" Helium_Dashboard.json
 
 ```
 
-Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file with your correct subscription GUID, resource group names, and App Insights name.
+Navigate to the ([dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file that you have created.
 
-For more documentation on creating and sharing Dashboards, see ([here](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards)).
+Refer to the [documentation](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards) for more information on creating and sharing dashboards.
 
 ## Team Development
 
