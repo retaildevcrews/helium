@@ -191,7 +191,8 @@ source ~/.helium.env
 ```bash
 
 ## create the Key Vault
-az keyvault create -g $He_App_RG -n $He_Name
+## do not disable soft-delete in production!
+az keyvault create --enable-soft-delete false -g $He_App_RG -n $He_Name
 
 ```
 
