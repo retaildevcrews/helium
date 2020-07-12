@@ -372,7 +372,11 @@ sed -i "s/%%He_Repo%%/${He_Name}/g" Helium_Dashboard.json
 
 Navigate to the ([dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file that you have created.
 
-Refer to the [documentation](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards) for more information on creating and sharing dashboards.
+## Example Dashboard
+
+![alt text](./docs/images/dashboard.jpg "Helium Example Dashboard")
+
+More [information](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards) on creating and sharing dashboards.
 
 ## Team Development
 
