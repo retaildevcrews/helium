@@ -21,9 +21,9 @@ Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally
 ### Prerequisites
 
 - Azure subscription with permissions to create:
-  - Resource Groups, Service Principals, Keyvault, Cosmos DB, App Service, Azure Container Registry, Azure Monitor
+  - Resource Groups, Service Principals, Keyvault, Cosmos DB, AKS, Azure Container Registry, Azure Monitor
 - Bash shell (tested on Mac, Ubuntu, Windows with WSL2)
-  - Will not work in Cloud Shell unless you have a remote dockerd
+  - Will not work in Cloud Shell or WSL1
 - Azure CLI ([download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest))
 - Docker CLI ([download](https://docs.docker.com/install/))
 - Visual Studio Code (optional) ([download](https://code.visualstudio.com/download))
@@ -56,7 +56,7 @@ export REPO_ROOT=$(pwd)
 
 ```
 
-Login to Azure and select subscription
+#### Login to Azure and select subscription
 
 ```bash
 
@@ -68,29 +68,11 @@ az account list -o table
 # select the Azure account
 az account set -s {subscription name or Id}
 
-# save the subscriptionID as a variable
-export He_Sub=$(az account show --query id -o tsv)
-
-```
-
-Save your environment variables for ease of reuse and picking up where you left off.
-
-```bash
-
-# run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/${He_Name}.env
-# make sure you are in the root of the repo
-cd $REPO_ROOT
-./saveenv.sh
-
-# at any point if your terminal environment gets cleared, you can source the file
-# you only need to remember the name of the env file (or set the $He_Name variable again)
-source ~/{yoursameuniquename}.env
-
 ```
 
 This demo will create resource groups, a Cosmos DB instance, Key Vault, Azure Container Registry, and Azure App Service.
 
-Choose a unique name for DNS and resource name prefix.
+#### Choose a unique DNS name
 
 ```bash
 
@@ -98,7 +80,7 @@ Choose a unique name for DNS and resource name prefix.
 # do not include punctuation - only use a-z and 0-9
 # must be at least 5 characters long
 # must start with a-z (only lowercase)
-export He_Name="youruniquename"
+export He_Name=[your unique name]
 
 ### if true, change He_Name
 az cosmosdb check-name-exists -n ${He_Name}
@@ -109,117 +91,128 @@ nslookup ${He_Name}.azurecr.io
 
 ```
 
-Create Resource Groups
+#### Create Resource Groups
 
-- When experimenting with this sample, you should create new resource groups to avoid accidentally deleting resources
-
-  - If you use an existing resource group, please make sure to apply resource locks to avoid accidentally deleting resources
+> When experimenting with this sample, you should create new resource groups to avoid accidentally deleting resources
+>
+> If you use an existing resource group, please make sure to apply resource locks to avoid accidentally deleting resources
 
 - You will create 3 resource groups
   - One for ACR
   - One for App Service or AKS, Key Vault and Azure Monitor
-  - One for Cosmos DB (see create and load sample data to Cosmos DB step)
+  - One for Cosmos DB
 
 ```bash
 
 # set location
 export He_Location=centralus
 
+# set the subscription
+export He_Sub=$(az account show --query id -o tsv)
+
 # resource group names
+export Imdb_Name=$He_Name
 export He_ACR_RG=${He_Name}-rg-acr
 export He_App_RG=${He_Name}-rg-app
+export Imdb_RG=${Imdb_Name}-rg-cosmos
+
+# export Cosmos DB env vars
+# these will be explained in the Cosmos DB setup step
+export Imdb_Location=$He_Location
+export Imdb_DB=imdb
+export Imdb_Col=movies
+export Imdb_RW_Key='az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query primaryMasterKey -o tsv'
 
 # create the resource groups
 az group create -n $He_App_RG -l $He_Location
 az group create -n $He_ACR_RG -l $He_Location
+az group create -n $Imdb_RG -l $Imdb_Location
 
-```
-
-Save your environment variables for ease of reuse and picking up where you left off.
-
-```bash
-
-# run the saveenv.sh script at any time to save He_* variables to ~/${He_Name}.env
+# run the saveenv.sh script at any time to save He_* variables to ~/.helium.env
 # make sure you are in the root of the repo
 cd $REPO_ROOT
 ./saveenv.sh
 
-# at any point if your terminal environment gets cleared, you can source the file
-# you only need to remember the name of the env file (or set the $He_Name variable again)
-source ~/{yoursameuniquename}.env
-
-```
-
-Create and load sample data into Cosmos DB
-
-- This takes several minutes to run
-- This reference app is designed to use a simple dataset from IMDb of 1300 movies and their associated actors and genres
-- Follow the guidance in the [IMDb Repo](https://github.com/retaildevcrews/imdb) to create a Cosmos DB server (SQL API), a database, and a collection and then load the IMDb data. The repo readme also provides an explanation of the data model design decisions.
-- Recommendation is to set $Imdb_Name the same value as $He_Name
-
-```bash
-
-# Run saveenv.sh to save the Imdb variables
-./saveenv.sh
-
-# Verify the output of the script shows the newly created Imdb_* variables
-
-```
-
-Get the Cosmos DB read only key used by App Service
-
-```bash
-
-export Imdb_Cosmos_RO_Key=$(az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query primaryMasterKey -o tsv)
+# if your terminal environment gets cleared, you can source the file to reload the environment variables
+source ~/.helium.env
 
 ```
 
 Create Azure Key Vault
 
 - All secrets are stored in Azure Key Vault for security
-  - This sample uses Managed Identity to access Key Vault
+  - Helium uses Managed Identity to access Key Vault in production
 
 ```bash
 
-## create the Key Vault and add secrets
+## create the Key Vault
 az keyvault create -g $He_App_RG -n $He_Name
-
-# add Cosmos DB keys
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosUrl" --value https://${Imdb_Name}.documents.azure.com:443/
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosKey" --value $Imdb_Cosmos_RO_Key
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosDatabase" --value $Imdb_DB
-az keyvault secret set -o table --vault-name $He_Name --name "CosmosCollection" --value $Imdb_Col
 
 ```
 
-Setup Container Registry
+#### Create and load sample data into Cosmos DB
 
-- Create the Container Registry with admin access _disabled_
+- This takes several minutes to run
+- This reference app is designed to use a simple dataset from IMDb of 1300 movies and their associated actors and genres
+- Follow the steps in the [IMDb Repo](https://github.com/retaildevcrews/imdb) to create a Cosmos DB server, database, and collection and load the sample IMDb data
+  - The repo readme also provides an explanation of the data model design decisions
+
+  > You can safely start with the Create Cosmos DB step
+  >
+  > The initial steps were completed above
+
+Save the Cosmos DB config to Key Vault
+
+```bash
+
+# add Cosmos DB config to Key Vault
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosUrl" --value https://${Imdb_Name}.documents.azure.com:443/
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosKey" --value $(az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query primaryReadonlyMasterKey -o tsv)
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosDatabase" --value $Imdb_DB
+az keyvault secret set -o table --vault-name $He_Name --name "CosmosCollection" --value $Imdb_Col
+
+# retrieve the Cosmos DB key using eval $Imdb_RO_Key
+export Imdb_RO_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name CosmosKey'
+
+# save the Imdb variables
+./saveenv.sh -y
+
+```
+
+#### Create Azure Monitor
+
+> The Application Insights extension is in preview and needs to be added to the CLI
+
+```bash
+
+# Add App Insights extension
+az extension add -n application-insights
+az feature register --name AIWorkspacePreview --namespace microsoft.insights
+az provider register -n microsoft.insights
+
+# Create App Insights
+az monitor app-insights component create -g $He_App_RG -l $He_Location -a $He_Name -o table
+
+# add App Insights Key to Key Vault
+az keyvault secret set -o tsv --query name --vault-name $He_Name --name "AppInsightsKey" --value $(az monitor app-insights component show -g $He_App_RG -a $He_Name --query instrumentationKey -o tsv)
+
+# save the env variable - use eval $He_AppInsights_Key
+export He_AppInsights_Key='az keyvault secret show -o tsv --query value --vault-name $He_Name --name AppInsightsKey'
+
+# save the environment variables
+./saveenv.sh -y
+
+```
+
+#### Setup Azure Container Registry
+
+- Create the Container Registry with admin access `disabled`
 
 ```bash
 
 # create the ACR
 az acr create --sku Standard --admin-enabled false -g $He_ACR_RG -n $He_Name
 
-```
-
-Create Azure Monitor
-
-- The Application Insights extension is in preview and needs to be added to the CLI
-
-```bash
-
-# Add App Insights extension
-az extension add -n application-insights
-
-# Create App Insights
-export He_AppInsights_Key=$(az monitor app-insights component create -g $He_App_RG -l $He_Location -a $He_Name --query instrumentationKey -o tsv)
-
-# add App Insights Key to Key Vault
-az keyvault secret set -o table --vault-name $He_Name --name "AppInsightsKey" --value $He_AppInsights_Key
-
-# Run saveenv.sh to save the Imdb variables
-./saveenv.sh
 ```
 
 Create your AKS Cluster
@@ -238,7 +231,7 @@ Determine the latest version of Kubernetes supported by AKS. It is recommended t
 
 az aks get-versions -l $He_Location -o table
 
-export He_K8S_VER=1.15.5
+export He_K8S_VER=1.16.9
 
 ```
 
@@ -301,7 +294,7 @@ Install the latest version of Helm by download the latest [release](https://gith
 
 # mac os
 OS=darwin-amd64 && \
-REL=v3.0.1 && \ #Should be lastest release from https://github.com/helm/helm/releases
+REL=v3.2.4 && \ #Should be lastest release from https://github.com/helm/helm/releases
 mkdir -p $HOME/.helm/bin && \
 curl -sSL "https://get.helm.sh/helm-${REL}-${OS}.tar.gz" | tar xvz && \
 chmod +x ${OS}/helm && mv ${OS}/helm $HOME/.helm/bin/helm
@@ -315,7 +308,7 @@ or
 
 # Linux/WSL
 OS=linux-amd64 && \
-REL=v3.0.2 && \
+REL=v3.2.4 && \
 mkdir -p $HOME/.helm/bin && \
 curl -sSL "https://get.helm.sh/helm-${REL}-${OS}.tar.gz" | tar xvz && \
 chmod +x ${OS}/helm && mv ${OS}/helm $HOME/.helm/bin/helm
@@ -437,7 +430,7 @@ labels:
   aadpodidbinding: %%MSI_Name%% # Should be value of $MSI_Name from the output of aad-podid.sh
 
 image:
-  repository: retaildevcrew # The specific acr created for this environment
+  repository: retaildevcrew # The specific repository created for this environment
   name: helium-csharp # The name of the image for the helium-csharp repo
 
 annotations:
@@ -448,7 +441,8 @@ ingress:
     - host: %%INGRESS_PIP%%.nip.io # Replace the IP address with the IP of the nginx external IP (value of $INGRESS_PIP or run kubectl get svc -n ingress-nginx to see the correct IP)
       paths: /
 
-KEYVAULT_NAME: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets (value of $He_Name)
+keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets (value of $He_Name)
+
 ```
 
 Replace the values in the file surrounded by `%%` with the proper environment variables
@@ -479,6 +473,11 @@ helm install helium-aks helium --set image.repository=<acr_name>.azurecr.io -f h
 
 # curl the health check endpoint
 curl ${INGRESS_PIP}.nip.io/healthz
+
+# NOTE: Currently there is an issue where the app does not start as expected
+# Logs from the linkerd-proxy container show the following error (repeatedly):
+# ERR! [    34.403788s] linkerd2_proxy::app::errors unexpected error: error trying to connect: Connection refused (os error 111) (address: 127.0.0.1:4120)
+# Additional investigation is needed to fix this bug
 
 ```
 

@@ -13,6 +13,7 @@ This is a Web API reference application designed to "fork and code" with the fol
 - Securely build and deploy the Docker container from Azure Container Registry (ACR) or Azure DevOps
 - Connect to and query Cosmos DB
 - Automatically send telemetry and logs to Azure Monitor
+- Deliver observability best practices via dashboards, alerting and availability tests
 
 ![alt text](./docs/images/architecture.jpg "Architecture Diagram")
 
@@ -267,14 +268,8 @@ az acr login -n $He_Name
 
 # if you get an error that the login server isn't available, it's a DNS issue that will resolve in a minute or two, just retry
 
-# Pull the image from the repo
-docker pull retaildevcrew/$He_Repo:stable
-
-# tag the image
-docker tag retaildevcrew/$He_Repo:stable $He_Name.azurecr.io/${He_Repo}:latest
-
-# push the image to ACR
-docker push $He_Name.azurecr.io/${He_Repo}:latest
+# import the helium image
+az acr import -n $He_Name --source docker.io/retaildevcrew/$He_Repo:stable --image $He_Repo:latest
 
 ```
 
@@ -284,8 +279,11 @@ docker push $He_Name.azurecr.io/${He_Repo}:latest
 
 ```bash
 
-# create a Service Principal and add password to Key Vault
-az keyvault secret set -o table --vault-name $He_Name --name "AcrPassword" --value $(az ad sp create-for-rbac -n http://${He_Name}-acr-sp --query password -o tsv)
+# get the Container Registry Id
+export He_ACR_Id=$(az acr show -n $He_Name -g $He_ACR_RG --query "id" -o tsv)
+
+# create a Service Principal scoped to the ACR with the acrpull role and add password to Key Vault
+az keyvault secret set -o table --vault-name $He_Name --name "AcrPassword" --value $(az ad sp create-for-rbac -n http://${He_Name}-acr-sp --scope $He_ACR_Id --role acrpull --query password -o tsv)
 
 # add Service Principal ID to Key Vault
 az keyvault secret set -o table --vault-name $He_Name --name "AcrUserId" --value $(az ad sp show --id http://${He_Name}-acr-sp --query appId -o tsv)
@@ -298,12 +296,6 @@ export He_SP_ID='az keyvault secret show -o tsv --query value --vault-name $He_N
 export He_AcrUserId=$(az keyvault secret show --vault-name $He_Name --name "AcrUserId" --query id -o tsv)
 export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "AcrPassword" --query id -o tsv)
 
-# get the Container Registry Id
-export He_ACR_Id=$(az acr show -n $He_Name -g $He_ACR_RG --query "id" -o tsv)
-
-# assign acrpull access to the Service Principal
-az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $He_SP_ID)
-
 # save the environment variables
 ./saveenv.sh -y
 
@@ -314,6 +306,54 @@ az role assignment create --scope $He_ACR_Id --role acrpull --assignee $(eval $H
 - Instructions for [App Service](docs/AppService.md)
 - Instructions for [AKS](docs/aks/README.md#L233)
 
+## Smoke test setup
+
+Deploy [web validate](https://github.com/retaildevcrews/webvalidate) to drive consistent traffic to the App Service for monitoring and alerting.
+
+```bash
+
+# Add Log Analytics extension
+az extension add -n log-analytics
+
+# create Log Analytics for the webv clients
+az monitor log-analytics workspace create -g $He_App_RG -l $He_Location -n $He_Name -o table
+
+# retrieve the Log Analytics values using eval $He_LogAnalytics_*
+export He_LogAnalytics_Id='az monitor log-analytics workspace show -g $He_App_RG -n $He_Name --query customerId -o tsv'
+export He_LogAnalytics_Key='az monitor log-analytics workspace get-shared-keys -g $He_App_RG -n $He_Name --query primarySharedKey -o tsv'
+
+# save the environment variables
+./saveenv.sh -y
+
+# create Azure Container Instance running webv
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+-n ${He_Name}-webv-${He_Location} -l $He_Location \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
+--command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+
+# create in additional regions (optional)
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+-n ${He_Name}-webv-eastus2 -l eastus2 \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
+--command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+-n ${He_Name}-webv-westeurope -l westeurope \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
+--command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+
+az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+-n ${He_Name}-webv-southeastasia -l southeastasia \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
+--command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+
+# Query logs in Log Analytics (takes several minutes after ACI creation to see logs)
+# TODO: add more query examples?
+az monitor log-analytics query -w $He_LogAnalytics_Id \
+--analytics-query "ContainerInstanceLog_CL | sort by TimeGenerated asc "
+
+```
+
 ## Dashboard setup
 
 Replace the values in the `Helium_Dashboard.json` file surrounded by `%%` with the proper environment variables
@@ -321,21 +361,16 @@ after making sure the proper environment variables are set (He_Sub, He_App_RG, I
 
 ```bash
 
-### TODO - this won't work since the instructions clone the language repo, not the helium repo
-### One option is to make dashboard setup a separate md file and include instructions for cloning
-###   the helium repo
-### Another option is to add the dashboard files to each of the language repos
-
-cd docs/dashboard
-sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json && \
-sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json && \
-sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json && \
-sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json && \
+curl -s https://raw.githubusercontent.com/retaildevcrews/helium/master/docs/dashboard/Helium_Dashboard.json > Helium_Dashboard.json
+sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json
+sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json
+sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json
+sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json
 sed -i "s/%%He_Repo%%/${He_Name}/g" Helium_Dashboard.json
 
 ```
 
-Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file with your correct subscription GUID, resource group names, and app insights name.
+Navigate to the ([dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `Helium_Dashboard.json` file that you have created.
 
 ## Example Dashboard
 
