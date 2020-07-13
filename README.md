@@ -349,13 +349,13 @@ az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv
 
 ```
 
-#### Sample Queries
+### Sample Queries
 
 Click on the 'Logs' item in the Log Analytics sidebar menu and run the `ContainerInstanceLog_CL` query to view all Azure Container Instance logs. Note that it may take several minutes after the ACI creation for logs to populate in Log Analytics.
 
 Refer to the Log Analytics Kusto Query Language (KQL) [overview](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/) for further information on creating queries.
 
-```
+```bash
 
 # Simplest query
 ContainerInstanceLog_CL
@@ -373,8 +373,9 @@ ContainerInstanceLog_CL
 # Get JSON log entries filtered by category and path values
 ContainerInstanceLog_CL
 | extend jsonMessage = parsejson(Message)
-| extend category = tostring(parsejson(Message).category),
+| extend category = tostring(jsonMessage.category),
   path = tostring(jsonMessage.path)
+  logType = tostring(jsonMesage.logType)
 | where Message startswith "{"
   and category == "DirectRead"
   and path startswith "/api/movies/tt02"
@@ -386,7 +387,7 @@ Run the queries directly in command line
 ```bash
 
 az monitor log-analytics query -w $(eval $He_LogAnalytics_Id) \
---analytics-query "ContainerInstanceLog_CL | top 10 by TimeGenerated "
+--analytics-query "ContainerInstanceLog_CL | top 10 by TimeGenerated"
 
 ```
 
