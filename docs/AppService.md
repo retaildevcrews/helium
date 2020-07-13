@@ -5,7 +5,7 @@ Create and configure App Service (Web App for Containers)
 ```bash
 
 # create App Service plan
-az appservice plan create --sku B1 --is-linux -g $He_App_RG -n ${He_Name}-plan
+az appservice plan create --sku S1 --is-linux -g $He_App_RG -n ${He_Name}-plan
 
 # create Web App for Containers
 # temporarily use the hello-world image - App Service will fail to start - error can be ignored
