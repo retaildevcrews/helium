@@ -347,10 +347,46 @@ az container create -g $He_App_RG --image retaildevcrew/webvalidate:debug -o tsv
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
 --command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
 
-# Query logs in Log Analytics (takes several minutes after ACI creation to see logs)
-# TODO: add more query examples?
-az monitor log-analytics query -w $He_LogAnalytics_Id \
---analytics-query "ContainerInstanceLog_CL | sort by TimeGenerated asc "
+```
+
+#### Sample Queries
+
+Click on the 'Logs' item in the Log Analytics sidebar menu and run the `ContainerInstanceLog_CL` query to view all Azure Container Instance logs. Note that it may take several minutes after the ACI creation for logs to populate in Log Analytics.
+
+Refer to the Log Analytics Kusto Query Language (KQL) [overview](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/) for further information on creating queries.
+
+```
+
+# Simplest query
+ContainerInstanceLog_CL
+
+# Get 10 most recent log entries
+ContainerInstanceLog_CL | top 10 by TimeGenerated
+
+# Get log entries with new calculated columns
+ContainerInstanceLog_CL
+| extend jsonMessage = parsejson(Message)
+| extend category = tostring(jsonMessage.category),
+  duration = toint(jsonMessage.duration),
+  tag = tostring(jsonMessage.tag)
+
+# Get JSON log entries filtered by category and path values
+ContainerInstanceLog_CL
+| extend jsonMessage = parsejson(Message)
+| extend category = tostring(parsejson(Message).category),
+  path = tostring(jsonMessage.path)
+| where Message startswith "{"
+  and category == "DirectRead"
+  and path startswith "/api/movies/tt02"
+
+```
+
+Run the queries directly in command line
+
+```bash
+
+az monitor log-analytics query -w $(eval $He_LogAnalytics_Id) \
+--analytics-query "ContainerInstanceLog_CL | top 10 by TimeGenerated "
 
 ```
 
