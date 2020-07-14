@@ -159,6 +159,7 @@ export He_Sub='az account show -o tsv --query id'
 export Imdb_Name=$He_Name
 export He_ACR_RG=${He_Name}-rg-acr
 export He_App_RG=${He_Name}-rg-app
+export He_WebV_RG=${He_Name}-rg-webv
 export Imdb_RG=${Imdb_Name}-rg-cosmos
 
 # export Cosmos DB env vars
@@ -171,6 +172,7 @@ export Imdb_RW_Key='az cosmosdb keys list -n $Imdb_Name -g $Imdb_RG --query prim
 # create the resource groups
 az group create -n $He_App_RG -l $He_Location
 az group create -n $He_ACR_RG -l $He_Location
+az group create -n $He_WebV_RG -l $He_Location
 az group create -n $Imdb_RG -l $Imdb_Location
 
 # run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/.helium.env
@@ -312,12 +314,6 @@ export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "Ac
 Deploy [web validate](https://github.com/retaildevcrews/webvalidate) to drive consistent traffic to the App Service for monitoring and alerting.
 
 ```bash
-
-# Resource Group Name
-export He_WebV_RG=${He_Name}-rg-webv
-
-# create a new resource group
-az group create -n $He_WebV_RG -l $He_Location
 
 # Add Log Analytics extension
 az extension add -n log-analytics
