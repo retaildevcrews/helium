@@ -115,6 +115,18 @@ az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:debug -o ts
 
 Click on the 'Logs' item in the Log Analytics sidebar menu and run the `ContainerInstanceLog_CL` query to view all Azure Container Instance logs. Note that it may take several minutes after the ACI creation for logs to populate in Log Analytics.
 
+Each log message consists of the following fields:
+
+- category - Type of request
+- path - Path to web API resource
+- tag - Tag associated when running Web Validate. For the smoke tests, this is the location where you created the ACI
+- statusCode - Status code from the test run
+- duration - Duration of the test
+- quartile - Based on the test duration
+- logType - Type of message, either request or summary
+- contentLength - Content length of test response
+- errorCount - Number of errors encountered running the test
+
 Refer to the Log Analytics Kusto Query Language (KQL) [overview](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/) for further information on creating queries.
 
 ```bash
@@ -124,16 +136,16 @@ ContainerInstanceLog_CL | top 10 by TimeGenerated
 
 # Unpack all fields of Message object into columns
 ContainerInstanceLog_CL
-| extend jsonMessage = parsejson(Message)               // Message string parsed as a JSON object
-| extend category = tostring(jsonMessage.category),     // Type of request
-  path = tostring(jsonMessage.path),                    // Path to web API resource
-  tag = tostring(jsonMessage.tag),                      // Tag associated with webv run
-  code = toint(jsonMessage.statusCode),                 // Status code from response
-  duration = toint(jsonMessage.duration),               // Duration of testrun
-  quartile = toint(jsonMessage.quartile),               // Based on the duration
-  logType = tostring(jsonMessage.logType),              // Type of message, either request or summary
-  length = toint(jsonMessage.contentLength),            // Content length of response
-  errors = toint(jsonMessage.errorCount)                // Number of errors encountered
+| extend jsonMessage = parsejson(Message)
+| extend category = tostring(jsonMessage.category),
+  path = tostring(jsonMessage.path),
+  tag = tostring(jsonMessage.tag),
+  code = toint(jsonMessage.statusCode),
+  duration = toint(jsonMessage.duration),
+  quartile = toint(jsonMessage.quartile),
+  logType = tostring(jsonMessage.logType),
+  length = toint(jsonMessage.contentLength),
+  errors = toint(jsonMessage.errorCount)
 
 # Failed or error tests
 ContainerInstanceLog_CL
