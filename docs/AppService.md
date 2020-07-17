@@ -117,7 +117,7 @@ Click on the 'Logs' item in the Log Analytics sidebar menu and run the `Containe
 
 Refer to the Log Analytics Kusto Query Language (KQL) [overview](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/) for further information on creating queries.
 
-```
+```bash
 
 # Get 10 most recent log entries
 ContainerInstanceLog_CL | top 10 by TimeGenerated
@@ -125,15 +125,15 @@ ContainerInstanceLog_CL | top 10 by TimeGenerated
 # Unpack all fields of Message object into columns
 ContainerInstanceLog_CL
 | extend jsonMessage = parsejson(Message)               // Message string parsed as a JSON object
-| extend category = tostring(jsonMessage.category),     // Type of test
+| extend category = tostring(jsonMessage.category),     // Type of request
   path = tostring(jsonMessage.path),                    // Path to web API resource
-  tag = tostring(jsonMessage.tag),                      // Tag associated with webv run, in this case, location
-  code = toint(jsonMessage.statusCode),                 // Status code from test result
-  duration = toint(jsonMessage.duration),               // Duration the test ran for
-  quartile = toint(jsonMessage.quartile),               // Based on the test duration
-  logType = tostring(jsonMessage.logType),              // Type of log, either request or summary
-  length = toint(jsonMessage.contentLength),            // Content length of test response
-  errors = toint(jsonMessage.errorCount)                // Number of errors encountered during test
+  tag = tostring(jsonMessage.tag),                      // Tag associated with webv run
+  code = toint(jsonMessage.statusCode),                 // Status code from response
+  duration = toint(jsonMessage.duration),               // Duration of testrun
+  quartile = toint(jsonMessage.quartile),               // Based on the duration
+  logType = tostring(jsonMessage.logType),              // Type of message, either request or summary
+  length = toint(jsonMessage.contentLength),            // Content length of response
+  errors = toint(jsonMessage.errorCount)                // Number of errors encountered
 
 # Failed or error tests
 ContainerInstanceLog_CL
