@@ -113,9 +113,7 @@ az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:debug -o ts
 
 ### Sample Queries
 
-Click on the 'Logs' item in the Log Analytics sidebar menu and run the `ContainerInstanceLog_CL` query to view all Azure Container Instance logs. Note that it may take several minutes after the ACI creation for logs to populate in Log Analytics.
-
-Each log message consists of the following fields:
+Click on the 'Logs' item in the Log Analytics sidebar menu and run the `ContainerInstanceLog_CL` query to view all Azure Container Instance logs. Each log message consists of the following fields:
 
 - category - Type of request
 - path - Path to web API resource
