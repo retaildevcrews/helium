@@ -8,8 +8,8 @@ Create and configure App Service (Web App for Containers)
 az appservice plan create --sku S1 --is-linux -g $He_App_RG -n ${He_Name}-plan
 
 # create Web App for Containers
-# temporarily use the hello-world image - App Service will fail to start - error can be ignored
-az webapp create --deployment-container-image-name hello-world -g $He_App_RG -p ${He_Name}-plan -n $He_Name
+# temporarily use the nginx image
+az webapp create --deployment-container-image-name nginx -g $He_App_RG -p ${He_Name}-plan -n $He_Name
 
 # stop the Web App
 az webapp stop -g $He_App_RG -n $He_Name
