@@ -2,23 +2,23 @@
 
 ## Index
 
-- [Managed Identity and Key Vault](#managed-identity-and-key-vault)
-- [Cosmos DB](#cosmos-db)
-  - [Partition Key Function](#partition-key-function)
-- [AKS Pod Identity Support](#aks-pod-identity-support)
-- [Versioning](#versioning)
-- [Dependency Injection (DI)](#dependency-injection-(di))
-  - [Key Vault](#key-vault)
-  - [Data Access Layer (DAL)](#data-access-layer-(DAL))
-  - [Application Insights](#application-insights)
-- [Middleware](#middleware)
-- [Logging](#logging)
+1. [Managed Identity and Key Vault](#managed-identity-and-key-vault)
+2. [Cosmos DB](#cosmos-db)
+    - [Partition Key Function](#partition-key-function)
+3. [AKS Pod Identity Support](#aks-pod-identity-support)
+4. [Versioning](#versioning)
+5. [Dependency Injection (DI)](#dependency-injection-(di))
+    - [Key Vault](#key-vault)
+    - [Data Access Layer (DAL)](#data-access-layer-(DAL))
+    - [Application Insights](#application-insights)
+6. [Middleware](#middleware)
+7. [Logging](#logging)
 
 ## Managed Identity and Key Vault
 
-After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code. For the local development scenario, we use a different credential specifically for Azure CLI credentials.  This works as long as the developer has access to the Key Vault and is logged in to the Azure CLI with az login. The authentication type can be specified as an environment variable or command line argument, defaulting to MI.
+After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code. For the local development scenario, we use a different credential specifically for Azure CLI credentials.  This works as long as the developer has access to the Key Vault and is logged in to the Azure CLI with `az login`. The authentication type can be specified as an environment variable or command line argument, defaulting to MSI.
 
-[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L433)
+[Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L245)
 
 ```c#
 
