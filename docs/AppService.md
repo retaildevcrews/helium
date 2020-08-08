@@ -15,10 +15,10 @@ az webapp create --deployment-container-image-name nginx -g $He_App_RG -p ${He_N
 az webapp stop -g $He_App_RG -n $He_Name
 
 # assign Managed Identity
-export He_MSI_ID=$(az webapp identity assign -g $He_App_RG -n $He_Name --query principalId -o tsv)
+export He_MI_ID=$(az webapp identity assign -g $He_App_RG -n $He_Name --query principalId -o tsv)
 
 # grant Key Vault access to Managed Identity
-az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id $He_MSI_ID
+az keyvault set-policy -n $He_Name --secret-permissions get list --key-permissions get list --object-id $He_MI_ID
 
 # turn on CI
 export He_CICD_URL=$(az webapp deployment container config -n $He_Name -g $He_App_RG --enable-cd true --query CI_CD_URL -o tsv)
