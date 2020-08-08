@@ -258,12 +258,12 @@ Change directories to the `docs/aks` folder and make the `aad-podid.sh` script e
 
 ```bash
 
-export MSI_Name=${He_Name}-msi
+export MI_Name=${He_Name}-mi
 
 cd $REPO_ROOT/docs/aks
 sudo chmod +x aad-podid.sh
 
-. ./aad-podid.sh -a ${He_AKS_Name} -r ${He_App_RG} -m ${MSI_Name}
+. ./aad-podid.sh -a ${He_AKS_Name} -r ${He_App_RG} -m ${MI_Name}
 
 cd $REPO_ROOT
 ./saveenv.sh
@@ -274,15 +274,15 @@ The last line of the output will explain the proper label annotation needed when
 
 ```bash
 
-echo $MSI_Name
+echo $MI_Name
 
 ```
 
-### Set Keyvault Policy for MSI User
+### Set Keyvault Policy for MI User
 
 ```bash
 
-az keyvault set-policy -n ${He_Name} --object-id ${MSI_PrincID} --secret-permissions get list --key-permissions get list --certificate-permissions get list
+az keyvault set-policy -n ${He_Name} --object-id ${MI_PrincID} --secret-permissions get list --key-permissions get list --certificate-permissions get list
 
 ```
 
@@ -427,7 +427,7 @@ A file called helm-config.yaml with the following contents that needs be to edit
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 labels:
-  aadpodidbinding: %%MSI_Name%% # Should be value of $MSI_Name from the output of aad-podid.sh
+  aadpodidbinding: %%MI_Name%% # Should be value of $MI_Name from the output of aad-podid.sh
 
 image:
   repository: retaildevcrew # The specific repository created for this environment
@@ -449,7 +449,7 @@ Replace the values in the file surrounded by `%%` with the proper environment va
 
 ```bash
 
-sed -i "s/%%MSI_Name%%/${MSI_Name}/g" helm-config.yaml && \
+sed -i "s/%%MI_Name%%/${MI_Name}/g" helm-config.yaml && \
 sed -i "s/%%INGRESS_PIP%%/${INGRESS_PIP}/g" helm-config.yaml && \
 sed -i "s/%%KV_Name%%/${He_Name}/g" helm-config.yaml
 
