@@ -84,16 +84,16 @@ To use the injected object, use the get method. Continuing the Cosmos DB example
 
 ## Managed Identity and Key Vault
 
-After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code.  For the local development scenario, we use a different credential specifically for Azure CLI credentials.  This works as long as the developer has access to the Key Vault and is logged in to the Azure CLI with az login. The authentication type can be specified as an environment variable or command line argument, defaulting to MSI.
+After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code.  For the local development scenario, we use a different credential specifically for Azure CLI credentials.  This works as long as the developer has access to the Key Vault and is logged in to the Azure CLI with az login. The authentication type can be specified as an environment variable or command line argument, defaulting to MI.
 
-Currently, we use a different package for MSI credentials and CLI credentials, this will be consolidated with the next release of @azure/identity when they plan to add CLI credentials as an option *without* the built in default to fall back on environment variable credentials.
+Currently, we use a different package for MI credentials and CLI credentials, this will be consolidated with the next release of @azure/identity when they plan to add CLI credentials as an option *without* the built in default to fall back on environment variable credentials.
 
 [KeyVaultService.ts](https://github.com/RetailDevCrews/helium-typescript/blob/master/src/services/KeyVaultService.ts#L36)
 
 ```typescript
 
-// use specified authentication type (either MSI or CLI)
-const creds: any = this.authType === "MSI" ?
+// use specified authentication type (either MI or CLI)
+const creds: any = this.authType === "MI" ?
     new azureIdentity.ManagedIdentityCredential() :
     await msRestNodeAuth.AzureCliCredentials.create({ resource: "https://vault.azure.net" });
 
@@ -106,7 +106,7 @@ await this.getSecret(cosmosUrl);
 
 ### Dev Flag
 
-To enforce MSI in production, the --dev flag is required as a command line argument in order to use CLI credentials to authenticate. There is no environment variable option for this arg, as there is with --keyvault-name (KEYVAULT_NAME), for instance. Ideally, conditionaly compilation would have been used as with the C# version. However, typescript does not currently support this feature.
+To enforce MI in production, the --dev flag is required as a command line argument in order to use CLI credentials to authenticate. There is no environment variable option for this arg, as there is with --keyvault-name (KEYVAULT_NAME), for instance. Ideally, conditionaly compilation would have been used as with the C# version. However, typescript does not currently support this feature.
 
 ```bash
 
@@ -218,8 +218,8 @@ public async connect() {
     let retries = 0;
     while (retries < MAX_RETRIES){
         try {
-            // use specified authentication type (either MSI or CLI)
-            const creds: any = this.authType === "MSI" ?
+            // use specified authentication type (either MI or CLI)
+            const creds: any = this.authType === "MI" ?
                 new azureIdentity.ManagedIdentityCredential() :
                 await msRestNodeAuth.AzureCliCredentials.create({ resource: "https://vault.azure.net" });
 
@@ -230,12 +230,12 @@ public async connect() {
             return;
         } catch (e) {
             retries++;
-            if (this.authType === "MSI" && retries < MAX_RETRIES) {
+            if (this.authType === "MI" && retries < MAX_RETRIES) {
                 this.logger.info("Key Vault: Retry");
                 // wait 1 second and retry (continue while loop)
                 await new Promise(resolve => setTimeout(resolve, 1000));
             } else {
-                throw new Error("Failed to connect to Key Vault with MSI");
+                throw new Error("Failed to connect to Key Vault with MI");
             }
         }
     }
