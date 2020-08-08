@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 labels:
-  aadpodidbinding: %%MSI_Name%% #should be value of $MSI_Name from the output of aad-podid.sh
+  aadpodidbinding: %%MI_Name%% #should be value of $MI_Name from the output of aad-podid.sh
 
 image:
   repository: retaildevcrew #The specific acr created for this environment
