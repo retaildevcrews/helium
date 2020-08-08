@@ -175,7 +175,7 @@ az group create -n $He_ACR_RG -l $He_Location
 az group create -n $He_WebV_RG -l $He_Location
 az group create -n $Imdb_RG -l $Imdb_Location
 
-# run the saveenv.sh script at any time to save He_*, Imdb_*, MSI_*, and AKS_* variables to ~/.helium.env
+# run the saveenv.sh script at any time to save He_*, Imdb_*, MI_*, and AKS_* variables to ~/.helium.env
 # the saveenv.sh script sets He_Repo correctly based on the helium language version you are using
 ./saveenv.sh
 
