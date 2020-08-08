@@ -53,9 +53,9 @@ azure.keyvault.enabled=true
 azure.keyvault.uri=https://${KeyVaultName}.vault.azure.net/
 ```
 
-### JAVA-SPRINGBOOT-KEYVAULT-SDK-GAP : Local Development issue with spring-boot starter for key-vault with MSI
+### JAVA-SPRINGBOOT-KEYVAULT-SDK-GAP : Local Development issue with spring-boot starter for key-vault with MI
 
-- This does not works in the local development scenario as the spring-boot keyvault java sdk fails to get Key Vault access through MSI on local development environment​
+- This does not works in the local development scenario as the spring-boot keyvault java sdk fails to get Key Vault access through MI on local development environment​
 - This is a security issue that affects the development environment
 
 Local development environment can only access keyvault with clear-text credentials as below
