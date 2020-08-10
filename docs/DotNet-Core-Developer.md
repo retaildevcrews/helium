@@ -16,13 +16,13 @@
 
 ## Managed Identity and Key Vault
 
-After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code. For the local development scenario, we use a different credential specifically for Azure CLI credentials.  This works as long as the developer has access to the Key Vault and is logged in to the Azure CLI with az login. The authentication type can be specified as an environment variable or command line argument, defaulting to MSI.
+After creating a Managed Identity for the Helium web app and assigning get and list secret permissions to Key Vault, the following code successfully authenticates using Managed Identity to create the Key Vault Client. Leveraging Managed Identity in this way eliminates the need to store any credential information in app code. For the local development scenario, we use a different credential specifically for Azure CLI credentials.  This works as long as the developer has access to the Key Vault and is logged in to the Azure CLI with az login. The authentication type can be specified as an environment variable or command line argument, defaulting to MI.
 
 [Program.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Program.cs#L433)
 
 ```c#
 
-// use Managed Identity (MSI) for secure access to Key Vault
+// use Managed Identity (MI) for secure access to Key Vault
 var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
 
 // read a key to make sure the connection is valid
@@ -76,7 +76,7 @@ Note that once the MI proxy is running, responses are generally under 100ms, so 
 ///   we retry for up to 90 seconds
 /// </summary>
 /// <param name="kvUrl">URL of the key vault</param>
-/// <param name="authType">MSI, CLI or VS</param>
+/// <param name="authType">MI, CLI or VS</param>
 /// <returns></returns>
 static async Task<KeyVaultClient> GetKeyVaultClient(string kvUrl, string authType)
 {
@@ -84,12 +84,12 @@ static async Task<KeyVaultClient> GetKeyVaultClient(string kvUrl, string authTyp
     //   AKS has to spin up an MI pod which can take a while the first time on the pod
     DateTime timeout = DateTime.Now.AddSeconds(90.0);
 
-    // use MSI as default
+    // use MI as default
     string authString;
 
     switch (authType.ToUpperInvariant())
     {
-        case "MSI":
+        case "MI":
             authString = "RunAs=App";
             break;
         case "CLI":
@@ -109,7 +109,7 @@ static async Task<KeyVaultClient> GetKeyVaultClient(string kvUrl, string authTyp
         {
             var tokenProvider = new AzureServiceTokenProvider(authString);
 
-            // use Managed Identity (MSI) for secure access to Key Vault
+            // use Managed Identity (MI) for secure access to Key Vault
             var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
 
             // read a key to make sure the connection is valid
@@ -120,9 +120,9 @@ static async Task<KeyVaultClient> GetKeyVaultClient(string kvUrl, string authTyp
         }
         catch (Exception ex)
         {
-            if (DateTime.Now <= timeout && authType == "MSI")
+            if (DateTime.Now <= timeout && authType == "MI")
             {
-                // retry MSI connections for pod identity
+                // retry MI connections for pod identity
                 Console.WriteLine($"KeyVault:Retry");
                 await Task.Delay(1000).ConfigureAwait(false);
             }
