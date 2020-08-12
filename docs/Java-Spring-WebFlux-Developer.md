@@ -43,7 +43,7 @@ The identity SDK is a core component of this project.  It is via the credentials
 
 ```
 
-As can be seen in the dependency configuration, this is one of the framewoks that we are using which is in a pre-release ([beta-5](https://azuresdkdocs.blob.core.windows.net/$web/java/azure-identity/1.1.0-beta.5/index.html)) state. This version of the Azure Identity SDK came with the ability for us to create discrete credentials so that we could target Managed Service Identity (MSI) and Azure CLI (CLI).  Additionally, this version would allow for the creation of other identity types such as `IntelliJCredential` and `VSCodeCredential` should you want to support them.
+As can be seen in the dependency configuration, this is one of the framewoks that we are using which is in a pre-release ([beta-5](https://azuresdkdocs.blob.core.windows.net/$web/java/azure-identity/1.1.0-beta.5/index.html)) state. This version of the Azure Identity SDK came with the ability for us to create discrete credentials so that we could target Managed Identity (MI) and Azure CLI (CLI).  Additionally, this version would allow for the creation of other identity types such as `IntelliJCredential` and `VSCodeCredential` should you want to support them.
 
 The identiy SDK is used only in the `KeyVaultService` `@Service` class as that is the only place the code actively authenticates presently.
 
