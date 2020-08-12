@@ -181,16 +181,6 @@ ContainerInstanceLog_CL
 | summarize avg(quartile) by category, tag
 | sort by category
 
-# Average quartile of tests per category and location
-ContainerInstanceLog_CL
-| extend jsonMessage = parsejson(Message)
-| extend category = tostring(jsonMessage.category),
-  duration = toint(jsonMessage.duration),
-  tag = tostring(jsonMessage.tag)
-| where isnotempty(category)
-| summarize percentile(duration, 98) by category, tag
-| sort by category
-
 # Tests with duration exceeding the 98th percentile within the matching category
 ContainerInstanceLog_CL
 | extend jsonMessage = parsejson(Message)
