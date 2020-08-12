@@ -6,15 +6,14 @@
     - [Identity](#identity)
     - [Key Vault](#key-vault)
     - [Configuration Cache](#configuration-cache)
-2. [Managed Identity and Key Vault](#managed-identity-and-key-vault)
-3. [Cosmos DB](#cosmos-db)
+2. [Cosmos DB](#cosmos-db)
     - [Partition Key Function](#partition-key-function)
-4. [AKS Pod Identity Support](#aks-pod-identity-support)
+3. [AKS Pod Identity Support](#aks-pod-identity-support)
     - Work in progress
-5. [Versioning](#versioning)
-6. [Middleware](#middleware)
+4. [Versioning](#versioning)
+5. [Middleware](#middleware)
     - [Request Logger](#request-logger)
-7. [Logging](#logging)
+6. [Logging](#logging)
 
 ## Frameworks and SDKs
 
