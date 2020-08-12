@@ -203,6 +203,7 @@ az keyvault create --enable-soft-delete false -g $He_App_RG -n $He_Name
 - This takes several minutes to run
 - This reference app is designed to use a simple dataset from IMDb of 1300 movies and their associated actors and genres
 - Follow the steps in the [IMDb Repo](https://github.com/retaildevcrews/imdb) to create a Cosmos DB server, database, and collection and load the sample IMDb data
+  - Be sure to clone the IMDB Repo into a separate folder from this project as you will need to run a command to populate your Cosmos DB instance
   - The repo readme also provides an explanation of the data model design decisions
 
   > You can safely start with the Create Cosmos DB step
