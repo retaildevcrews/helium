@@ -18,22 +18,33 @@ Engineering Playbook [Definition of Done](https://github.com/microsoft/code-with
 ## Markdown (md files)
 
 - Use [markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint) add-in for VS Code
-- Use "-" for unordered lists
-- Add a blank line before and after ``` for visualization
+  - Repeating header lint issues are OK if avoiding would cause readability issues
+- Use [Code Spell Checker](https://github.com/streetsidesoftware/vscode-spell-checker) add-in for VS Code
+- Use `-` for unordered lists
+  - Mixing `-` and `*` will cause linter errors
+- Use single back-quote to `call out terms`
+- Add a blank line before and after ''' for visualization
+- ''' blocks must specify a language for color coding
+- Preview the MD to make sure it renders in a highly readable format
+  - Avoid long headers, especially H1 and H2
+    - Using a short Hx with a long call out renders better than a long Hx
+
+> use call outs to emphasize important points
 
 ## Tool for Code Reviews
 
 - CodeFlow extension for GitHub [Link](https://www.1eswiki.com/wiki/CodeFlow_integration_with_GitHub_Pull_Requests)
 
-## Kanban Management Best Practices
+## Kanban Board Management Best Practices
 
 ### Triage
 
 > All net-new issues need to be triaged, leverage Notes for discussions points as needed
 
-- Create the issue in the appropriate board and template
-- Add project to the issue (i.e. Helium) - this is automatic add to master board
-- Add all relevant tags (language, enchancement, bug, design review, bug, etc)
+- Create the issue in the appropriate repo with the appropriate template
+- Add project to the issue (i.e. Helium) - this will add to the master board
+  - This is only necessary in a multi-repo project like Helium
+- Add all relevant tags (language, enhancement, bug, design review, etc)
 - Do not add Size, Priority, Milestone, or Assignee
 - All issues will be triaged at the end of the Standup call
 
@@ -60,17 +71,17 @@ Engineering Playbook [Definition of Done](https://github.com/microsoft/code-with
 
 ### PR Submitted / Review
 
-> _Pull Requests to create or update code, documentation, templates, etc and issues that need reviewed
+> Pull Requests to create or update code, documentation, templates, etc and issues that need reviewed
 
 - Complete the PR Template (ensure original issue is closed or referenced)
 - Assign reviewers, assign yourself, add Project board, and Milestone
-- If issue has multiple issue to close and/or reference, report each reference/close # on seperate line to ensure correct link
+- If issue has multiple issue to close and/or reference, report each reference/close # on separate line to ensure correct link
 
 ### Done
 
-- Issue is completed, no further action rquired
+- Issue is completed, no further action required
 - Ensure task checklist is complete
 
-### Burndown
+### Burn Down
 
-> During the final sprint of the milestone, create a burndown column for issues pivotal to achieve goal
+> During the final sprint of the milestone, create a burn down column for issues pivotal to achieve goals
