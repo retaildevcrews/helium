@@ -193,10 +193,23 @@ source ~/.helium.env
 ```bash
 
 ## create the Key Vault
-## do not disable soft-delete in production!
-az keyvault create --enable-soft-delete false -g $He_App_RG -n $He_Name
+az keyvault create -g $He_App_RG -n $He_Name
 
 ```
+
+Key Vault does a soft delete when deleting vaults. If you have gone through this setup already, you could run into errors like "Exist soft deleted vault with the same name.", and "Secret is currently in a deleted but recoverable state ...". You can check if you have deleted vaults and keys with the commands below.
+
+```shell
+
+# list deleted keyvaults that still exist
+az keyvault list-deleted -o table
+
+# list deleted secrets that still exist
+az keyvault secret list-deleted --vault-name $He_Name -o table
+
+```
+
+If you see the Helium vaults or secrets in this state, you can purge or recover the values before moving forward.
 
 #### Create and load sample data into Cosmos DB
 
