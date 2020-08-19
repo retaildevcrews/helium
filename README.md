@@ -209,7 +209,17 @@ az keyvault secret list-deleted --vault-name $He_Name -o table
 
 ```
 
-If you see the Helium vaults or secrets in this state, you can purge or recover the values before moving forward.
+If you see the Helium vaults or secrets in this state, you can purge or recover the values before moving forward. There are example commands below for deleting and purging a keyvault.
+
+```shell
+
+# Deleting a keyvault if you intend to reuse the same name.
+az keyvault delete -g $He_App_RG -n $He_Name
+
+# Purging a key vault. This will permanently delete the keyvault and all its contents.
+az keyvault purge  -n $He_Name
+
+```
 
 #### Create and load sample data into Cosmos DB
 
