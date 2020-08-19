@@ -147,6 +147,8 @@ nslookup ${He_Name}.azurecr.io
   - One for App Service or AKS, Key Vault and Azure Monitor
   - One for Cosmos DB
 
+Some of the environment variables that will be created will be commands for retriving sensitive values. This is intentional to avoid saving sensitive data in environment variables. For example, `export Imdb_RW_Key='az cosmosdb keys list ...'`. Make sure to run the export commands as is to save the actual command as a string.
+
 ```bash
 
 # set location
