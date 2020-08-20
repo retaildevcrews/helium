@@ -147,7 +147,7 @@ nslookup ${He_Name}.azurecr.io
   - One for App Service or AKS, Key Vault and Azure Monitor
   - One for Cosmos DB
 
-Some environment variables will save commands as strings instead of running the command and saving the output. This is intentional to avoid saving sensitive data in environment variables. For example, `export Imdb_RW_Key='az cosmosdb keys list ...'`. Make sure to run the export commands as is.
+> Some environment variables will save commands as strings instead of running the command and saving the output. This is intentional to avoid saving sensitive data in environment variables. For example, `export Imdb_RW_Key='az cosmosdb keys list ...'`. Make sure to run the export commands as is. When the value is needed, the command will be executed with `eval`. For example, `dotnet run -- $Imdb_Name $(eval $Imdb_RW_Key) ...`.
 
 ```bash
 
