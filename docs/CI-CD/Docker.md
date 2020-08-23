@@ -81,9 +81,9 @@ After adding the secrets, your repo should look like this
 
 ## Run the Workflow
 
-> The GitHub action only runs on PR to master or commit to master
+> The GitHub action only runs on PR to main or commit to main
 
-- Merge a change into master
+- Merge a change into main
 - Navigate to the Actions tab in your GitHub repo
 - You should see results similar to below
 

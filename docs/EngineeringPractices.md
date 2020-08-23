@@ -5,7 +5,7 @@
 - Code changes reviewed & signed off
 - Existing documentation is updated (readme, .md's)
 - New documentation needed to support the change is created
-- Code changes checked into master
+- Code changes checked into main
 - All existing automated tests (unit and/or e2e) pass successfully, new tests added as needed
 - CI completes successfully
 - CD completes successfully
@@ -42,7 +42,7 @@ Engineering Playbook [Definition of Done](https://github.com/microsoft/code-with
 > All net-new issues need to be triaged, leverage Notes for discussions points as needed
 
 - Create the issue in the appropriate repo with the appropriate template
-- Add project to the issue (i.e. Helium) - this will add to the master board
+- Add project to the issue (i.e. Helium) - this will add to the main board
   - This is only necessary in a multi-repo project like Helium
 - Add all relevant tags (language, enhancement, bug, design review, etc)
 - Do not add Size, Priority, Milestone, or Assignee
