@@ -70,7 +70,7 @@ docker run -it --rm retaildevcrew/webvalidate --server https://${He_Name}.azurew
 
 ## Smoke Test setup
 
-Deploy [Web Validate](https://github.com/retaildevcrews/webvalidate) to drive consistent traffic to the App Service for monitoring and alerting. The `debug` image is used which allows you to connect to the container to debug any latency or network issues.
+Deploy [Web Validate](https://github.com/retaildevcrews/webvalidate) to drive consistent traffic to the App Service for monitoring and alerting. You can use the `debug` image to connect to the container to debug any latency or network issues.
 
 ```bash
 
@@ -87,30 +87,36 @@ export He_LogAnalytics_Key='az monitor log-analytics workspace get-shared-keys -
 # save the environment variables
 ./saveenv.sh -y
 
-# create Azure Container Instance running the debug webv image
-az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+# create Azure Container Instance running webv
+az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:latest -o tsv --query name \
 -n ${He_Name}-webv-${He_Location} -l $He_Location \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
---command-line "dotnet run -- --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
 
 # create in additional regions (optional)
-az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:latest -o tsv --query name \
 -n ${He_Name}-webv-eastus2 -l eastus2 \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
---command-line "dotnet run -- --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
 
-az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:latest -o tsv --query name \
 -n ${He_Name}-webv-westeurope -l westeurope \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
---command-line "dotnet run -- --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
 
-az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:latest -o tsv --query name \
 -n ${He_Name}-webv-southeastasia -l southeastasia \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
---command-line "dotnet run -- --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/master/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
 
-# Connect to the webv container instance for further debugging (as needed)
-az container exec -g $He_WebV_RG -n ${He_Name}-webv-${He_Location} --exec-command "/bin/bash"
+# create ACI running the debug webv image (optional)
+az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
+-n ${He_Name}-webv-${He_Location}-debug -l $He_Location \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
+--command-line "dotnet run -- --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
+
+# connect to the debug webv container instance for further debugging (as needed)
+az container exec -g $He_WebV_RG -n ${He_Name}-webv-${He_Location}-debug --exec-command "/bin/bash"
 
 ```
 
