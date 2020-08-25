@@ -304,6 +304,8 @@ az acr import -n $He_Name --source docker.io/retaildevcrew/$He_Repo:stable --ima
 #### Create a Service Principal for Container Registry
 
 > Currently, App Service cannot access ACR via Managed Identity, so we have to create a Service Principal and grant access to that SP
+>
+> Note: You will encounter an unauthorized error creating the SP with a `Contributor` role or lower. Ensure you have `Owner` access to the account to create the SP.
 
 ```bash
 

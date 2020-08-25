@@ -53,7 +53,7 @@ The identiy SDK is used only in the `KeyVaultService` `@Service` class as that i
 public KeyVaultService(IEnvironmentReader environmentReader)
     throws HeliumException {
 
-    if (this.authType.equals(Constants.USE_MSI)) {
+    if (this.authType.equals(Constants.USE_MI)) {
 
         credential = new ManagedIdentityCredentialBuilder().build();
 
@@ -61,7 +61,7 @@ public KeyVaultService(IEnvironmentReader environmentReader)
 
         credential = new AzureCliCredentialBuilder().build();
 
-    } else if (this.authType.equals(Constants.USE_MSI_APPSVC)) {
+    } else if (this.authType.equals(Constants.USE_MI_APPSVC)) {
         try {
         credential = new ManagedIdentityCredentialBuilder().build();
         } catch (final Exception ex) {
@@ -69,7 +69,7 @@ public KeyVaultService(IEnvironmentReader environmentReader)
         throw new HeliumException(ex.getMessage());
         }
     } else {
-        this.authType = Constants.USE_MSI;
+        this.authType = Constants.USE_MI;
         credential = new ManagedIdentityCredentialBuilder().build();
     }
 
