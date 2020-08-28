@@ -53,7 +53,7 @@ The identiy SDK is used only in the `KeyVaultService` `@Service` class as that i
 public KeyVaultService(IEnvironmentReader environmentReader)
     throws HeliumException {
 
-    if (this.authType.equals(Constants.USE_MlsI)) {
+    if (this.authType.equals(Constants.USE_MI)) {
 
         credential = new ManagedIdentityCredentialBuilder().build();
 
