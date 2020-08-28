@@ -39,24 +39,30 @@ return keyVaultClient;
 
 In order to directly read a document using 1 RU (assuming the document is 1K or less), you need the document's ID and partition key. A good CosmosDB best practice is to compute the partition key from the ID. In our case, we use the integer portion of the Movie or Actor document mod 10. This gives us 10 partitions ("0" - "9") with good distribution. For a deeper discussion on the document modeling decisions, please read this [document](https://github.com/retaildevcrews/imdb).
 
-[dalMain.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/DataAccessLayer/dalMain.cs#L132)
+While this function calculates the key similarly for both the Actor and Movie IDs, the method is added for both the Actor and Movie model classes. This allows for the method to calculate the partition key differently based on the entity.
+
+[Actor.ts](https://github.com/retaildevcrews/helium-csharp/blob/main/src/app/Model/Actor.cs#L29)
+[Movie.ts](https://github.com/retaildevcrews/helium-csharp/blob/main/src/app/Model/Movie.cs#L32)
 
 ```c#
 
 public static string GetPartitionKey(string id)
 {
     // validate id
-    if (id.Length > 5 &&
-        (id.StartsWith("tt") || id.StartsWith("nm")) &&
-        Int32.TryParse(id.Substring(2), out int idInt))
+    if (!string.IsNullOrEmpty(id) &&
+        id.Length > 5 &&
+        (id.StartsWith("tt", StringComparison.OrdinalIgnoreCase)) &&
+        int.TryParse(id.Substring(2), out int idInt))
     {
-        return (idInt % 10).ToString();
+        return (idInt % 10).ToString(CultureInfo.InvariantCulture);
     }
 
-    throw new ArgumentException("GetPartitionKey");
+    throw new ArgumentException("Invalid Partition Key");
 }
 
 ```
+
+The above code shows the `ComputePartitionKey` method for the Movie class which is almost identical to the one in the Actor class.
 
 ## AKS Pod Identity Support
 
