@@ -35,7 +35,7 @@ Given the above extension member called `validationErrors`, the `code` property 
 
 ## Application Type
 
-In accordance with RFC 7807, the application type, also known as the `Content-Type` property of the HTTP response header, shall be set to: `application/problem+json`
+In accordance with [RFC 7807](https://tools.ietf.org/html/rfc7807), the application type, also known as the `Content-Type` property of the HTTP response header, shall be set to: `application/problem+json`
 
 ## Parameter Response Messages
 
