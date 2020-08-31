@@ -41,12 +41,12 @@ In order to directly read a document using 1 RU (assuming the document is 1K or 
 
 While this function calculates the key similarly for both the Actor and Movie IDs, the method is added for both the Actor and Movie model classes. This allows for the method to calculate the partition key differently based on the entity.
 
-[Actor.ts](https://github.com/retaildevcrews/helium-csharp/blob/main/src/app/Model/Actor.cs#L29)
-[Movie.ts](https://github.com/retaildevcrews/helium-csharp/blob/main/src/app/Model/Movie.cs#L32)
+[Actor.cs](https://github.com/retaildevcrews/helium-csharp/blob/main/src/app/Model/Actor.cs#L29)
+[Movie.cs](https://github.com/retaildevcrews/helium-csharp/blob/main/src/app/Model/Movie.cs#L32)
 
 ```c#
 
-public static string GetPartitionKey(string id)
+public static string ComputePartitionKey(string id)
 {
     // validate id
     if (!string.IsNullOrEmpty(id) &&
