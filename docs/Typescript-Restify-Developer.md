@@ -158,17 +158,18 @@ Helium leverages the parameterized query for Cosmos DB queries instead of simply
 
 In order to directly read a document using 1 RU (assuming the document is 1K or less), you need the document's ID and partition key. A good CosmosDB best practice is to compute the partition key from the ID. In our case, we use the integer portion of the Movie or Actor document mod 10. This gives us 10 partitions ("0" - "9") with good distribution. For a deeper discussion on the document modeling decisions, please read this [document](https://github.com/retaildevcrews/imdb).
 
-[queryUtilities.ts](https://github.com/retaildevcrews/helium-typescript/blob/master/src/utilities/queryUtilities.ts)
+While this function calculates the key similarly for both the Actor and Movie IDs, the method is added for both the Actor and Movie model classes. This allows for the method to calculate the partition key differently based on the entity.
+
+[Actor.ts](https://github.com/retaildevcrews/helium-typescript/blob/main/src/models/Actor.ts#L32)
+[Movie.ts](https://github.com/retaildevcrews/helium-typescript/blob/main/src/models/Movie.ts#L38)
 
 ```typescript
 
-// compute the partition key based on the movieId or actorId
-// for this sample, the partition key is mod 10 of the numeric portion of the id
-// returns "0" by default
-public static getPartitionKey(id: string): string {
+// compute the partition key based on the movieId
+public static computePartitionKey(id: string): string {
     let idInt = 0;
 
-    if ( id.length > 5 && (id.startsWith("tt") || id.startsWith("nm"))) {
+    if ( id.length > 5 && id.startsWith("tt")) {
         idInt = parseInt(id.substring(2), 10);
         return isNaN(idInt) ? "0" : (idInt % 10).toString();
     }
@@ -177,6 +178,8 @@ public static getPartitionKey(id: string): string {
 }
 
 ```
+
+The above code shows the `computePartitionKey` method for the Movie class which is almost identical to the one in the Actor class.
 
 ## Healthz Response Cache
 

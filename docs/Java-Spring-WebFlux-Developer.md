@@ -131,18 +131,17 @@ A `ConfigurationService` class has been defined within the project.  This class 
 
 In order to directly read a document using 1 RU (assuming the document is 1K or less), you need the document's ID and partition key. A good CosmosDB best practice is to compute the partition key from the ID. In our case, we use the integer portion of the Movie or Actor document mod 10. This gives us 10 partitions ("0" - "9") with good distribution. For a deeper discussion on the document modeling decisions, please read this [document](https://github.com/retaildevcrews/imdb).
 
-[CommonUtils.java](https://github.com/retaildevcrews/helium-java/blob/master/src/main/java/com/cse/helium/app/utils/CommonUtils.java#L28)
+While this function calculates the key similarly for both the Actor and Movie IDs, the method is added for both the Actor and Movie model classes. This allows for the method to calculate the partition key differently based on the entity.
+
+[Actor.java](https://github.com/retaildevcrews/helium-java/blob/main/src/main/java/com/cse/helium/app/models/Actor.java#L58)
+[Movie.java](https://github.com/retaildevcrews/helium-java/blob/main/src/main/java/com/cse/helium/app/models/Movie.java#L55)
 
 ```java
 
-/**
-   * GetPartitionKey.
-   */
-
-  public String getPartitionKey(String id) {
+  public static String computePartitionKey(String id) {
     // validate id
-    if (!StringUtils.isEmpty(id) && id.length() > 5 && StringUtils.startsWithIgnoreCase(id, "tt")
-        || StringUtils.startsWithIgnoreCase(id, "nm")) {
+    if (!StringUtils.isEmpty(id) && id.length() > 5
+        && StringUtils.startsWithIgnoreCase(id, "tt")) {
       int idInt = Integer.parseInt(id.substring(2));
       return String.valueOf(idInt % 10);
     }
@@ -150,6 +149,8 @@ In order to directly read a document using 1 RU (assuming the document is 1K or 
   }
 
 ```
+
+The above code shows the `computePartitionKey` method for the Movie class which is almost identical to the one in the Actor class.
 
 ## AKS Pod Identity Support
 
