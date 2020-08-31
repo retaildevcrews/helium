@@ -10,11 +10,11 @@ The HTTP/400 error responses outlined in this document currently only cover API 
 
 The HTTP response contains a "Problem Details Object" which has the following members:
 
-- "type" (string): An optional URI which identifies the problem type.
-- "title" (string): Summary of the problem.
-- "status" (number): Currently scoped to HTTP/400
-- "detail" (string): A message specific to this type of problem.
-- "instance" (string): A URI reference indicating the HTTP route referenced by the API (excluding query string parameters)
+- "**type**" (string): An optional URI which identifies the problem type.
+- "**title**" (string): Summary of the problem.
+- "**status**" (number): Currently scoped to HTTP/400
+- "**detail**" (string): A message specific to this type of problem.
+- "**instance**" (string): A URI reference indicating the HTTP route referenced by the API (excluding query string parameters)
 
 Note: Object order is not pre-defined or set and can vary.
 
@@ -22,21 +22,35 @@ Note: Object order is not pre-defined or set and can vary.
 
 To provide more specific information about the error condition, the RFC permits extension members to be defined with no limit to the schema. As such, an object array called `validationErrors` is used to hold one or more objects with the following members:
 
-- "code" (string): The error type specific to the validation issue in the collection
-- "target" (string): The name of the parameter which did not validate correctly
-- "message" (string): A descriptive message outlining the constrains of the input
+- "**code**" (string): The error type specific to the validation issue in the collection
+- "**target**" (string): The name of the parameter which did not validate correctly
+- "**message**" (string): A descriptive message outlining the constrains of the input
 
 ## Error Types
 
 Given the above extension member called `validationErrors`, the `code` property can hold the following values:
 
-1. NullValue
-2. MalformedValue
-3. InvalidValue
+1. **NullValue**: Used when the input parameter is null
+2. **InvalidValue**: Used when the input parameter is not the correct type or outside the bounds of the required value(s)
 
 ## Application Type
 
-In accordance with RFC 7807, the application type, also known as the `Content-Type` property of the HTTP response header shall be set to: `application/problem+json`
+In accordance with RFC 7807, the application type, also known as the `Content-Type` property of the HTTP response header, shall be set to: `application/problem+json`
+
+## Parameter Response Messages
+
+|   Parameter    |  Message  |
+|     :--:       |    --     |
+|   'q'          |   The parameter 'q' should be between 2 and 20 characters. |
+|   'actorId'    |   The parameter 'actorId' should start with 'nm' and be between 7 and 11 characters in total. |
+|   'movieId'    |   The parameter 'movieId' should start with 'tt' and be between 7 and 11 characters in total. |
+|   'year'       |   The parameter 'year' should be between 1874 and {Current Year + 5} |
+|   'genre'      |   The parameter 'genre' should be between 3 and 20 characters. |
+|   'rating'     |   The parameter 'rating' should be between 0 and 10.0 |
+|   'pageSize'   |   The parameter 'pageSize' should be between 1 and 1000. |
+|   'pageNumber' |   The parameter 'pageNumber' should be between 1 and 10000 |
+
+Note: The `year` parameter listed above uses a dynamic range for the maximum value which is today's year plus five (i.e. 2025 at current time of writing).
 
 ## Examples
 
@@ -56,12 +70,12 @@ The following examples show multiple validation errors be triggered on both the 
         {
             "code": "InvalidValue",
             "target": "Year",
-            "message": "The parameter should be between 1874 and 2025."
+            "message": "The parameter 'Year' should be between 1874 and 2025."
         },
                 {
             "code": "InvalidValue",
             "target": "Genre",
-            "message": "The parameter should be between 3 and 20 characters."
+            "message": "The parameter 'Genre' should be between 3 and 20 characters."
         }
     ]
 }
