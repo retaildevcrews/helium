@@ -48,8 +48,8 @@ Define valid Query String and URL parameters for the Helium API
       - Empty array when no results
   - Invalid input: length [2, 20]
     - Status: 400
-    - Content-Type: text/plain
-    - Response Body: Invalid q parameter
+    - Content-Type: application/problem+json
+    - Response Body: RFC 7807 compliant response
 
 - Name: pageSize
 - Type: integer
@@ -63,8 +63,8 @@ Define valid Query String and URL parameters for the Helium API
       - Empty array when no results
   - Invalid input: non-integer or out of range
     - Status: 400
-    - Content-Type: text/plain
-    - Response Body: Invalid pageSize parameter
+    - Content-Type: application/problem+json
+    - Response Body: RFC 7807 compliant response
 
 - Name: pageNumber
 - Type: integer
@@ -78,8 +78,8 @@ Define valid Query String and URL parameters for the Helium API
       - Empty array when no results
   - Invalid input: non-integer or out of range
     - Status: 400
-    - Content-Type: text/plain
-    - Response Body: Invalid pageNumber parameter
+    - Content-Type: application/problem+json
+    - Response Body: RFC 7807 compliant response
 
 ## Movies
 
@@ -99,8 +99,8 @@ Define valid Query String and URL parameters for the Helium API
       - Empty array when no results
   - Invalid input: input that does not parse or is out of range
     - Status: 400
-    - Content-Type: text/plain
-    - Response Body: Invalid year parameter
+    - Content-Type: application/problem+json
+    - Response Body: RFC 7807 compliant response
 
 - Name: rating
 - Type: double
@@ -113,8 +113,8 @@ Define valid Query String and URL parameters for the Helium API
     - Response Body: array of `Movie`
   - Invalid input: does not parse or out of range
     - Status: 400
-    - Content-Type: text/plain
-    - Response Body: Invalid rating parameter
+    - Content-Type: application/problem+json
+    - Response Body: RFC 7807 compliant response
 
 - Name: actorId
 - Type: string
@@ -130,8 +130,8 @@ Define valid Query String and URL parameters for the Helium API
       - Empty array when no results
   - Invalid input:
     - Status: 400
-    - Content-Type: text/plain
-    - Response Body: Invalid actorId parameter
+    - Content-Type: application/problem+json
+    - Response Body: RFC 7807 compliant response
 
 - Name: genre
 - Type: string
@@ -145,8 +145,8 @@ Define valid Query String and URL parameters for the Helium API
       - Empty array when no results
   - Invalid input: length [3, 20]
     - Status: 400
-    - Content-Type: text/plain
-    - Response Body: Invalid genre parameter
+    - Content-Type: application/problem+json
+    - Response Body: RFC 7807 compliant response
 
 ### Direct Read
 
@@ -168,8 +168,8 @@ Define valid Query String and URL parameters for the Helium API
     - Response Body: none
   - Invalid input:
     - Status: 400
-    - Content-Type: text/plain
-    - Response Body: Invalid movieId parameter
+    - Content-Type: application/problem+json
+    - Response Body: RFC 7807 compliant response
 
 ## Actors
 
@@ -199,5 +199,5 @@ Define valid Query String and URL parameters for the Helium API
     - Response Body: none
   - Invalid input:
     - Status: 400
-    - Content-Type: text/plain
-    - Response Body: Invalid actorId parameter
+    - Content-Type: application/problem+json
+    - Response Body: RFC 7807 compliant response
