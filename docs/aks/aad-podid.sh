@@ -37,15 +37,6 @@ if echo $AKS_NODE_RG > /dev/null 2>&1; then
     echo "AKS Node Resource Group Full ID = $AKS_NODE_RG_RESID"
 fi
 
-
-echo "creating aad-pod-identity deployment in the default namespace"
-if ! kubectl get deploy mic > /dev/null 2>&1; then
-    if ! kubectl apply -f https://raw.githubusercontent.com/Azure/aad-pod-identity/master/deploy/infra/deployment-rbac.yaml; then
-        echo "ERROR: failed to create kubernetes aad-pod-idenity deployment"
-        exit 1
-    fi
-fi
-
 echo "creating azure user assigned managed identity $MI_NAME in the $AKS_NODE_RG Resource Group"
 if echo $AKS_NODE_RG > /dev/null 2>&1 && echo $MI_NAME > /dev/null 2>&1; then
     if ! export MI_PrincID=$(az identity create -g ${AKS_NODE_RG} -n ${MI_NAME} --query principalId -o tsv); then
@@ -120,43 +111,23 @@ fi
 #     fi
 # fi
 
-
-
-echo "The aadpodidentity resource will be deployed to cluster $AKS_NAME. It will be saved to your current directory as aadpodidentity.yaml"
-cat << EOF > cluster/manifests/aadpodidentity/${MI_NAME}aadpodidentity.yaml
-apiVersion: "aadpodidentity.k8s.io/v1"
-kind: AzureIdentity
-metadata:
- name: $MI_NAME
-spec:
- type: 0
- ResourceID: $MI_ResID
- ClientID: $MI_ClientID
+# write aad helm chart values file.
+cat << EOF > cluster/manifests/aadpodidentity/${MI_NAME}-values.yaml
+azureIdentities:
+  - name: "${MI_NAME}"
+    namespace: "default"
+    type: 0
+    resourceID: "${MI_ResID}"
+    clientID: "${MI_ClientID}"
+    binding:
+      name: "${MI_NAME}-binding"
+      selector: "${MI_NAME}"
 EOF
 
-echo "deploying aadpodidentity resource into the default namespace"
-if kubectl get deploy mic > /dev/null 2>&1; then
-    if ! kubectl apply -f cluster/manifests/aadpodidentity/${MI_NAME}aadpodidentity.yaml; then
-        echo "ERROR: failed to create kubernetes aadpodidenity resource"
-        exit 1
-    fi
-fi
-
-echo "The aadpodidentitybiding resource will be deployed to cluster $AKS_NAME. It will be saved to your current directory as aadpodidentitybinding.yaml"
-cat << EOF > cluster/manifests/aadpodidentity/${MI_NAME}aadpodidentitybinding.yaml
-apiVersion: "aadpodidentity.k8s.io/v1"
-kind: AzureIdentityBinding
-metadata:
- name: ${MI_NAME}-binding
-spec:
- AzureIdentity: ${MI_NAME}
- Selector: ${MI_NAME}
-EOF
-
-echo "creating deploying aadpodidentitybinding resource into the default namespace"
-if kubectl get deploy mic > /dev/null 2>&1; then
-    if ! kubectl apply -f cluster/manifests/aadpodidentity/${MI_NAME}aadpodidentitybinding.yaml; then
-        echo "ERROR: failed to create kubernetes aadpodidenitybinding resource"
+echo "creating aad-pod-identity deployment in the default namespace with values file "
+if ! kubectl get deploy mic > /dev/null 2>&1; then
+    if ! helm install aad-pod-identity aad-pod-identity/aad-pod-identity -f cluster/manifests/aadpodidentity/${MI_NAME}-values.yaml; then
+        echo "ERROR: failed to create kubernetes aad-pod-idenity deployment"
         exit 1
     fi
 fi
