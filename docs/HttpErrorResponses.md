@@ -1,6 +1,6 @@
 # Helium HTTP/400 Error Response Design
 
-This design guide covers the types of responses and format used when an HTTP/400 error occurs. Aligning with [RFC 7807](https://tools.ietf.org/html/rfc7807), the error responses adhere to this specification with a additional extension members containing a collection of parameter validation errors.
+This design guide covers the types of responses and format used when an HTTP/400 error occurs. Aligning with [RFC 7807](https://tools.ietf.org/html/rfc7807), the error responses adhere to this specification with additional extension members containing a collection of parameter validation errors.
 
 ## Scope
 
@@ -44,17 +44,17 @@ In accordance with [RFC 7807](https://tools.ietf.org/html/rfc7807), the applicat
 |   q            |   The parameter 'q' should be between 2 and 20 characters. |
 |   actorId      |   The parameter 'actorId' should start with 'nm' and be between 7 and 11 characters in total. |
 |   movieId      |   The parameter 'movieId' should start with 'tt' and be between 7 and 11 characters in total. |
-|   year         |   The parameter 'year' should be between 1874 and {Current Year + 5} |
+|   year         |   The parameter 'year' should be between 1874 and {Current Year + 5}. |
 |   genre        |   The parameter 'genre' should be between 3 and 20 characters. |
-|   rating       |   The parameter 'rating' should be between 0 and 10.0 |
+|   rating       |   The parameter 'rating' should be between 0.0 and 10.0. |
 |   pageSize     |   The parameter 'pageSize' should be between 1 and 1000. |
-|   pageNumber   |   The parameter 'pageNumber' should be between 1 and 10000 |
+|   pageNumber   |   The parameter 'pageNumber' should be between 1 and 10000. |
 
 Note: The `year` parameter listed above uses a dynamic range for the maximum value which is today's year plus five (i.e. 2025 at current time of writing).
 
 ## Examples
 
-The following examples show multiple validation errors be triggered on both the `Movies` and `Actors` APIs.
+The following examples show multiple validation errors triggered on both the `Movies` and `Actors` APIs.
 
 ### Invalid `Movies` API Query Parameter Response
 
