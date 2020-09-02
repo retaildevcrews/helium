@@ -8,23 +8,25 @@ The HTTP/400 error responses outlined in this document currently only cover API 
 
 ## Base Problem Details Object
 
-The HTTP response contains a "Problem Details Object" which has the following members:
+|   Property    |   Type    |   Required    |   Description                                         |
+|:-------------:|:---------:|:-------------:|-------------------------------------------------------|
+|   type        |   String  |               | An optional URI which identifies the problem type.    |
+|   title       |   String  |      ✔       | Summary of the problem.                               |
+|   status      |   Number  |      ✔       | Currently scoped to HTTP/400.                         |
+|   detail      |   String  |      ✔       | A message specific to this type of problem.           |
+|   instance    |   String  |      ✔       | Characters referencing the HTTP route (excluding query string parameters). |
 
-- "**type**" (string): An optional URI which identifies the problem type.
-- "**title**" (string): Summary of the problem.
-- "**status**" (number): Currently scoped to HTTP/400
-- "**detail**" (string): A message specific to this type of problem.
-- "**instance**" (string): A URI reference indicating the HTTP route referenced by the API (excluding query string parameters)
-
-Note: Object order is not pre-defined or set and can vary.
+>Note: Object order in the response body and can vary.
 
 ## Extension Members
 
 To provide more specific information about the error condition, the RFC permits extension members to be defined with no limit to the schema. As such, an object array called `validationErrors` is used to hold one or more objects with the following members:
 
-- "**code**" (string): The error type specific to the validation issue in the collection
-- "**target**" (string): The name of the parameter which did not validate correctly
-- "**message**" (string): A descriptive message outlining the constrains of the input
+|   Property    |   Type    |   Required    |   Description                                         |
+|:-------------:|:---------:|:-------------:|-------------------------------------------------------|
+|   code        |   String  |      ✔       | The error type specific to the validation issue in the collection.    |
+|   target      |   String  |      ✔       | The name of the parameter which did not validate correctly.                               |
+|   message     |   String  |      ✔       | A descriptive message outlining the constrains of the input.                         |
 
 ## Error Types
 
