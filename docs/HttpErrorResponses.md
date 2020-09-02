@@ -50,7 +50,7 @@ In accordance with [RFC 7807](https://tools.ietf.org/html/rfc7807), the applicat
 |   pageSize     |   The parameter 'pageSize' should be between 1 and 1000. |
 |   pageNumber   |   The parameter 'pageNumber' should be between 1 and 10000. |
 
-Note: The `year` parameter listed above uses a dynamic range for the maximum value which is today's year plus five (i.e. 2025 at current time of writing).
+>Note: The `year` parameter listed above uses a dynamic range for the maximum value which is today's year plus five (i.e. 2025 at current time of writing).
 
 ## Examples
 
