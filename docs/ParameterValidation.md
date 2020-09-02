@@ -20,12 +20,16 @@ Define valid Query String and URL parameters for the Helium API
 
 - Parameter validation fails on the first error
 - Additional query string parameters are ignored
-- Additional URL paramaters result in 404 Not Found
+- Additional URL parameters result in 404 Not Found
   - example: /api/movies/tt12345/foo
 - Specifying multiple instances of a query string is an error and results are unpredictable
   - Results are idiomatic to the language / framework used
     - i.e. /api/movies?year=1998&year=1999 will return 400 on some frameworks
     - while /api/movies?genre=action&genre=comedy will use the first value
+
+### Error Response Format
+
+The error response to parameter or route path validation errors uses a combination of RFC 7807 and the Microsoft REST API guidelines and can be found on the [HttpErrorResponses](HttpErrorResponses.md) page.
 
 ## Common Parameters
 
@@ -49,7 +53,7 @@ Define valid Query String and URL parameters for the Helium API
   - Invalid input: length [2, 20]
     - Status: 400
     - Content-Type: application/problem+json
-    - Response Body: RFC 7807 compliant response
+    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
 
 - Name: pageSize
 - Type: integer
@@ -64,7 +68,7 @@ Define valid Query String and URL parameters for the Helium API
   - Invalid input: non-integer or out of range
     - Status: 400
     - Content-Type: application/problem+json
-    - Response Body: RFC 7807 compliant response
+    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
 
 - Name: pageNumber
 - Type: integer
@@ -79,7 +83,7 @@ Define valid Query String and URL parameters for the Helium API
   - Invalid input: non-integer or out of range
     - Status: 400
     - Content-Type: application/problem+json
-    - Response Body: RFC 7807 compliant response
+    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
 
 ## Movies
 
@@ -100,7 +104,7 @@ Define valid Query String and URL parameters for the Helium API
   - Invalid input: input that does not parse or is out of range
     - Status: 400
     - Content-Type: application/problem+json
-    - Response Body: RFC 7807 compliant response
+    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
 
 - Name: rating
 - Type: double
@@ -114,7 +118,7 @@ Define valid Query String and URL parameters for the Helium API
   - Invalid input: does not parse or out of range
     - Status: 400
     - Content-Type: application/problem+json
-    - Response Body: RFC 7807 compliant response
+    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
 
 - Name: actorId
 - Type: string
@@ -131,7 +135,7 @@ Define valid Query String and URL parameters for the Helium API
   - Invalid input:
     - Status: 400
     - Content-Type: application/problem+json
-    - Response Body: RFC 7807 compliant response
+    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
 
 - Name: genre
 - Type: string
@@ -146,7 +150,7 @@ Define valid Query String and URL parameters for the Helium API
   - Invalid input: length [3, 20]
     - Status: 400
     - Content-Type: application/problem+json
-    - Response Body: RFC 7807 compliant response
+    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
 
 ### Direct Read
 
@@ -169,7 +173,7 @@ Define valid Query String and URL parameters for the Helium API
   - Invalid input:
     - Status: 400
     - Content-Type: application/problem+json
-    - Response Body: RFC 7807 compliant response
+    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
 
 ## Actors
 
@@ -200,4 +204,4 @@ Define valid Query String and URL parameters for the Helium API
   - Invalid input:
     - Status: 400
     - Content-Type: application/problem+json
-    - Response Body: RFC 7807 compliant response
+    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
