@@ -310,4 +310,4 @@ There is a robotsText middleware extension method added to Helium to handle a de
 
 A custom Request Logger extension is added to handle logging Http request information. This can be configured with LoggerOptions to control which requests to log based on status code.  By default, only 4xx and 5xx responses are logged.  This helps make logs easy to search through when debugging errors, rather than having to navigate through several successful requests.  In addition to the request logger, helium logs to console the console. Log level can be controlled with the --log-level command line parameter. The default is `warn`
 
-Code: [requestLogger.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Middleware/requestLogger.cs)
+Code: [requestLogger.cs](https://github.com/retaildevcrews/helium-csharp/blob/main/src/app/Middleware/RequestLogger/logger.cs)
