@@ -30,6 +30,7 @@ Encouraged to just replay "best of" Sprint Demo
 ### Key Project Risks and Concerns
 
 - [ ] Present Retro
+- [ ] Engineering Fundamentals Assessment
 - [ ] Discuss open risks and mitigation plans
 
 ### Backlog Review
