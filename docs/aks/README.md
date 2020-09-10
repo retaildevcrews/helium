@@ -258,6 +258,9 @@ Change directories to the `docs/aks` folder and make the `aad-podid.sh` script e
 
 ```bash
 
+# add helm repo for aad pod identity
+helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
+
 export MI_Name=${He_Name}-mi
 
 cd $REPO_ROOT/docs/aks
@@ -473,11 +476,6 @@ helm install helium-aks helium --set image.repository=<acr_name>.azurecr.io -f h
 
 # curl the health check endpoint
 curl ${INGRESS_PIP}.nip.io/healthz
-
-# NOTE: Currently there is an issue where the app does not start as expected
-# Logs from the linkerd-proxy container show the following error (repeatedly):
-# ERR! [    34.403788s] linkerd2_proxy::app::errors unexpected error: error trying to connect: Connection refused (os error 111) (address: 127.0.0.1:4120)
-# Additional investigation is needed to fix this bug
 
 ```
 

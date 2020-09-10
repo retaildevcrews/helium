@@ -6,18 +6,6 @@ This design guide covers the types of responses and format used when an HTTP/400
 
 The HTTP/400 error responses outlined in this document currently only cover API input parameter validation at this time.
 
-## Error Handling
-
-- Parameter validation is performed on all input Query String parameters
-- A collection of validation errors is displayed in the response
-- Each invalid parameter is logged
-- Additional URL parameters result in 404 Not Found
-  - example: /api/movies/tt12345/foo
-- Specifying multiple instances of a query string is an error and results are unpredictable
-  - Results are idiomatic to the language / framework used
-    - i.e. /api/movies?year=1998&year=1999 will return 400 on some frameworks
-    - while /api/movies?genre=action&genre=comedy will use the first value
-
 ## Problem Details Object
 
 |   Property    |   Type    |   Required    |   Description                                         |

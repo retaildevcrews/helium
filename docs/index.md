@@ -32,10 +32,10 @@ This is a Web API reference application designed to "fork and code" with the fol
 
 ### [dotnet Implementation](DotNet-Core-Developer.md)
 
-### [Java Implementation](Java-SpringBoot-Developer.md)
+### [Java Implementation](Java-Spring-WebFlux-Developer.md)
 
 ## CI-CD Documentation
 
-### [ACR Tasks](CI-CD/ACRTask.md)
+### [ACR Tasks](CI-CD/ACR.md)
 
-### [GitHub Actions](CI-CD/GithubActions.md)
+### [GitHub Actions](CI-CD/GitHubActions.md)
