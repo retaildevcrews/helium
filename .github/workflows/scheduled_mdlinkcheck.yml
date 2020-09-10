@@ -2,7 +2,7 @@ name: Check Markdown Links
 
 on: 
   schedule:
-  # Run on the 1st and 15th of every month at 2:00 AM 
+  # Run on the 1st, 8th, 15th and 22nd of every month at 2:00 AM 
   - cron: "0 2 1,8,15,22 * *"
 
 jobs:
