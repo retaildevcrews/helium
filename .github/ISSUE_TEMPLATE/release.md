@@ -17,6 +17,7 @@ This checklist is for verifying the release is ready to publish and published co
 ### Validation
 
 - [ ] All packages up to date (or task created)
+- [ ] Remove any unused flags or conditional compilation
 - [ ] Remove unused packages
 - [ ] Code Version updated
 - [ ] Code Review completed
