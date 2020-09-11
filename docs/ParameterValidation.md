@@ -16,7 +16,7 @@ The following section describes two types of interactions with the API; 'searchi
 
 - Valid single read returns `HTTP/200` with `Movie` or `Actor` and content-type of `application/json`
 - Valid single read with no results returns `HTTP/404` and content-type of `application/json`
-- Invalid input returns a `HTTP/400` error response with a `application/problem+json` content type
+- Invalid single read returns a `HTTP/400` error response with a `application/problem+json` content type
 
 ### Error Handling
 
