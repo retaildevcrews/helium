@@ -1,207 +1,81 @@
 # Helium Parameter Validation
 
-Define valid Query String and URL parameters for the Helium API
+The following documentation describes the types of Query String and route parameters available in the Helium REST API. The categories are broken down by [Common Query Parameters](##Common-Query-Parameters), the [Movies API](##Movies-API), and the [Actors API](##Actors-API).
 
-## StatusCode
+## Overview
 
-### Searches
+The following section describes two types of interactions with the API; 'searching' or 'direct reads'. Searching involves the use of Query String parameters which can be specified independent of each other. A direct read involves specifying an `ActorId` or `MovieId` in the route path without Query String parameters.
 
-- Valid input returns 200 with array of `Movie` or `Actor`
-- Valid input with no results returns 200 with empty array
-- Invalid input returns 400 text/plain with Invalid parameter error
+### Searches (query string parameters)
+
+- Valid input returns `HTTP/200` with array of `Movie` or `Actor` and content-type of `application/json`
+- Valid input with no results returns `HTTP/200` with empty array and content-type of `application/json`
+- Invalid input returns a `HTTP/400` error response and content-type of `application/problem+json`
 
 ### Direct Reads
 
-- Valid single read returns 200 with `Movie` or `Actor`
-- Valid single read with no results returns 404
-- Invalid single read returns 400 with Invalid movieId | actorId error
+- Valid single read returns `HTTP/200` with `Movie` or `Actor` and content-type of `application/json`
+- Valid single read with no results returns `HTTP/404` and content-type of `application/json`
+- Invalid single read returns a `HTTP/400` error response with a `application/problem+json` content type
 
 ### Error Handling
 
-- Parameter validation fails on the first error
-- Additional query string parameters are ignored
-- Additional URL parameters result in 404 Not Found
-  - example: /api/movies/tt12345/foo
-- Specifying multiple instances of a query string is an error and results are unpredictable
-  - Results are idiomatic to the language / framework used
-    - i.e. /api/movies?year=1998&year=1999 will return 400 on some frameworks
-    - while /api/movies?genre=action&genre=comedy will use the first value
+The error handling details including the response to parameter or route path validation errors uses a combination of RFC 7807 and the Microsoft REST API guidelines and can be found on the [HttpErrorResponses](HttpErrorResponses.md) page.
 
-### Error Response Format
+## Common Query Parameters
 
-The error response to parameter or route path validation errors uses a combination of RFC 7807 and the Microsoft REST API guidelines and can be found on the [HttpErrorResponses](HttpErrorResponses.md) page.
+The following API routes use these common parameters:
 
-## Common Parameters
+- /api/movies
+- /api/actors
 
-> /api/movies
->
-> /api/actors
+|   Name        |  Description                                                |  Type    |  Valid Input         |  Response Body                                |  Notes                               |
+|   ----        |  -----------                                                |  ----    |  -----------         |  -------------                                |  ------                              |
+|   q (search)  |  Case insensitive search on 'Movie Title' or 'Actor Name'   |  string  |  between [2, 20]     |  Array of `Movie` or `Actor` or empty array   |  Movie.Title/Actor.Name contains q   |
+|   pageSize    |  Limit the number of results                                |  integer |  between [1, 1000]   |  Array of `Movie` or `Actor` or empty array   |  n/a                                 |
+|   pageNumber  |  Return a specific page from the results                    |  integer |  between [1, 10000]  |  Array of `Movie` or `Actor` or empty array   |  n/a                                 |
 
-### Query String Parameters
+## Movies API
 
-- Name: q (search)
-- Description: case insensitive contains search on Movie.Title or Actor.Name
-- Type: string
-- Parameter Validation:
-  - Valid input: length [2, 20]
-    - Status: 200
-    - Content-Type: application/json
-    - Filter: Movie.Title contains q
-      - Actor.Name contains q
-    - Response Body: array of `Movie` or `Actor` filtered by search query
-      - Empty array when no results
-  - Invalid input: length [2, 20]
-    - Status: 400
-    - Content-Type: application/problem+json
-    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
+### Movies Query String Parameters
 
-- Name: pageSize
-- Type: integer
-- Description: limit the number of documents returned
-- Parameter Validation:
-  - Default value: 100
-  - Valid input range: [1, 1000]
-    - Status: 200
-    - Content-Type: application/json
-    - Response Body: array of `Movie` or `Actor`
-      - Empty array when no results
-  - Invalid input: non-integer or out of range
-    - Status: 400
-    - Content-Type: application/problem+json
-    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
+The following API route uses these additional parameters:
 
-- Name: pageNumber
-- Type: integer
-- Description: 1 based page number
-- Parameter Validation:
-  - Default value: 1
-  - Valid input range: [1, 10000]
-    - Status: 200
-    - Content-Type: application/json
-    - Response Body: array of `Movie` or `Actor`
-      - Empty array when no results
-  - Invalid input: non-integer or out of range
-    - Status: 400
-    - Content-Type: application/problem+json
-    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
+- /api/movies
 
-## Movies
+|   Name     |  Description                                |  Type    |  Valid Input                           |  Response Body                     |  Notes                  |
+|   ----     |  -----------                                |  ----    |  -----------                           |  -------------                     |  -----                  |
+|   year     |  Get movies by year                         |  integer |  between [1874, currentYear + 5]       |  Array of `Movie` or empty array   |  n/a                    |
+|   rating   |  Filter by Movie.Rating >= rating           |  double  |  between [0.0, 10.0]                   |  Array of `Movie` or empty array   |  n/a                    |
+|   genre    |  Filter by Movie.Genre                      |  string  |  between [3, 20] characters            |  Array of `Movie` or empty array   |  n/a                    |
+|   actorId  |  Return a specific page from the results    |  string  |  starts with 'nm' + [5, 9] characters  |  Array of `Movie` or empty array   |  'nm' must be lowercase |
 
-### Additional Query String Parameters
+### Movies Direct Read
 
-> /api/movies
+This applies to the following API route:
 
-- Name: year
-- Type: integer
-- Description: filter by year
-- Parameter Validation:
-  - Valid input range: [1874, currentYear + 5]
-    - Status: 200
-    - Content-Type: application/json
-    - Filter: Movie.Year == year
-    - Response Body: array of `Movie`
-      - Empty array when no results
-  - Invalid input: input that does not parse or is out of range
-    - Status: 400
-    - Content-Type: application/problem+json
-    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
+- /api/movies/{movieId}
 
-- Name: rating
-- Type: double
-- Description: filter by Movie.Rating >= rating
-- Parameter Validation:
-  - Valid input range: [0.0, 10.0]
-    - Status: 200
-    - Content-Type: application/json
-    - Filter: Movie.Rating >= rating
-    - Response Body: array of `Movie`
-  - Invalid input: does not parse or out of range
-    - Status: 400
-    - Content-Type: application/problem+json
-    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
+|   Name     |  Description                                |  Type    |  Valid Input                           |  Response Body     |  Notes                  |
+|   ----     |  -----------                                |  ----    |  -----------                           |  -------------     |  -----                  |
+|   movieId  |  Return a specific page from the results    |  string  |  starts with 'tt' + [5, 9] characters  |  Single `Movie`    |  'tt' must be lowercase |
 
-- Name: actorId
-- Type: string
-- Description: filter by actorId in Movie.Roles
-- Parameter Validation
-  - Valid input: starts with 'nm' (case sensitive)
-    - followed by 5-9 digits
-      - parses to int > 0
-    - Status: 200
-    - Content-Type: application/json
-    - Filter: Movie.Roles contains actorId
-    - Response Body: array of `Movie`
-      - Empty array when no results
-  - Invalid input:
-    - Status: 400
-    - Content-Type: application/problem+json
-    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
+## Actors API
 
-- Name: genre
-- Type: string
-- Description: filter by genre in Movie.Genres
-- Parameter Validation:
-  - Valid input: length [3, 20]
-    - Status: 200
-    - Content-Type: application/json
-    - Filter: Movie.Genres contains genre
-    - Response Body: array of `Movie`
-      - Empty array when no results
-  - Invalid input: length [3, 20]
-    - Status: 400
-    - Content-Type: application/problem+json
-    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
+### Actors Query String Parameters
 
-### Direct Read
+The following API route uses these parameters:
 
-> /api/movies/{movieId}
+- /api/actors
 
-- Name: movieId
-- Type: string
-- Description: `Movie` by movieId
-- Parameter Validation:
-  - Valid input: starts with 'tt' (case sensitive)
-    - followed by 5-9 digits
-      - parses to int > 0
-    - Status: 200
-    - Content-Type: application/json
-    - Filter: Movie.MovieId == movieId
-    - Response Body: Single `Movie`
-  - Valid input: movieId does not exist
-    - Status: 404
-    - Response Body: none
-  - Invalid input:
-    - Status: 400
-    - Content-Type: application/problem+json
-    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
+> NOTE: [Refer to the Common Query Parameters](##-Common-Query-Parameters)
 
-## Actors
+### Actors Direct Read
 
-### Query String Parameters
+This applies to the following API route:
 
-> /api/actors
+- /api/actors/{actorId}
 
-- [Refer to the Common Query String Parameters](##-Common-Parameters)
-
-### Direct Read
-
-> /api/actors/{actorId}
-
-- Name: actorId
-- Type: string
-- Description: `Actor` by actorId
-- Parameter Validation:
-  - Valid input: starts with 'nm' (case sensitive)
-    - followed by 5-9 digits
-      - parses to int > 0
-    - Status: 200
-    - Content-Type: application/json
-    - Filter: Actor.ActorId == actorId
-    - Response Body: Single `Actor`
-  - Valid input: actorId does not exist
-    - Status: 404
-    - Response Body: none
-  - Invalid input:
-    - Status: 400
-    - Content-Type: application/problem+json
-    - Response Body: [HttpErrorResponses](HttpErrorResponses.md)
+|   Name     |  Description                                |  Type    |  Valid Input                           |  Response Body    |  Notes                   |
+|   ----     |  -----------                                |  ----    |  -----------                           |  -------------    |  -----                   |
+|   actorId  |  Return a specific page from the results    |  string  |  starts with 'nm' + [5, 9] characters  |  Single `Actor`   |  'nm' must be lowercase  |
