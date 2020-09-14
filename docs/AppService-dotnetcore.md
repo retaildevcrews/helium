@@ -25,11 +25,13 @@ az webapp config appsettings set --settings KEYVAULT_NAME=$He_Name -g $He_App_RG
 # delete the deployment source if it exists
 az webapp deployment source delete -g $He_App_RG -n $He_Name
 
-# Note that you will have to clone the repo to an organization where you have permissions to create a webhook
-# Replace the -u and --branch parameters with your values
+# Note that you will have to clone the repo to an organization where you have permissions
+# to create a webhook or use the --manual-integration flag
+# Replace the -u and --branch parameters with your repo values
 
 # set deployment
-az webapp deployment source config -g $He_App_RG -n $He_Name -u https://github.com/retaildevcrews/helium-csharp --branch main
+# this step usually takes 3-5 minutes
+az webapp deployment source config -g $He_App_RG -n $He_Name -u https://github.com/retaildevcrews/helium-csharp --branch main --manual-integration
 
 # save environment variables
 ./saveenv.sh -y
