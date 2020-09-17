@@ -2,6 +2,7 @@
 
 ## Definition of Done
 
+- Execute code cleanup task in Visual Studio
 - Code changes reviewed & signed off
 - Existing documentation is updated (readme, .md's)
 - New documentation needed to support the change is created
@@ -29,7 +30,22 @@ Engineering Playbook [Definition of Done](https://github.com/microsoft/code-with
   - Avoid long headers, especially H1 and H2
     - Using a short Hx with a long call out renders better than a long Hx
 
-> use call outs to emphasize important points
+> Use call outs to emphasize important points
+
+## Code cleanup (Visual Studio)
+
+Visual Studio 2019 includes a code cleanup feature which contains two profiles, each with their own configurable "fixers". The following instructions describe the steps necessary to configure "Profile 2" with the correct fixers.
+
+> Note: A code cleanup should be run before a PR is ready for review
+
+### Configure Profile 2 Fixers
+
+1. From within Visual Studio 2019 click the **Analyze** menu
+2. Choose **Code Cleanup** then choose **Configure Code Cleanup**
+3. Click **Profile 2** and click the down icon/button to remove any existing fixers.
+4. Add the following fixers (order does not matter):
+
+![Visual Studio Code Cleanup](./images/vs2019-code-cleanup.png)
 
 ## Tool for Code Reviews
 
