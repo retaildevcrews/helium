@@ -34,7 +34,7 @@ Engineering Playbook [Definition of Done](https://github.com/microsoft/code-with
 
 ## Code cleanup (Visual Studio)
 
-Visual Studio 2019 includes a code cleanup feature which contains two profiles; each with their own configurable "fixers". The following instructions describe the steps necessary to configure "Profile 2" with the correct fixers.
+Visual Studio 2019 includes a code cleanup feature which contains two profiles, each with their own configurable "fixers". The following instructions describe the steps necessary to configure "Profile 2" with the correct fixers.
 
 > Note: A code cleanup should be run before a PR is ready for review
 
