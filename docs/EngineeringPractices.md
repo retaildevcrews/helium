@@ -30,7 +30,7 @@ Engineering Playbook [Definition of Done](https://github.com/microsoft/code-with
   - Avoid long headers, especially H1 and H2
     - Using a short Hx with a long call out renders better than a long Hx
 
-> use call outs to emphasize important points
+> Use call outs to emphasize important points
 
 ## Code cleanup (Visual Studio)
 
