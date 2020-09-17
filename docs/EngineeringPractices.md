@@ -44,13 +44,8 @@ Visual Studio 2019 includes a code cleanup feature which contains two profiles, 
 2. Choose **Code Cleanup** then choose **Configure Code Cleanup**
 3. Click **Profile 2** and click the down icon/button to remove any existing fixers.
 4. Add the following fixers (order does not matter):
-   - Apply language/framework type preferences
-   - Add/Remove braces for single-line control statements
-   - Remove unnecessary casts
-   - Apply expression/block body preferences
-   - Apply object/collection initialization preferences
-   - Remove unnecessary usings
-   - Sort usings
+
+![Visual Studio Code Cleanup](./images/vs2019-code-cleanup.png)
 
 ## Tool for Code Reviews
 
