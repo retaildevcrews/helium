@@ -215,7 +215,7 @@ az acr create --sku Standard --admin-enabled false -g $He_ACR_RG -n $He_Name
 
 ```
 
-Create your AKS Cluster
+#### Create the AKS Cluster
 
 Set local variables to use in AKS deployment
 
@@ -235,6 +235,8 @@ export He_K8S_VER=1.16.9
 
 ```
 
+Create and connect to the AKS cluster. You can also create the cluster by following the [Terraform setup](https://github.com/retaildevcrews/helium-terraform/tree/main/src/aks).
+
 ```bash
 
 # note: if you see the following failure, navigate to your .azure\ directory
@@ -250,7 +252,7 @@ kubectl get nodes
 
 ```
 
-Install AAD Pod Identity for the application
+### Install AAD Pod Identity for the application
 
 Change directories to the `docs/aks` folder and make the `aad-podid.sh` script executable. Running this shell script will deploy AAD Pod Identity to your cluster and assign a Managed Identity.
 
