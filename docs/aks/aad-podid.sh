@@ -70,7 +70,7 @@ do
   sleep 10s
 done
 
-echo "assigning the managed identity Principal ID $MI_PrincID reader role to  the $AKS_NODE_RG Resource Group"
+echo "assigning the managed identity Principal ID $MI_PrincID reader role to the $AKS_NODE_RG Resource Group"
 if echo $MI_PrincID > /dev/null 2>&1 && echo $AKS_NODE_RG > /dev/null 2>&1; then
     if ! az role assignment create --role Reader --assignee $MI_PrincID --scope $AKS_NODE_RG_RESID; then
         echo "ERROR: failed to assign the reader role to the managed identity"
@@ -80,25 +80,36 @@ fi
 
 echo "creating required variables"
 if echo $AKS_NAME > /dev/null 2>&1 && echo $AKS_RG >/dev/null 2>&1; then
-    if ! export AKS_SPID=$(az aks show -g ${AKS_RG} -n ${AKS_NAME} --query 'servicePrincipalProfile.clientId' -o tsv); then
+    if ! export AKS_IDENTITY_ID=$(az aks show -g ${AKS_RG} -n ${AKS_NAME} --query 'servicePrincipalProfile.clientId' -o tsv); then
         echo "ERROR: failed to get Service Principal ID for AKS Cluster"
         exit 1
     fi
-    echo "AKS Service Principal ID = $AKS_SPID"
+
+    echo "Checking if the cluster is using managed identity"
+    if [ "${AKS_IDENTITY_ID:-}" = "msi" ]; then
+        if ! export AKS_IDENTITY_ID=$(az aks show -g ${AKS_RG} -n ${AKS_NAME} --query identityProfile.kubeletidentity.clientId -o tsv); then
+            echo "ERROR: failed to get Kubelet Identity ID for AKS Cluster"
+            exit 1
+        fi
+    fi
+
+    echo "AKS Identity ID = $AKS_IDENTITY_ID"
 fi
 
-if echo $AKS_NAME > /dev/null 2>&1 && echo $AKS_RG >/dev/null 2>&1; then
-    if ! export AKS_SP_ObjID=$(az ad sp show --id ${AKS_SPID} --query objectId -o tsv); then
-        echo "ERROR: failed to get Service Principal Object ID for AKS Cluster"
+# The role assignments for AKS Identity below have been modeled after the documentation
+# found in https://github.com/Azure/aad-pod-identity/blob/master/docs/readmes/README.role-assignment.md
+echo "assigning the AKS Identity Managed Identity Operator rights"
+if echo $AKS_IDENTITY_ID > /dev/null 2>&1 && echo $AKS_NODE_RG > /dev/null 2>&1; then
+    if ! az role assignment create --role "Managed Identity Operator" --assignee $AKS_IDENTITY_ID --scope $AKS_NODE_RG_RESID; then
+        echo "ERROR: failed to assign the AKS Identity Managed Identity Operator rights"
         exit 1
     fi
-    echo "AKS Service Principal Object ID = $AKS_SP_ObjID"
 fi
 
-echo "assigning the AKS Service Principal Managed Identity Operator rights"
-if echo $AKS_SP_ObjID > /dev/null 2>&1 && echo $MI_ResID > /dev/null 2>&1; then
-    if ! az role assignment create --role "Managed Identity Operator" --assignee $AKS_SP_ObjID --scope $MI_ResID; then
-        echo "ERROR: failed to assign the AKS Service Principal Managed Identity Operator rights"
+echo "assigning the AKS Identity Virtual Machine Contributor rights"
+if echo $AKS_IDENTITY_ID > /dev/null 2>&1 && echo $AKS_NODE_RG > /dev/null 2>&1; then
+    if ! az role assignment create --role "Virtual Machine Contributor" --assignee $AKS_IDENTITY_ID --scope $AKS_NODE_RG_RESID; then
+        echo "ERROR: failed to assign the AKS Identity Virtual Machine Contributor rights"
         exit 1
     fi
 fi
