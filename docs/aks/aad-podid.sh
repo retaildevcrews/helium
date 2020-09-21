@@ -114,14 +114,6 @@ if echo $AKS_IDENTITY_ID > /dev/null 2>&1 && echo $AKS_NODE_RG > /dev/null 2>&1;
     fi
 fi
 
-# echo "assigning the Managed Identity access rights to the Azure Key Vault"
-# if echo $KEY_VAULT_NAME > /dev/null 2>&1 && echo $MI_PrincID > /dev/null 2>&1; then
-#     if ! az keyvault set-policy -n $KEY_VAULT_NAME --object-id $MI_PrincID --secret-permissions get list --key-permissions get list --certificate-permissions get list; then
-#         echo "ERROR: failed to assign the Managed Identity access rights to the Azure Key Vault"
-#         exit 1
-#     fi
-# fi
-
 # write aad helm chart values file.
 cat << EOF > cluster/manifests/aadpodidentity/${MI_NAME}-values.yaml
 azureIdentities:
@@ -151,8 +143,7 @@ echo "**************************************************************************
 echo " "
 echo "******************************************************************************************************************"
 echo "To assign the MI to your keyvault run the following:"
-echo "az keyvault set-policy -n ${He_Name} --object-id ${MI_PrincID} --secret-permissions get list \\"
-echo "--key-permissions get list --certificate-permissions get list"
+echo "az keyvault set-policy -n ${He_Name} --object-id ${MI_PrincID} --secret-permissions get list"
 echo "******************************************************************************************************************"
 echo " "
 echo "******************************************************************************************************************"

@@ -324,16 +324,15 @@ helm repo update
 
 ### Install AAD Pod Identity for the application
 
-Change directories to the `docs/aks` folder and make the `aad-podid.sh` script executable. Running this shell script will deploy AAD Pod Identity to your cluster and assign a Managed Identity.
+Change directories to the `docs/aks` folder. Running this shell script will deploy AAD Pod Identity to your cluster and assign a Managed Identity.
 
->NOTE: The second command below has a `.` then a space followed by `./aad-podid.sh ...` this is so the exported variables in the script persist after the script ends in the uder interactive shell
+>NOTE: The second command below has a `.` then a space followed by `./aad-podid.sh ...` this is so the exported variables in the script persist after the script ends in the outer interactive shell
 
 ```bash
 
 export MI_Name=${He_Name}-mi
 
 cd $REPO_ROOT/docs/aks
-sudo chmod +x aad-podid.sh
 
 . ./aad-podid.sh -a ${He_AKS_Name} -r ${He_App_RG} -m ${MI_Name}
 
@@ -354,7 +353,7 @@ echo $MI_Name
 
 ```bash
 
-az keyvault set-policy -n ${He_Name} --object-id ${MI_PrincID} --secret-permissions get list --key-permissions get list --certificate-permissions get list
+az keyvault set-policy -n ${He_Name} --object-id ${MI_PrincID} --secret-permissions get list
 
 ```
 
