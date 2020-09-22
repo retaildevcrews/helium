@@ -239,22 +239,12 @@ Create and connect to the AKS cluster. You can also create the cluster by follow
 
 ```bash
 
-# Add Application Gateway Ingress Controller extension
-az feature register --name AKS-IngressApplicationGatewayAddon --namespace Microsoft.ContainerService
-az provider register -n Microsoft.ContainerService
-az extension add --name aks-preview
-
 # note: if you see the following failure, navigate to your .azure\ directory
 # and delete the file "aksServicePrincipal.json":
 #    Waiting for AAD role to propagate[################################    ]  90.0000%Could not create a
 #    role assignment for ACR. Are you an Owner on this subscription?
 
-az aks create --name $He_AKS_Name --resource-group $He_App_RG --location $He_Location --enable-cluster-autoscaler --min-count 3 --max-count 6 --node-count 3 --kubernetes-version $He_K8S_VER --attach-acr $He_Name  --no-ssh-key -a ingress-appgw --appgw-name "${He_Name}-gateway" --appgw-subnet-prefix "10.2.0.0/16" --network-plugin azure --enable-managed-identity
-
-export He_K8S_APP_GATEWAY_ID=$(az network application-gateway show -n ${He_Name}-gateway -g $AKS_NODE_RG --query 'frontendIpConfigurations[0].publicIpAddress.id' -o tsv)
-
-# App Gateway public IP address
-export INGRESS_PIP=$(az network public-ip show --ids $He_K8S_APP_GATEWAY_ID --query ipAddress -o tsv)
+az aks create --name $He_AKS_Name --resource-group $He_App_RG --location $He_Location --enable-cluster-autoscaler --min-count 3 --max-count 6 --node-count 3 --kubernetes-version $He_K8S_VER --attach-acr $He_Name  --no-ssh-key --enable-managed-identity
 
 az aks get-credentials -n $He_AKS_Name -g $He_App_RG
 
@@ -315,9 +305,9 @@ Add the required helm repositories
 
 ```bash
 
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
-helm repo add application-gateway-kubernetes-ingress https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
 helm repo update
 
 ```
@@ -386,6 +376,47 @@ linkerd check
 
 ```
 
+## Install the NGNIX ingress controller
+
+Create a namespace for your ingress resources. There is a yaml file located in the clones repository under `$REPO_ROOT/docs/aks/cluster/manifests/ingress-nginx-namespace.yaml`
+
+```bash
+
+kubectl apply -f $REPO_ROOT/docs/aks/cluster/manifests/ingress-nginx-namespace.yaml
+
+```
+
+Use Helm to deploy an NGINX ingress controller
+
+```bash
+
+helm install ingress ingress-nginx/ingress-nginx \
+    --namespace ingress-nginx \
+    --set controller.replicaCount=2 \
+    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
+    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+
+# Add the ingress controller pods to the linkerd service mesh AFTER the controller is up and running.
+# If the namespace has this annotation before installing the ingress controller, then the install will fail.
+# The cause is a pod that is stuck in the "NotReady" because of a completed ingress-nginx job, and a running linkered container.
+kubectl annotate namespace ingress-nginx linkerd.io/inject='enabled'
+kubectl get deployment ingress-ingress-nginx-controller --namespace ingress-nginx -o yaml \
+  | linkerd inject - \
+  | kubectl apply -f -
+
+```
+
+Get the Public IP of your Ingress Controller. This will be used later in deploying the application.
+
+```bash
+
+export INGRESS_PIP=$(kubectl --namespace ingress-nginx get svc -l app.kubernetes.io/component=controller -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
+
+cd $REPO_ROOT
+./saveenv.sh
+
+```
+
 ## Deploy the needed componenets of helium, key rotator and the testing harness
 
 An helm chart is included for the reference application ([helium](https://github.com/RetailDevCrews/helium-csharp))
@@ -416,7 +447,8 @@ annotations:
 
 ingress:
   hosts:
-    - paths: /
+    - host: %%INGRESS_PIP%%.nip.io # Replace the IP address with the IP of the nginx external IP (value of $INGRESS_PIP or run kubectl get svc -n ingress-nginx to see the correct IP)
+      paths: /
 
 keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets (value of $He_Name)
 
@@ -427,6 +459,7 @@ Replace the values in the file surrounded by `%%` with the proper environment va
 ```bash
 
 sed -i "s/%%MI_Name%%/${MI_Name}/g" helm-config.yaml && \
+sed -i "s/%%INGRESS_PIP%%/${INGRESS_PIP}/g" helm-config.yaml && \
 sed -i "s/%%KV_Name%%/${He_Name}/g" helm-config.yaml
 
 ```
@@ -448,7 +481,7 @@ optionally if you stored the helium-csharp image in your own Azure Container Reg
 helm install helium-aks helium --set image.repository=<acr_name>.azurecr.io -f helm-config.yaml
 
 # curl the health check endpoint
-curl ${INGRESS_PIP}/healthz
+curl ${INGRESS_PIP}.nip.io/healthz
 
 ```
 
