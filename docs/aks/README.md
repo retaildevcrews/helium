@@ -398,7 +398,7 @@ helm install ingress ingress-nginx/ingress-nginx \
 
 # Add the ingress controller pods to the linkerd service mesh AFTER the controller is up and running.
 # If the namespace has this annotation before installing the ingress controller, then the install will fail.
-# The cause is a pod that is stuck in the "NotReady" because of a completed ingress-nginx job, and a running linkered container.
+# The cause is a Pod that is stuck in the "NotReady" state because of a completed ingress-nginx container from a Job, and a running linkerd proxy container.
 kubectl annotate namespace ingress-nginx linkerd.io/inject='enabled'
 kubectl get deployment ingress-ingress-nginx-controller --namespace ingress-nginx -o yaml \
   | linkerd inject - \
