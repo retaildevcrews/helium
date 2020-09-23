@@ -1,6 +1,10 @@
 name: Check Markdown Links
 
-on: 
+on:
+  push:
+    branches:
+      - nudoyen/create-project-card
+
   schedule:
   # Run on the 1st, 8th, 15th and 22nd of every month at 2:00 AM 
   - cron: "0 2 1,8,15,22 * *"
@@ -28,6 +32,8 @@ jobs:
       if: ${{ failure() }}
       uses: peter-evans/create-or-update-project-card@v1
       with:
+        token:  ${{ secrets.DOCKER_PAT }}
+        project-location: 'retaildevcrews'
         project-number: '1'
         column-name: 'Triage'
         issue-number: ${{ steps.ciff.outputs.issue-number }}
