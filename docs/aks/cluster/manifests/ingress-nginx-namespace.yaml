@@ -3,5 +3,4 @@ kind: Namespace
 metadata:
   annotations:
     fluxcd.io/ignore: "false"
-    linkerd.io/inject: enabled
   name: ingress-nginx
