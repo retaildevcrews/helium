@@ -27,6 +27,8 @@ jobs:
       with:
         title: Remove dead links from repository
         content-filepath: ./.github/ISSUE_TEMPLATE/found-dead-links.md
+        labels: Documentation
+        project: Helium
 
     - name: Create Project Card
       if: ${{ failure() }}
