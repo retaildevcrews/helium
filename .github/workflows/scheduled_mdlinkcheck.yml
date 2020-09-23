@@ -32,7 +32,6 @@ jobs:
       if: ${{ failure() }}
       uses: peter-evans/create-or-update-project-card@v1
       with:
-        token:  ${{ secrets.DOCKER_PAT }}
         project-location: 'retaildevcrews'
         project-number: '1'
         column-name: 'Triage'
