@@ -193,7 +193,7 @@ If you need access to Key Vault in your app, you can retrieve the Key Vault Clie
 
 #### Adding Key Vault via ASP.NET DI
 
-[KeyVaultConnectionExtension.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/KeyVault.Extensions/KeyVaultConnectionExtension.cs#L8)
+[KeyVaultConnectionExtension.cs](https://github.com/retaildevcrews/helium-csharp/blob/main/src/app/CSE.KeyVault/KeyVaultConnectionExtension.cs#L8)
 
 ```c#
 

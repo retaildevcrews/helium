@@ -1,4 +1,4 @@
-name: Check Markdown Links
+name: Scheduled Check for Dead Markdown Links
 
 on:
   push:
