@@ -28,12 +28,12 @@ jobs:
         title: Remove dead links from repository
         content-filepath: ./.github/ISSUE_TEMPLATE/found-dead-links.md
         labels: Documentation
-        project: Helium
 
     - name: Create Project Card
       if: ${{ failure() }}
       uses: peter-evans/create-or-update-project-card@v1
       with:
+        token: ${{ secrets.BOT_PAT }}
         project-location: 'retaildevcrews'
         project-number: '1'
         column-name: 'Triage'
