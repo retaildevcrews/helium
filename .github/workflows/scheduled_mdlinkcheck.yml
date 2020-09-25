@@ -1,10 +1,6 @@
 name: Scheduled Check for Dead Markdown Links
 
 on:
-  push:
-    branches:
-      - nudoyen/create-project-card
-
   schedule:
   # Run on the 1st, 8th, 15th and 22nd of every month at 2:00 AM 
   - cron: "0 2 1,8,15,22 * *"
