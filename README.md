@@ -29,40 +29,23 @@ This is a Web API reference application designed to "fork and code" with the fol
 
 ## Setup
 
-> [Visual Studio Codespaces](https://visualstudio.microsoft.com/services/visual-studio-codespaces/) is the easiest way to evaluate helium as all of the prerequisites are automatically installed
+> [Codespaces](https://github.com/features/codespaces) is the easiest way to evaluate helium as all of the prerequisites are automatically installed
 
 ### Codespaces
 
-Setup using Visual Studio Codespaces
+- Choose which Helium language implementation you want to use and open the repo in a web browser
+  - [C#](https://github.com/retaildevcrews/helium-csharp)
+  - [Java](https://github.com/retaildevcrews/helium-java)
+  - [TypeScript](https://github.com/retaildevcrews/helium-typescript)
 
-- Open your [Codespaces](https://online.visualstudio.com/environments)
-- Sign in if prompted
-- If you haven't used Codespaces, you will be prompted to create a new Codespace
-- Click on Create Codespace
+- Click on the `Code` button
 
-![alt text](./docs/images/codespaces1.jpg "Create Codespaces")
+![Open with codespaces](./docs/images/codespaces1.jpg "Open with Codespaces")
 
-- If you haven't setup a billing plan, you will be prompted to set one up
-  - Expand the Advanced Options or accept the defaults
+- Click on `Open with Codespaces`
+- Click on the `New codespace` button
 
-![alt text](./docs/images/codespaces2.jpg "Create a billing plan if necessary")
-
-- Create your Codespace
-  - Name your Codespace
-  - Choose which Helium language implementation you want to use and create a new Codespaces from the repo
-    - retaildevcrews/helium-csharp
-    - retaildevcrews/helium-java
-    - retaildevcrews/helium-typescript
-  - Choose your Linux instance type
-  - Click Create
-
-![alt text](./docs/images/codespaces3.jpg "Create a Codespace")
-
-> dotfiles allow you to customize your Codespace to your individual preferences
->
-> Using dotfiles is optional
->
-> A sample dotfiles repo is available [here](https://github.com/retaildevcrews/dotfiles)
+![New codespace](./docs/images/codespaces2.jpg "New codespace")
 
 - Codespaces will display a `Creation Log` window
   - You may close this window once all the steps have completed
@@ -75,7 +58,7 @@ Setup using Visual Studio Codespaces
     - choose view
     - choose terminal
 
-![alt text](./docs/images/codespaces4.jpg "Codespaces Menu Button")
+![Codespaces Menu Button](./docs/images/codespaces4.jpg "Codespaces Menu Button")
 
 > If using Codespaces, skip to the Azure login step
 
@@ -124,7 +107,7 @@ az account set -s {subscription name or Id}
 # only use a-z and 0-9 - do not include punctuation or uppercase characters
 # must be at least 5 characters long
 # must start with a-z (only lowercase)
-export He_Name=[your unique name]
+export He_Name=your_unique_name
 
 ### if true, change He_Name
 az cosmosdb check-name-exists -n ${He_Name}
