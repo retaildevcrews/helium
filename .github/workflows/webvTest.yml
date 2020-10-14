@@ -3,6 +3,7 @@ name: WebV Test
 on:
   push:
     paths:
+    - '.github/workflows/webvTest.yml'
     - 'TestFiles/**'
 
 jobs:
