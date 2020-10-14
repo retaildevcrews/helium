@@ -1,0 +1,38 @@
+name: WebV Test
+
+on:
+  push:
+    paths:
+    - '.github/workflows/loadtest.yml'
+    - 'TestFiles/**'
+
+jobs:
+
+  webv-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install WebV
+      run: |
+        dotnet tool install -g webvalidate
+
+    - name: bluebell
+      run: |
+        # run web validation test
+        cd TestFiles
+        webv -s bluebell -f e2e.json
+
+    - name: gelato
+      run: |
+        # run web validation test
+        cd TestFiles
+        webv -s gelato -f e2e.json
+
+    - name: sherbert
+      run: |
+        # run web validation test
+        cd TestFiles
+        webv -s sherbert -f e2e.json
