@@ -22,16 +22,16 @@ jobs:
       run: |
         # run web validation test
         cd TestFiles
-        webv -s bluebell -f e2e.json
+        webv -s bluebell -f e2e.json --max-errors 0
 
     - name: gelato
       run: |
         # run web validation test
         cd TestFiles
-        webv -s gelato -f e2e.json
+        webv -s gelato -f e2e.json --max-errors 0
 
     - name: sherbert
       run: |
         # run web validation test
         cd TestFiles
-        webv -s sherbert -f e2e.json
+        webv -s sherbert -f e2e.json --max-errors 0
