@@ -3,7 +3,7 @@ name: WebV Test
 on:
   push:
     paths:
-    - '.github/workflows/loadtest.yml'
+    - '.github/workflows/webvTest.yml'
     - 'TestFiles/**'
 
 jobs:
@@ -23,16 +23,16 @@ jobs:
       run: |
         # run web validation test
         cd TestFiles
-        webv -s bluebell -f e2e.json
+        webv -s bluebell -f e2e.json --max-errors 1
 
     - name: gelato
       run: |
         # run web validation test
         cd TestFiles
-        webv -s gelato -f e2e.json
+        webv -s gelato -f e2e.json --max-errors 1
 
     - name: sherbert
       run: |
         # run web validation test
         cd TestFiles
-        webv -s sherbert -f e2e.json
+        webv -s sherbert -f e2e.json --max-errors 1
