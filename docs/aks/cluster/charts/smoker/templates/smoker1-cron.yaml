@@ -12,20 +12,24 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: "false"
         spec:
           containers:
             - name: smoker1
-              image: retaildevcrew/helium-integration-test
+              image: retaildevcrew/webvalidate
               imagePullPolicy: Always
-              command:
-                - dotnet
-                - integration-test.dll
-                - '-h'
-                - '{{ .Values.ingressURL }}'
-                - '-t'
-                - '1'
+              args:
                 - '-s'
-                - '100'
-                - '-d'
+                - '{{ .Values.ingressURL }}'
+                - '-u'
+                - 'https://raw.githubusercontent.com/retaildevcrews/helium/main/TestFiles/'
+                - '-f'
+                - 'benchmark.json'
+                - '-r'
+                - '--duration'
                 - '450'
+                - '-l'
+                - '10'
           restartPolicy: OnFailure

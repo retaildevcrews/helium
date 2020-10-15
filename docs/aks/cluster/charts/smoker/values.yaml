@@ -1,1 +1,1 @@
-ingressURL: http://<IP_OF_INGRESS>.nip.io
+ingressURL: http://$INGRESS_PIP

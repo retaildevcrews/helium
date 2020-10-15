@@ -1,14 +1,13 @@
-# Demo and Deployment Walk Through
+# Deployment Walk Through
 
 ## Background
 
-Project Helium is a reusable Advocated Pattern (AdPat). The focus was originally Azure App Services (Web Apps for Containers). The goal is to have a best practices implementation of a C# (TypeScript/Node & Java Springboot are under development) + Cosmos DB + Key Vault + Azure Monitor application that project teams can use to build applications that support security, HA, DR and Business Continuity.
+Project Helium is a Web API reference application using Managed Identity, Key Vault, Cosmos DB  and Azure Monitor. Teams can use Helium to build applications that support security, HA, DR and Business Continuity.
 
 ### Azure Components in Use
 
-- Azure Container Registry
 - Azure Kubernetes Service
-  - Linkerd ServiceMesh
+  - Istio ServiceMesh
   - Prometheus
   - Azure Application Gateway Ingress Controller
   - Azure AAD Pod Identity
@@ -38,10 +37,6 @@ Fork this repo and clone to your local machine
 
 cd $HOME
 
-mkdir demo
-
-cd demo
-
 git clone https://github.com/retaildevcrews/helium
 
 ```
@@ -70,7 +65,7 @@ az account set -s {subscription name or Id}
 
 ```
 
-This demo will create resource groups, a Cosmos DB instance, Key Vault, Azure Container Registry, and Azure App Service.
+This walkthrough will create resource groups, a Cosmos DB instance, Key Vault, Azure Container Registry, and a Azure Kubernetes Service (AKS) cluster.
 
 #### Choose a unique DNS name
 
@@ -108,7 +103,7 @@ nslookup ${He_Name}.azurecr.io
 export He_Location=centralus
 
 # set the subscription
-export He_Sub=$(az account show --query id -o tsv)
+export He_Sub='az account show --query id -o tsv'
 
 # resource group names
 export Imdb_Name=$He_Name
@@ -231,7 +226,7 @@ Determine the latest version of Kubernetes supported by AKS. It is recommended t
 
 az aks get-versions -l $He_Location -o table
 
-export He_K8S_VER=1.16.9
+export He_K8S_VER=1.18.8
 
 ```
 
@@ -244,7 +239,8 @@ Create and connect to the AKS cluster. You can also create the cluster by follow
 #    Waiting for AAD role to propagate[################################    ]  90.0000%Could not create a
 #    role assignment for ACR. Are you an Owner on this subscription?
 
-az aks create --name $He_AKS_Name --resource-group $He_App_RG --location $He_Location --enable-cluster-autoscaler --min-count 3 --max-count 6 --node-count 3 --kubernetes-version $He_K8S_VER --attach-acr $He_Name  --no-ssh-key --enable-managed-identity
+# this step usually takes 2-4 minutes
+az aks create --name $He_AKS_Name --resource-group $He_App_RG --location $He_Location --enable-cluster-autoscaler --min-count 3 --max-count 6 --node-count 3 --kubernetes-version $He_K8S_VER --attach-acr $He_Name --no-ssh-key --enable-managed-identity
 
 az aks get-credentials -n $He_AKS_Name -g $He_App_RG
 
@@ -260,7 +256,7 @@ Install the latest version of Helm by download the latest [release](https://gith
 
 # mac os
 OS=darwin-amd64 && \
-REL=v3.2.4 && \ #Should be lastest release from https://github.com/helm/helm/releases
+REL=v3.3.4 && \ #Should be lastest release from https://github.com/helm/helm/releases
 mkdir -p $HOME/.helm/bin && \
 curl -sSL "https://get.helm.sh/helm-${REL}-${OS}.tar.gz" | tar xvz && \
 chmod +x ${OS}/helm && mv ${OS}/helm $HOME/.helm/bin/helm
@@ -274,7 +270,7 @@ or
 
 # Linux/WSL
 OS=linux-amd64 && \
-REL=v3.2.4 && \
+REL=v3.3.4 && \
 mkdir -p $HOME/.helm/bin && \
 curl -sSL "https://get.helm.sh/helm-${REL}-${OS}.tar.gz" | tar xvz && \
 chmod +x ${OS}/helm && mv ${OS}/helm $HOME/.helm/bin/helm
@@ -305,9 +301,9 @@ Add the required helm repositories
 
 ```bash
 
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
+helm repo add kedacore https://kedacore.github.io/charts  
 helm repo update
 
 ```
@@ -347,77 +343,73 @@ az keyvault set-policy -n ${He_Name} --object-id ${MI_PrincID} --secret-permissi
 
 ```
 
-## Install Linkerd Service Mesh into the cluster
+## Install Istio Service Mesh into the cluster
 
-Download the Linkerd v2 CLI:
-
-```bash
-
-# macOS and linux/WSL
-
-curl -sL https://run.linkerd.io/install | sh
-export PATH=$PATH:$HOME/.linkerd2/bin
-
-```
-
-Install the Linkerd control plane in the linkerd namespace:
+Specify the Istio version that will be leveraged throughout these instructions. Note: If using a macOS device, make sure to set ARCH to `osx`.
 
 ```bash
 
-linkerd install | kubectl apply -f -
+export ISTIO_VERSION=1.7.3
+export ARCH=linux-amd64
+curl -sL "https://github.com/istio/istio/releases/download/$ISTIO_VERSION/istioctl-$ISTIO_VERSION-$ARCH.tar.gz" | tar xz
 
 ```
 
-Validate the install with:
+Copy the istioctl client binary to the standard user program location in your PATH
 
 ```bash
 
-linkerd check
+sudo mv ./istioctl /usr/local/bin/istioctl
+sudo chmod +x /usr/local/bin/istioctl
 
 ```
 
-## Install the NGNIX ingress controller
-
-Create a namespace for your ingress resources. There is a yaml file located in the clones repository under `$REPO_ROOT/docs/aks/cluster/manifests/ingress-nginx-namespace.yaml`
+Install the Istio Operator and Components on AKS
 
 ```bash
 
-kubectl apply -f $REPO_ROOT/docs/aks/cluster/manifests/ingress-nginx-namespace.yaml
+istioctl operator init
+kubectl create ns istio-system
+kubectl apply -f $REPO_ROOT/docs/aks/cluster/manifests/istio/istio.aks.yaml
 
 ```
 
-Use Helm to deploy an NGINX ingress controller
+Validate the Istio installation
 
 ```bash
 
-helm install ingress ingress-nginx/ingress-nginx \
-    --namespace ingress-nginx \
-    --set controller.replicaCount=2 \
-    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
-
-# Add the ingress controller pods to the linkerd service mesh AFTER the controller is up and running.
-# If the namespace has this annotation before installing the ingress controller, then the install will fail.
-# The cause is a Pod that is stuck in the "NotReady" state because of a completed ingress-nginx container from a Job, and a running linkerd proxy container.
-kubectl annotate namespace ingress-nginx linkerd.io/inject='enabled'
-kubectl get deployment ingress-ingress-nginx-controller --namespace ingress-nginx -o yaml \
-  | linkerd inject - \
-  | kubectl apply -f -
+kubectl get all -n istio-system
 
 ```
 
-Get the Public IP of your Ingress Controller. This will be used later in deploying the application.
+You should see the following components:
+
+- `istio*` - the Istio components
+- `jaeger-*`, `tracing`, and `zipkin` - tracing addon
+- `prometheus` - metrics addon
+- `grafana` - analytics and monitoring dashboard addon
+- `kiali` - service mesh dashboard addon
+
+Enable automatic sidecar injection in the default namespace:
 
 ```bash
 
-export INGRESS_PIP=$(kubectl --namespace ingress-nginx get svc -l app.kubernetes.io/component=controller -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
-
-cd $REPO_ROOT
-./saveenv.sh
+kubectl label namespace default istio-injection=enabled
 
 ```
 
-## Deploy the needed componenets of helium, key rotator and the testing harness
+## Install KEDA
+
+The KEDA helm chart is used for retrieving the Istio ingress metrics from Prometheus to be able to autoscale the helium pods.
+
+```bash
+
+kubectl create ns keda
+helm install keda kedacore/keda -n keda
+
+```
+
+## Deploy the needed components for Helium
 
 An helm chart is included for the reference application ([helium](https://github.com/RetailDevCrews/helium-csharp))
 
@@ -432,6 +424,7 @@ cd $REPO_ROOT/docs/aks/cluster/charts/helium
 A file called helm-config.yaml with the following contents that needs be to edited to fit the environment being deployed in. The file looks like this
 
 ```yaml
+
 # Default values for helium.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -441,14 +434,7 @@ labels:
 image:
   repository: retaildevcrew # The specific repository created for this environment
   name: helium-csharp # The name of the image for the helium-csharp repo
-
-annotations:
-  linkerd.io/inject: enabled # Allows for the application to be injected into the Service Mesh
-
-ingress:
-  hosts:
-    - host: %%INGRESS_PIP%%.nip.io # Replace the IP address with the IP of the nginx external IP (value of $INGRESS_PIP or run kubectl get svc -n ingress-nginx to see the correct IP)
-      paths: /
+  tag: stable
 
 keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets (value of $He_Name)
 
@@ -459,7 +445,6 @@ Replace the values in the file surrounded by `%%` with the proper environment va
 ```bash
 
 sed -i "s/%%MI_Name%%/${MI_Name}/g" helm-config.yaml && \
-sed -i "s/%%INGRESS_PIP%%/${INGRESS_PIP}/g" helm-config.yaml && \
 sed -i "s/%%KV_Name%%/${He_Name}/g" helm-config.yaml
 
 ```
@@ -470,18 +455,21 @@ This file can now be given to the the helm install as an override to the default
 
 cd $REPO_ROOT/docs/aks/cluster/charts
 
+# Option 1: Install Helium using the upstream helium-csharp image from Dockerhub
 helm install helium-aks helium -f ./helium/helm-config.yaml
 
-```
+# Option 2: Install Helium using the helium-csharp image in your own ACR
+helm install helium-aks helium \
+    --set image.repository=${He_Name}.azurecr.io \
+    --set image.tag=latest \
+    -f helm-config.yaml
 
-optionally if you stored the helium-csharp image in your own Azure Container Registry you can change the registry at the command line as such:
+export INGRESS_PIP=$(kubectl --namespace istio-system  get svc -l istio=ingressgateway -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
 
-```bash
+# check the version endpoint
+# you may get a 403 or timeout error, if so, just retry
 
-helm install helium-aks helium --set image.repository=<acr_name>.azurecr.io -f helm-config.yaml
-
-# curl the health check endpoint
-curl ${INGRESS_PIP}.nip.io/healthz
+http ${INGRESS_PIP}.nip.io/version
 
 ```
 
@@ -491,10 +479,12 @@ Replace the values in the `AKS_Dashboard.json` file surrounded by `%%` with the 
 
 ```bash
 
-cd $REPO_ROOT/docs/aks/demo
-sed -i "s/%%SUBSCRIPTION_GUID%%/${He_Sub}/g" AKS_Dashboard.json && \
+cd $REPO_ROOT/docs/aks/dashboard
+sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" AKS_Dashboard.json && \
 sed -i "s/%%AKS_RESOURCE_GROUP%%/${He_App_RG}/g" AKS_Dashboard.json && \
-sed -i "s/%%COSMOS_RESOURCE_GROUP%%/${Imdb_RG}/g" AKS_Dashboard.json
+sed -i "s/%%IMDB_RG%%/${Imdb_RG}/g" AKS_Dashboard.json && \
+sed -i "s/%%HE_NAME%%/${He_Name}/g" AKS_Dashboard.json && \
+sed -i "s/%%HE_LOCATION%%/${He_Location}/g" AKS_Dashboard.json
 
 ```
 
@@ -502,19 +492,14 @@ Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure
 
 For more documentation on creating and sharing Dashboards, see ([here](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards)).
 
-## Optional
-
-A testing application was written to stress test the application and drive the Request Units on the Cosmos DB. You can deploy the application to AKS as a cronjob. The cronjobs can be deployed to your cluster via a helm chart located at `REPO_ROOT/docs/aks/cluster/charts`.
+## TODO ACI instructions to test AKS Helium
 
 ```bash
 
-cd $REPO_ROOT/docs/aks/cluster/charts
-
-helm install helium-smoker smoker --set ingressURL=http://<IP_OF_INGRESS>.nip.io
-
-#Verify the CronJobs are in the cluster
-kubectl get cronjobs
+# create Azure Container Instance running webv
+az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:latest -o tsv --query name \
+-n ${He_Name}-webv-${He_Location} -l $He_Location \
+--log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
+--command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s http://${INGRESS_PIP}.nip.io -u https://raw.githubusercontent.com/retaildevcrews/helium/main/TestFiles/ -f benchmark.json -r --json-log"
 
 ```
-
-The cronjobs are set to run for 7.5 minutes every 20 minutes.

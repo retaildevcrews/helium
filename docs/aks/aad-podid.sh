@@ -125,6 +125,12 @@ azureIdentities:
     binding:
       name: "${MI_NAME}-binding"
       selector: "${MI_NAME}"
+mic:
+  podAnnotations:
+    sidecar.istio.io/inject: "false"
+nmi:
+  podAnnotations:
+    sidecar.istio.io/inject: "false"
 EOF
 
 echo "creating aad-pod-identity deployment in the default namespace with values file "

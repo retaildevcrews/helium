@@ -9,12 +9,4 @@ image:
   name: helium-csharp # The name of the image for the helium-csharp repo
   tag: stable
 
-annotations:
-  linkerd.io/inject: enabled # Allows for the application to be injected into the Service Mesh
-
-ingress:
-  hosts:
-    - host: %%INGRESS_PIP%%.nip.io # Replace the IP address with the IP of the nginx external IP. kubectl get svc -n ingress-nginx to see the correct IP
-      paths: /
-
 keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets

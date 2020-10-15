@@ -1,1 +1,1 @@
-1. Get the application URL by running these commands:
+Setting up the Helium Application with Istio Ingress

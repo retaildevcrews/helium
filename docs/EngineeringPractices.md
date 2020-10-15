@@ -32,6 +32,12 @@ Engineering Playbook [Definition of Done](https://github.com/microsoft/code-with
 
 > Use call outs to emphasize important points
 
+## Query Strings
+
+TypeScript is case sensitive on query string parameters
+
+> All query string parameters should be camelCase
+
 ## Code cleanup (Visual Studio)
 
 Visual Studio 2019 includes a code cleanup feature which contains two profiles, each with their own configurable "fixers". The following instructions describe the steps necessary to configure "Profile 2" with the correct fixers.

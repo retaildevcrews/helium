@@ -51,7 +51,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/helium-aks"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%HE_NAME%%"
                           },
                           "name": "requests/count",
                           "aggregationType": 7,
@@ -114,7 +114,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/helium-aks"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%HE_NAME%%"
                           },
                           "name": "requests/duration",
                           "aggregationType": 4,
@@ -198,7 +198,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/helium-aks"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%HE_NAME%%"
                           },
                           "name": "requests/count",
                           "aggregationType": 1,
@@ -266,26 +266,26 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%COSMOS_RESOURCE_GROUP%%/providers/Microsoft.DocumentDB/databaseAccounts/helium-aks"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%IMDB_RG%%/providers/Microsoft.DocumentDB/databaseAccounts/%%HE_NAME%%"
                           },
                           "name": "TotalRequestUnits",
                           "aggregationType": 1,
                           "namespace": "microsoft.documentdb/databaseaccounts",
                           "metricVisualization": {
                             "displayName": "Total Request Units",
-                            "resourceDisplayName": "helium-aks"
+                            "resourceDisplayName": "%%HE_NAME%%"
                           }
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%COSMOS_RESOURCE_GROUP%%/providers/Microsoft.DocumentDB/databaseAccounts/helium-aks"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%IMDB_RG%%/providers/Microsoft.DocumentDB/databaseAccounts/%%HE_NAME%%"
                           },
                           "name": "TotalRequests",
                           "aggregationType": 7,
                           "namespace": "microsoft.documentdb/databaseaccounts",
                           "metricVisualization": {
                             "displayName": "Total Requests",
-                            "resourceDisplayName": "helium-aks"
+                            "resourceDisplayName": "%%HE_NAME%%"
                           }
                         }
                       ],
@@ -363,7 +363,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/helium-aks"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%HE_NAME%%"
                           },
                           "name": "requests/failed",
                           "aggregationType": 1,
@@ -431,7 +431,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/helium-aks"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%HE_NAME%%"
                           },
                           "name": "requests/failed",
                           "aggregationType": 1,
@@ -520,14 +520,14 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/helium-aks"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%HE_NAME%%"
                           },
                           "name": "keyRotated",
                           "aggregationType": 7,
                           "namespace": "azure.applicationinsights",
                           "metricVisualization": {
                             "displayName": "keyRotated",
-                            "resourceDisplayName": "helium-aks"
+                            "resourceDisplayName": "%%HE_NAME%%"
                           }
                         }
                       ],
@@ -584,14 +584,14 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/helium-aks"
+                            "id": "/subscriptions/%%SUBSCRIPTION_GUID%%/resourceGroups/%%AKS_RESOURCE_GROUP%%/providers/microsoft.insights/components/%%HE_NAME%%"
                           },
                           "name": "newKeyLoaded",
                           "aggregationType": 7,
                           "namespace": "azure.applicationinsights",
                           "metricVisualization": {
                             "displayName": "newKeyLoaded",
-                            "resourceDisplayName": "helium-aks"
+                            "resourceDisplayName": "%%HE_NAME%%"
                           }
                         }
                       ],
@@ -667,11 +667,11 @@
       }
     }
   },
-  "name": "helium AKS Dashboard",
+  "name": "Helium AKS Dashboard",
   "type": "Microsoft.Portal/dashboards",
-  "location": "INSERT LOCATION",
+  "location": "%%HE_LOCATION%%",
   "tags": {
-    "hidden-title": "helium AKS Dashboard"
+    "hidden-title": "Helium AKS Dashboard"
   },
   "apiVersion": "2015-08-01-preview"
 }
