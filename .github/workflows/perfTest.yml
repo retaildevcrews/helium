@@ -1,0 +1,40 @@
+name: Load Test
+
+on:
+  schedule:
+    # Run daily at 3:00 AM
+    - cron: "0 3 * * *"
+
+jobs:
+
+  load-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install WebV
+      run: |
+        dotnet tool install -g webvalidate
+
+    - name: bluebell
+      run: |
+        # run web validation test
+        # 10 req/sec for 5 minutes
+        cd TestFiles
+        webv -s bluebell -f benchmark.json -r -l 100 --duration 300
+
+    - name: gelato
+      run: |
+        # run web validation test
+        # 10 req/sec for 5 minutes
+        cd TestFiles
+        webv -s gelato -f benchmark.json -r -l 100 --duration 300
+
+    - name: sherbert
+      run: |
+        # run web validation test
+        # 10 req/sec for 5 minutes
+        cd TestFiles
+        webv -s sherbert -f benchmark.json -r -l 100 --duration 300
