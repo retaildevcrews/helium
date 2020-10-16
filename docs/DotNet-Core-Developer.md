@@ -158,7 +158,7 @@ Helium builds a version string in version attribute in the assembly version foll
 
 The version is displayed at app startup, in the healthz/ietf endpoint output, and the /version endpoint output. The app version string is retrieved from the assembly in the version middleware.
 
-[version.cs](https://github.com/retaildevcrews/helium-csharp/blob/master/src/app/Middleware/version.cs)
+[VersionExtension.cs](https://github.com/retaildevcrews/helium-csharp/blob/master/src/app/Middleware/VersionExtension.cs)
 
 ```c#
 
@@ -304,7 +304,7 @@ if (!string.IsNullOrEmpty(config[Constants.AppInsightsKey]))
 
 ## Middleware
 
-There is a robotsText middleware extension method added to Helium to handle a default warmup request of /robots43245.txt (43245 is random) when deploying to Azure App Service. Because Helium does not expect this request as part of its normal app logic, it would cause a 404 error, or in this case a false (expected) error, to appear in Azure Monitor reporting. This extension helps keep reporting clean and only contain true errors warranting investigation. Code: [robotsText.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Middleware/robotsText.cs)
+There is a RobotsExtension middleware extension method added to Helium to handle a default warmup request of /robots43245.txt (43245 is random) when deploying to Azure App Service. Because Helium does not expect this request as part of its normal app logic, it would cause a 404 error, or in this case a false (expected) error, to appear in Azure Monitor reporting. This extension helps keep reporting clean and only contain true errors warranting investigation. Code: [RobotsExtension.cs](https://github.com/RetailDevCrews/helium-csharp/blob/master/src/app/Middleware/RobotsExtension.cs)
 
 ## Logging
 
