@@ -33,6 +33,9 @@ az webapp config appsettings set --settings KEYVAULT_NAME=$He_Name -g $He_App_RG
 # this will send stdout and stderr to the logs
 az webapp log config --docker-container-logging filesystem -g $He_App_RG -n $He_Name
 
+# set the app endpoint
+export He_App_Endpoint=https://${He_Name}.azurewebsites.net
+
 # save environment variables
 ./saveenv.sh -y
 
@@ -53,7 +56,7 @@ az webapp start -g $He_App_RG -n $He_Name
 # check the version endpoint
 # you may get a 403 or timeout error, if so, just retry
 
-http https://${He_Name}.azurewebsites.net/version
+http ${He_App_Endpoint}/version
 
 ```
 
@@ -64,10 +67,10 @@ Run the Validation Test
 ```bash
 
 # run the tests in the container
-docker run -it --rm retaildevcrew/webvalidate --server https://${He_Name}.azurewebsites.net --files helium.json
+docker run -it --rm retaildevcrew/webvalidate --server $He_App_Endpoint --files helium.json
 
 ```
 
 ## Observability
 
-See [App Service Observability](AppServiceObservability.md) for details
+See [App Observability](AppObservability.md) for details

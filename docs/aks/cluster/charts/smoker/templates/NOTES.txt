@@ -1,1 +1,0 @@
-Simple cron jobs for smoke test

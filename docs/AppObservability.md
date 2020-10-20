@@ -23,29 +23,29 @@ export He_LogAnalytics_Key='az monitor log-analytics workspace get-shared-keys -
 az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:latest -o tsv --query name \
 -n ${He_Name}-webv-${He_Location} -l $He_Location \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
---command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s ${He_App_Endpoint} -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
 
 # create in additional regions (optional)
 az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:latest -o tsv --query name \
 -n ${He_Name}-webv-eastus2 -l eastus2 \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
---command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag eastus2 -l 10000 -s ${He_App_Endpoint} -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
 
 az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:latest -o tsv --query name \
 -n ${He_Name}-webv-westeurope -l westeurope \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
---command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag westeurope -l 10000 -s ${He_App_Endpoint} -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
 
 az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:latest -o tsv --query name \
 -n ${He_Name}-webv-southeastasia -l southeastasia \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
---command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet ../webvalidate.dll --tag southeastasia -l 10000 -s ${He_App_Endpoint} -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
 
 # create ACI running the debug webv image (optional)
 az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:debug -o tsv --query name \
 -n ${He_Name}-webv-${He_Location}-debug -l $He_Location \
 --log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
---command-line "dotnet run -- --tag $He_Location -l 1000 -s https://${He_Name}.azurewebsites.net -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
+--command-line "dotnet run -- --tag $He_Location -l 1000 -s ${He_App_Endpoint} -u https://raw.githubusercontent.com/retaildevcrews/${He_Repo}/main/TestFiles/ -f benchmark.json -r --json-log"
 
 # connect to the debug webv container instance for further debugging (as needed)
 az container exec -g $He_WebV_RG -n ${He_Name}-webv-${He_Location}-debug --exec-command "/bin/bash"
@@ -158,7 +158,7 @@ curl -s https://raw.githubusercontent.com/retaildevcrews/helium/main/docs/dashbo
 sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json
 sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json
 sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json
-sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json
+sed -i "s/%%Imdb_Name%%/${Imdb_Name}/g" Helium_Dashboard.json
 sed -i "s/%%He_Repo%%/${He_Name}/g" Helium_Dashboard.json
 
 ```

@@ -15,8 +15,6 @@ Project Helium is a Web API reference application using Managed Identity, Key Va
 - Azure Cosmos DB
 - Application Insights
 
-## Demo Install
-
 ### Prerequisites
 
 - Azure subscription with permissions to create:
@@ -434,7 +432,7 @@ labels:
 image:
   repository: retaildevcrew # The specific repository created for this environment
   name: helium-csharp # The name of the image for the helium-csharp repo
-  tag: stable
+  tag: beta
 
 keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets (value of $He_Name)
 
@@ -464,42 +462,21 @@ helm install helium-aks helium \
     --set image.tag=latest \
     -f helm-config.yaml
 
+# Get the public IP and endpoint for the cluster
 export INGRESS_PIP=$(kubectl --namespace istio-system  get svc -l istio=ingressgateway -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
+export He_App_Endpoint=http://${INGRESS_PIP}.nip.io
 
 # check the version endpoint
 # you may get a 403 or timeout error, if so, just retry
 
-http ${INGRESS_PIP}.nip.io/version
+http ${He_App_Endpoint}/version
+
+# save the cluster IP and endpoint variables
+cd $REPO_ROOT
+./saveenv.sh -y
 
 ```
 
-## Dashboard setup
+## Observability
 
-Replace the values in the `AKS_Dashboard.json` file surrounded by `%%` with the proper environment variables
-
-```bash
-
-cd $REPO_ROOT/docs/aks/dashboard
-sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" AKS_Dashboard.json && \
-sed -i "s/%%AKS_RESOURCE_GROUP%%/${He_App_RG}/g" AKS_Dashboard.json && \
-sed -i "s/%%IMDB_RG%%/${Imdb_RG}/g" AKS_Dashboard.json && \
-sed -i "s/%%HE_NAME%%/${He_Name}/g" AKS_Dashboard.json && \
-sed -i "s/%%HE_LOCATION%%/${He_Location}/g" AKS_Dashboard.json
-
-```
-
-Navigate to ([Dashboard](https://portal.azure.com/#dashboard)) within your Azure portal. Click upload and select the `AKS_Dashboard.json` file with your correct subscription GUID, resource group names, and app name.
-
-For more documentation on creating and sharing Dashboards, see ([here](https://docs.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards)).
-
-## TODO ACI instructions to test AKS Helium
-
-```bash
-
-# create Azure Container Instance running webv
-az container create -g $He_WebV_RG --image retaildevcrew/webvalidate:latest -o tsv --query name \
--n ${He_Name}-webv-${He_Location} -l $He_Location \
---log-analytics-workspace $(eval $He_LogAnalytics_Id) --log-analytics-workspace-key $(eval $He_LogAnalytics_Key) \
---command-line "dotnet ../webvalidate.dll --tag $He_Location -l 1000 -s http://${INGRESS_PIP}.nip.io -u https://raw.githubusercontent.com/retaildevcrews/helium/main/TestFiles/ -f benchmark.json -r --json-log"
-
-```
+See [App Observability](AppObservability.md) for details.

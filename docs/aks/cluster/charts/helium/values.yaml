@@ -8,7 +8,7 @@ replicaCount: 1
 image:
   repository: retaildevcrew
   name: helium-csharp
-  tag: stable
+  tag: beta
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []

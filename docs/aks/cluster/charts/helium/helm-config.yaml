@@ -7,6 +7,6 @@ labels:
 image:
   repository: retaildevcrew #The specific acr created for this environment
   name: helium-csharp # The name of the image for the helium-csharp repo
-  tag: stable
+  tag: beta
 
 keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets
