@@ -398,7 +398,7 @@ kubectl label namespace default istio-injection=enabled
 
 ## Install KEDA
 
-The KEDA helm chart is used for retrieving the Istio ingress metrics from Prometheus to be able to autoscale the helium pods.
+KEDA autoscales the Helium pods by assessing metrics for incoming requests, which are captured by Istio and stored in Prometheus.
 
 ```bash
 
@@ -407,7 +407,7 @@ helm install keda kedacore/keda -n keda
 
 ```
 
-## Deploy the needed components for Helium
+## Deploy Helium with Helm
 
 An helm chart is included for the reference application ([helium](https://github.com/RetailDevCrews/helium-csharp))
 
@@ -452,7 +452,7 @@ This file can now be given to the the helm install as an override to the default
 ```bash
 
 cd $REPO_ROOT/docs/aks/cluster/charts
-
+\
 # Option 1: Install Helium using the upstream helium-csharp image from Dockerhub
 helm install helium-aks helium -f ./helium/helm-config.yaml
 
@@ -460,20 +460,33 @@ helm install helium-aks helium -f ./helium/helm-config.yaml
 helm install helium-aks helium \
     --set image.repository=${He_Name}.azurecr.io \
     --set image.tag=latest \
-    -f helm-config.yaml
+    -f ./helium/helm-config.yaml
+
+# the application generally takes about 1-3 minutes to be ready
 
 # Get the public IP and endpoint for the cluster
 export INGRESS_PIP=$(kubectl --namespace istio-system  get svc -l istio=ingressgateway -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
 export He_App_Endpoint=http://${INGRESS_PIP}.nip.io
 
 # check the version endpoint
-# you may get a 403 or timeout error, if so, just retry
+# you may get a timeout error, if so, just retry
 
 http ${He_App_Endpoint}/version
 
 # save the cluster IP and endpoint variables
 cd $REPO_ROOT
 ./saveenv.sh -y
+
+```
+
+Run the Validation Test
+
+> For more information on the validation test tool, see [Web Validate](https://github.com/retaildevcrews/webvalidate)
+
+```bash
+
+# run the tests in a container
+docker run -it --rm retaildevcrew/webvalidate --server $He_App_Endpoint --base-url https://raw.githubusercontent.com/retaildevcrews/helium/main/TestFiles/ --files baseline.json
 
 ```
 

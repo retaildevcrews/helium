@@ -66,8 +66,8 @@ Run the Validation Test
 
 ```bash
 
-# run the tests in the container
-docker run -it --rm retaildevcrew/webvalidate --server $He_App_Endpoint --files helium.json
+# run the tests in a container
+docker run -it --rm retaildevcrew/webvalidate --server $He_App_Endpoint --base-url https://raw.githubusercontent.com/retaildevcrews/helium/main/TestFiles/ --files baseline.json
 
 ```
 
