@@ -46,7 +46,7 @@ ingress:
   paths:
     - /
   
-  tls: []
+  tls: {}
 
 resources:
   limits:

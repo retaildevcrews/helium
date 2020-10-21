@@ -3,7 +3,10 @@ kind: VirtualService
 metadata:
   name: {{ include "helium.fullname" . }}
 spec:
-  hosts: {{ .Values.ingress.hosts }}
+  hosts: 
+  {{- range .Values.ingress.hosts }}
+    - {{ . | quote }}
+  {{- end }}
   gateways:
   - {{ include "helium.fullname" . }}-gateway
   http:
