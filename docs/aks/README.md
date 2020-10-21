@@ -370,6 +370,8 @@ istioctl operator init
 kubectl create ns istio-system
 kubectl apply -f $REPO_ROOT/docs/aks/cluster/manifests/istio/istio.aks.yaml
 
+# the istio resources will take about a minute to be installed
+
 ```
 
 Validate the Istio installation
@@ -482,7 +484,7 @@ helm install helium-aks helium \
     --set image.tag=latest \
     -f ./helium/helm-config.yaml
 
-# the application generally takes about 1-3 minutes to be ready
+# the application generally takes about 2-4 minutes to be ready
 
 # check the version endpoint
 # you may get a timeout error, if so, just retry
