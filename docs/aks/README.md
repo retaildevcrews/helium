@@ -396,6 +396,19 @@ kubectl label namespace default istio-injection=enabled
 
 ```
 
+Get the public IP of the Istio Ingress Gateway and set the application endpoint.
+
+```bash
+
+export INGRESS_PIP=$(kubectl --namespace istio-system  get svc -l istio=ingressgateway -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
+export He_App_Endpoint=http://${INGRESS_PIP}.nip.io
+
+# save the cluster IP and endpoint variables
+cd $REPO_ROOT
+./saveenv.sh -y
+
+```
+
 ## Install KEDA
 
 KEDA autoscales the Helium pods by assessing metrics for incoming requests, which are captured by Istio and stored in Prometheus.
@@ -434,6 +447,12 @@ image:
   name: helium-csharp # The name of the image for the helium-csharp repo
   tag: beta
 
+ingress:
+  hosts:
+    - %%INGRESS_PIP%%.nip.io # Replace the IP address with the external IP of the Istio ingress gateway (value of $INGRESS_PIP or run kubectl get svc istio-ingressgateway -n istio-system to see the correct IP)
+  paths:
+    - /
+
 keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets (value of $He_Name)
 
 ```
@@ -443,6 +462,7 @@ Replace the values in the file surrounded by `%%` with the proper environment va
 ```bash
 
 sed -i "s/%%MI_Name%%/${MI_Name}/g" helm-config.yaml && \
+sed -i "s/%%INGRESS_PIP%%/${INGRESS_PIP}/g" helm-config.yaml && \
 sed -i "s/%%KV_Name%%/${He_Name}/g" helm-config.yaml
 
 ```
@@ -464,18 +484,10 @@ helm install helium-aks helium \
 
 # the application generally takes about 1-3 minutes to be ready
 
-# Get the public IP and endpoint for the cluster
-export INGRESS_PIP=$(kubectl --namespace istio-system  get svc -l istio=ingressgateway -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
-export He_App_Endpoint=http://${INGRESS_PIP}.nip.io
-
 # check the version endpoint
 # you may get a timeout error, if so, just retry
 
 http ${He_App_Endpoint}/version
-
-# save the cluster IP and endpoint variables
-cd $REPO_ROOT
-./saveenv.sh -y
 
 ```
 
@@ -492,4 +504,4 @@ docker run -it --rm retaildevcrew/webvalidate --server $He_App_Endpoint --base-u
 
 ## Observability
 
-See [App Observability](AppObservability.md) for details.
+See [App Observability](../AppObservability.md) for details.

@@ -39,6 +39,15 @@ service:
   type: ClusterIP
   port: 4120
 
+ingress:
+  hosts:
+    - <INGRESS_PIP>.nip.io
+  
+  paths:
+    - /
+  
+  tls: []
+
 resources:
   limits:
     cpu: 200m

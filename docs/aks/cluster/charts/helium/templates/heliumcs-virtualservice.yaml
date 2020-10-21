@@ -3,14 +3,15 @@ kind: VirtualService
 metadata:
   name: {{ include "helium.fullname" . }}
 spec:
-  hosts:
-  - "*"
+  hosts: {{ .Values.ingress.hosts }}
   gateways:
   - {{ include "helium.fullname" . }}-gateway
   http:
-  - match:
-    - uri:
-        prefix: /
+  - match: 
+    {{- range .Values.ingress.paths }}
+      - uri:
+          prefix: {{ . }}
+    {{- end }}
     route:
     - destination:
         port:

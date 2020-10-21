@@ -10,5 +10,5 @@ spec:
       number: 80
       name: http
       protocol: HTTP
-    hosts:
-    - "*"
+    hosts: {{ .Values.ingress.hosts }}
+    tls: {{ .Values.ingress.tls }}

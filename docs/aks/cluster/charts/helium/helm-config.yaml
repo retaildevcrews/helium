@@ -9,4 +9,10 @@ image:
   name: helium-csharp # The name of the image for the helium-csharp repo
   tag: beta
 
+ingress:
+  hosts:
+    - %%INGRESS_PIP%%.nip.io # Replace the IP address with the external IP of the Istio ingress gateway (value of $INGRESS_PIP or run kubectl get svc istio-ingressgateway -n istio-system to see the correct IP)
+  paths: 
+    - /
+
 keyVaultName: %%KV_Name%% # Replace with the name of the Key Vault that holds the secrets
