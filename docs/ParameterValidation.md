@@ -68,7 +68,7 @@ The following API route uses these parameters:
 
 - /api/actors
 
-> NOTE: [Refer to the Common Query Parameters](##-Common-Query-Parameters)
+> NOTE: [Refer to the Common Query Parameters](#Common-Query-Parameters)
 
 ### Actors Direct Read
 

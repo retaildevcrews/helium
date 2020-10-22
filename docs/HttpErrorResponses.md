@@ -61,7 +61,7 @@ The following examples show multiple validation errors triggered on both the `Mo
 ```json
 
 {
-    "type": "https://github.com/retaildevcrews/helium/blob/main/docs/ParameterValidation.md#movies",
+    "type": "https://github.com/retaildevcrews/helium/blob/main/docs/ParameterValidation.md#movies-api",
     "title": "Parameter validation error",
     "status": 400,
     "detail": "One or more invalid parameters were specified.",
@@ -87,7 +87,7 @@ The following examples show multiple validation errors triggered on both the `Mo
 ```json
 
 {
-    "type": "https://github.com/retaildevcrews/helium/blob/main/docs/ParameterValidation.md#actors",
+    "type": "https://github.com/retaildevcrews/helium/blob/main/docs/ParameterValidation.md#actors-api",
     "title": "Parameter validation error",
     "status": 400,
     "detail": "One or more invalid parameters were specified.",
@@ -113,7 +113,7 @@ The following examples show multiple validation errors triggered on both the `Mo
 ```json
 
 {
-    "type": "https://github.com/retaildevcrews/helium/blob/main/docs/ParameterValidation.md#direct-read",
+    "type": "https://github.com/retaildevcrews/helium/blob/main/docs/ParameterValidation.md#movies-direct-read",
     "title": "Parameter validation error",
     "status": 400,
     "detail": "One or more invalid parameters were specified.",
@@ -123,6 +123,27 @@ The following examples show multiple validation errors triggered on both the `Mo
             "code": "InvalidValue",
             "target": "movieId",
             "message": "The parameter 'movieId' should start with 'tt' and be between 7 and 11 characters in total."
+        }
+    ]
+}
+
+```
+
+### Invalid `Actors` API Direct Read Response
+
+```json
+
+{
+    "type": "https://github.com/retaildevcrews/helium/blob/main/docs/ParameterValidation.md#actors-direct-read",
+    "title": "Parameter validation error",
+    "status": 400,
+    "detail": "One or more invalid parameters were specified.",
+    "instance": "/api/actors/nM0000206",
+    "validationErrors": [
+        {
+            "code": "InvalidValue",
+            "target": "actorId",
+            "message": "The parameter 'actorId' should start with 'nm' and be between 7 and 11 characters in total."
         }
     ]
 }
