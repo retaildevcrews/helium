@@ -398,14 +398,13 @@ kubectl label namespace default istio-injection=enabled
 
 ```
 
-Get the public IP of the Istio Ingress Gateway and set the application endpoint.
+Get the public IP of the Istio Ingress Gateway.
 
 ```bash
 
 export INGRESS_PIP=$(kubectl --namespace istio-system  get svc -l istio=ingressgateway -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
-export He_App_Endpoint=http://${INGRESS_PIP}.nip.io
 
-# save the cluster IP and endpoint variables
+# save the cluster IP
 cd $REPO_ROOT
 ./saveenv.sh -y
 
@@ -474,7 +473,7 @@ This file can now be given to the the helm install as an override to the default
 ```bash
 
 cd $REPO_ROOT/docs/aks/cluster/charts
-\
+
 # Option 1: Install Helium using the upstream helium-csharp image from Dockerhub
 helm install helium-aks helium -f ./helium/helm-config.yaml
 
@@ -489,7 +488,7 @@ helm install helium-aks helium \
 # check the version endpoint
 # you may get a timeout error, if so, just retry
 
-http ${He_App_Endpoint}/version
+http ${INGRESS_PIP}.nip.io/version
 
 ```
 
@@ -506,4 +505,4 @@ docker run -it --rm retaildevcrew/webvalidate --server $He_App_Endpoint --base-u
 
 ## Observability
 
-See [App Observability](../AppObservability.md) for details.
+This is a work in progress.

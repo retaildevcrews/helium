@@ -64,7 +64,7 @@ affinity: {}
 
 keyVaultName: ""
 
-hpa:
+autoscaling:
   enabled: true
   minReplicas: 1
   maxReplicas: 10

@@ -323,11 +323,6 @@
                           }
                         },
                         "disablePinning": true
-                      },
-                      "grouping": {
-                        "dimension": "cloud/roleInstance",
-                        "sort": 2,
-                        "top": 10
                       }
                     }
                   }
@@ -391,11 +386,6 @@
                           }
                         },
                         "disablePinning": true
-                      },
-                      "grouping": {
-                        "dimension": "cloud/roleInstance",
-                        "sort": 2,
-                        "top": 10
                       }
                     }
                   }

@@ -33,9 +33,6 @@ az webapp deployment source delete -g $He_App_RG -n $He_Name
 # this step usually takes 3-5 minutes
 az webapp deployment source config -g $He_App_RG -n $He_Name -u https://github.com/retaildevcrews/helium-csharp --branch main --manual-integration
 
-# set the app endpoint
-export He_App_Endpoint=https://${He_Name}.azurewebsites.net
-
 # save environment variables
 ./saveenv.sh -y
 
@@ -45,7 +42,7 @@ az webapp start -g $He_App_RG -n $He_Name
 # check the version endpoint
 # you may get a 403 or timeout error, if so, just retry
 
-http ${He_App_Endpoint}/version
+http https://${He_Name}.azurewebsites.net/version
 
 
 ```
@@ -57,10 +54,10 @@ Run the Validation Test
 ```bash
 
 # run the tests in a container
-docker run -it --rm retaildevcrew/webvalidate --server $He_App_Endpoint --base-url https://raw.githubusercontent.com/retaildevcrews/helium/main/TestFiles/ --files baseline.json
+docker run -it --rm retaildevcrew/webvalidate --server https://${He_Name}.azurewebsites.net --base-url https://raw.githubusercontent.com/retaildevcrews/helium/main/TestFiles/ --files baseline.json
 
 ```
 
 ## Observability
 
-See [App Observability](AppObservability.md) for details
+See [App Service Observability](AppServiceObservability.md) for details
