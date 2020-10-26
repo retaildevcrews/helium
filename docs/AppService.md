@@ -70,4 +70,4 @@ docker run -it --rm retaildevcrew/webvalidate --server https://${He_Name}.azurew
 
 ## Observability
 
-See [App Observability](AppServiceObservability.md) for details
+See [App Service Observability](AppServiceObservability.md) for details
