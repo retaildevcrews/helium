@@ -59,7 +59,7 @@ http https://${He_Name}.azurewebsites.net/version
 
 Run the Validation Test
 
-> For more information on the validation test tool, see [Web Validate](https://github.com/retaildevcrews/webvalidate)
+> For more information on the validation test tool, see [Web Validate](https://github.com/microsoft/webvalidate)
 
 ```bash
 
