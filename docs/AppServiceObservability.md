@@ -2,7 +2,7 @@
 
 ## Smoke Test setup
 
-Deploy [Web Validate](https://github.com/retaildevcrews/webvalidate) to drive consistent traffic to the App Service for monitoring and alerting. Use the `debug` image if you need to connect to the container to debug any latency or network issues.
+Deploy [Web Validate](https://github.com/microsoft/webvalidate) to drive consistent traffic to the App Service for monitoring and alerting. Use the `debug` image if you need to connect to the container to debug any latency or network issues.
 
 ```bash
 
