@@ -158,7 +158,7 @@ curl -s https://raw.githubusercontent.com/retaildevcrews/helium/main/docs/dashbo
 sed -i "s/%%SUBSCRIPTION_GUID%%/$(eval $He_Sub)/g" Helium_Dashboard.json
 sed -i "s/%%He_App_RG%%/${He_App_RG}/g" Helium_Dashboard.json
 sed -i "s/%%Imdb_RG%%/${Imdb_RG}/g" Helium_Dashboard.json
-sed -i "s/%%Imdb_NAME%%/${Imdb_Name}/g" Helium_Dashboard.json
+sed -i "s/%%Imdb_Name%%/${Imdb_Name}/g" Helium_Dashboard.json
 sed -i "s/%%He_Repo%%/${He_Name}/g" Helium_Dashboard.json
 
 ```

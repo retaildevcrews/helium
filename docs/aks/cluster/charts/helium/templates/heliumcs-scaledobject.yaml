@@ -1,0 +1,23 @@
+{{- if .Values.autoscaling.enabled -}}
+apiVersion: keda.k8s.io/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "helium.fullname" . }}-scaledobject
+  namespace: default
+  labels:
+    deploymentName: {{ include "helium.fullname" . }}
+spec:
+  scaleTargetRef:
+    deploymentName: {{ include "helium.fullname" . }}
+  pollingInterval: {{ .Values.autoscaling.pollingInterval }}
+  minReplicaCount: {{ .Values.autoscaling.minReplicas }}
+  maxReplicaCount: {{ .Values.autoscaling.maxReplicas }}
+  cooldownPeriod: {{ .Values.autoscaling.cooldownPeriod }}
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus.istio-system.svc.cluster.local:9090
+      metricName: {{ .Values.autoscaling.metricName }}
+      threshold: '{{ .Values.autoscaling.threshold }}'
+      query: sum(rate(istio_requests_total{pod_name=~"{{ include "helium.fullname" . }}.*"}[1m]))
+{{- end }}

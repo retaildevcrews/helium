@@ -25,6 +25,8 @@ spec:
         chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
         app.kubernetes.io/name: {{ include "helium.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+        app: {{ include "helium.name" . }}
+        version: {{ .Chart.AppVersion | replace "+" "_" }}
       {{- with .Values.annotations }}
       annotations:
 {{ toYaml . | indent 8 }}

@@ -318,7 +318,7 @@ export He_AcrPassword=$(az keyvault secret show --vault-name $He_Name --name "Ac
 
 - Instructions for [App Service (container)](docs/AppService.md)
 - Instructions for [App Service (dotnetcore)](docs/AppService-dotnetcore.md)
-- Instructions for [AKS](docs/aks/README.md#L233)
+- Instructions for [AKS](docs/aks/README.md#create-the-aks-cluster)
 
 ## Team Development
 

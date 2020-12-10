@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ include "helium.fullname" . }}-gateway
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    {{- with .Values.ingress.tls }}
+    tls:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    hosts: 
+    {{- range .Values.ingress.hosts }}
+      - {{ . | quote }}
+    {{- end }}
+    
