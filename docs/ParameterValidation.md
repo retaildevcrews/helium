@@ -45,7 +45,7 @@ The following API route uses these additional parameters:
 
 |   Name     |  Description                                |  Type    |  Valid Input                           |  Response Body                     |  Notes                  |
 |   ----     |  -----------                                |  ----    |  -----------                           |  -------------                     |  -----                  |
-|   year     |  Get movies by year                         |  integer |  between [1874, currentYear + 5]       |  Array of `Movie` or empty array   |  n/a                    |
+|   year     |  Get movies by year                         |  integer |  between [1874, 2025]       |  Array of `Movie` or empty array   |  n/a                    |
 |   rating   |  Filter by Movie.Rating >= rating           |  double  |  between [0.0, 10.0]                   |  Array of `Movie` or empty array   |  n/a                    |
 |   genre    |  Filter by Movie.Genre                      |  string  |  between [3, 20] characters            |  Array of `Movie` or empty array   |  n/a                    |
 |   actorId  |  Return a specific page from the results    |  string  |  starts with 'nm' + [5, 9] characters  |  Array of `Movie` or empty array   |  'nm' must be lowercase |
