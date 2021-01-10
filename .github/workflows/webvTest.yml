@@ -19,7 +19,7 @@ jobs:
       run: |
         dotnet tool install -g webvalidate
 
-    - name: bluebell
+    - name: baseline test
       run: |
         # run web validation test
         cd TestFiles
