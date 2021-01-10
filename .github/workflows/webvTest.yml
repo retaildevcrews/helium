@@ -19,20 +19,8 @@ jobs:
       run: |
         dotnet tool install -g webvalidate
 
-    - name: bluebell
+    - name: baseline test
       run: |
         # run web validation test
         cd TestFiles
-        webv -s bluebell -f baseline.json --max-errors 1
-
-    - name: gelato
-      run: |
-        # run web validation test
-        cd TestFiles
-        webv -s gelato -f baseline.json --max-errors 1
-
-    - name: sherbert
-      run: |
-        # run web validation test
-        cd TestFiles
-        webv -s sherbert -f baseline.json --max-errors 1
+        webv -s bluebell gelato sherbert -f baseline.json --max-errors 1
