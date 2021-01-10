@@ -1,6 +1,10 @@
 name: Load Test
 
 on:
+  push:
+    paths:
+    - '.github/workflows/perfTest.yml'
+
   schedule:
     # Run daily at 3:00 AM
     - cron: "0 3 * * *"
@@ -18,23 +22,14 @@ jobs:
       run: |
         dotnet tool install -g webvalidate
 
-    - name: bluebell
+    - name: run baseline test
       run: |
-        # run web validation test
-        # 10 req/sec for 5 minutes
         cd TestFiles
-        webv -s bluebell -f benchmark.json -r -l 100 --duration 300
+        webv -s bluebell gelato sherbert -f baseline.json
 
-    - name: gelato
+    - name: run validation test
       run: |
         # run web validation test
         # 10 req/sec for 5 minutes
         cd TestFiles
-        webv -s gelato -f benchmark.json -r -l 100 --duration 300
-
-    - name: sherbert
-      run: |
-        # run web validation test
-        # 10 req/sec for 5 minutes
-        cd TestFiles
-        webv -s sherbert -f benchmark.json -r -l 100 --duration 300
+        webv -s bluebell gelato sherbert -f benchmark.json -r -l 100 --duration 300
