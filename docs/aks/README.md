@@ -301,7 +301,7 @@ Add the required helm repositories
 
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
-helm repo add kedacore https://kedacore.github.io/charts  
+helm repo add kedacore https://kedacore.github.io/charts
 helm repo update
 
 ```
@@ -494,7 +494,7 @@ http ${INGRESS_PIP}.nip.io/version
 
 Run the Validation Test
 
-> For more information on the validation test tool, see [Web Validate](https://github.com/retaildevcrews/webvalidate)
+> For more information on the validation test tool, see [Web Validate](https://github.com/microsoft/webvalidate)
 
 ```bash
 
